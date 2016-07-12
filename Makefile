@@ -1,5 +1,8 @@
 PACKAGE_PATH="github.com/synrobo/proto/pkg/"
 
+deps:
+	go get -u github.com/square/goprotowrap/cmd/protowrap
+
 gengo:
 	protowrap -I $$(pwd)/src/ \
 		--proto_path $$(pwd)/src \
