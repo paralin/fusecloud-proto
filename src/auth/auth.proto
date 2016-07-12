@@ -1,10 +1,14 @@
 syntax = "proto3";
 package auth;
 
+/*
+  User: a standard user with username, email, password
+*/
 message User {
   string username = 1;
   string password = 2;
   UserMetadata meta = 3;
+  // certificates, latest at index 0
   repeated UserCert cert = 4;
 
   message UserMetadata {
@@ -18,6 +22,11 @@ message User {
   }
 }
 
+/*
+  AuthWithPassword: auth attempt with password
+  where sha256() returns lowercase, 64 char hex string
+  Password is: sha256(timestamp + sha256(sha256(username) + plaintext password))
+*/
 message AuthWithPassword {
   string username = 1;
   string password = 2;
