@@ -1,6 +1,12 @@
 syntax = "proto3";
 package auth;
 
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.marshaler_all) = true;
+
 /*
   User: a standard user with username, email, password
 */

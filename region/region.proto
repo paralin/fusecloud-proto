@@ -1,0 +1,34 @@
+syntax = "proto3";
+package region;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/common/common.proto";
+
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+
+/*
+  Region: a self contained, isolated, installation with IP ranges.
+*/
+message Region {
+  // slug / ID
+  string id = 1;
+  // Human readable name
+  string name = 2;
+
+  // IP range for devices
+  common.IPRange ip_range = 3;
+
+  // State
+  RegionState state = 4;
+
+  // Keyspace name
+  string keyspace = 5;
+
+  message RegionState {
+    bool keyspace_created = 1;
+    bool consul_inited = 2;
+    bool ip_range_verified = 3;
+  }
+}
