@@ -10,6 +10,7 @@
 
 	It has these top-level messages:
 		IPRange
+		CertChain
 */
 package common
 
@@ -42,8 +43,20 @@ func (m *IPRange) String() string            { return proto.CompactTextString(m)
 func (*IPRange) ProtoMessage()               {}
 func (*IPRange) Descriptor() ([]byte, []int) { return fileDescriptorCommon, []int{0} }
 
+// Certificate chain
+type CertChain struct {
+	// Cert chain, idx 0 should be last cert.
+	Cert []string `protobuf:"bytes,1,rep,name=cert" json:"cert,omitempty"`
+}
+
+func (m *CertChain) Reset()                    { *m = CertChain{} }
+func (m *CertChain) String() string            { return proto.CompactTextString(m) }
+func (*CertChain) ProtoMessage()               {}
+func (*CertChain) Descriptor() ([]byte, []int) { return fileDescriptorCommon, []int{1} }
+
 func init() {
 	proto.RegisterType((*IPRange)(nil), "common.IPRange")
+	proto.RegisterType((*CertChain)(nil), "common.CertChain")
 }
 func (m *IPRange) Marshal() (data []byte, err error) {
 	size := m.Size()
@@ -81,6 +94,39 @@ func (m *IPRange) MarshalTo(data []byte) (int, error) {
 		data[i] = 0x10
 		i++
 		i = encodeVarintCommon(data, i, uint64(m.Plen))
+	}
+	return i, nil
+}
+
+func (m *CertChain) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *CertChain) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Cert) > 0 {
+		for _, s := range m.Cert {
+			data[i] = 0xa
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
 	}
 	return i, nil
 }
@@ -124,6 +170,18 @@ func (m *IPRange) Size() (n int) {
 	}
 	if m.Plen != 0 {
 		n += 1 + sovCommon(uint64(m.Plen))
+	}
+	return n
+}
+
+func (m *CertChain) Size() (n int) {
+	var l int
+	_ = l
+	if len(m.Cert) > 0 {
+		for _, s := range m.Cert {
+			l = len(s)
+			n += 1 + l + sovCommon(uint64(l))
+		}
 	}
 	return n
 }
@@ -272,6 +330,85 @@ func (m *IPRange) Unmarshal(data []byte) error {
 	}
 	return nil
 }
+func (m *CertChain) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowCommon
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CertChain: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CertChain: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cert", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthCommon
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Cert = append(m.Cert, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipCommon(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthCommon
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipCommon(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
@@ -378,7 +515,7 @@ var (
 )
 
 var fileDescriptorCommon = []byte{
-	// 146 bytes of a gzipped FileDescriptorProto
+	// 169 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xd2, 0x49, 0xcf, 0x2c, 0xc9,
 	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0xae, 0xcc, 0x2b, 0xca, 0x4f, 0xca, 0xd7, 0x2f,
 	0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x07, 0x8a, 0xe4, 0xe6, 0xe7, 0x41, 0x29, 0x3d, 0xb0, 0x98, 0x10,
@@ -386,7 +523,8 @@ var fileDescriptorCommon = []byte{
 	0x83, 0xe8, 0x07, 0xb1, 0x20, 0xda, 0x94, 0x0c, 0xb9, 0xd8, 0x3d, 0x03, 0x82, 0x12, 0xf3, 0xd2,
 	0x53, 0x85, 0x84, 0xb8, 0x98, 0x32, 0x0b, 0x24, 0x18, 0x15, 0x98, 0x35, 0x78, 0x9d, 0x98, 0x04,
 	0x18, 0x83, 0x80, 0x3c, 0xa0, 0x18, 0x4b, 0x41, 0x4e, 0x6a, 0x9e, 0x04, 0x93, 0x02, 0xa3, 0x06,
-	0x6f, 0x10, 0x98, 0xed, 0xc4, 0x73, 0xe2, 0x91, 0x1c, 0xe3, 0x05, 0x20, 0x7e, 0x00, 0xc4, 0x49,
-	0x6c, 0x60, 0x73, 0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0xba, 0x40, 0x7d, 0x7d, 0xae, 0x00,
-	0x00, 0x00,
+	0x6f, 0x10, 0x98, 0xad, 0x24, 0xcf, 0xc5, 0xe9, 0x9c, 0x5a, 0x54, 0xe2, 0x9c, 0x91, 0x98, 0x99,
+	0x07, 0x52, 0x90, 0x0c, 0xe4, 0x80, 0xb5, 0x71, 0x06, 0x81, 0xd9, 0x4e, 0x3c, 0x27, 0x1e, 0xc9,
+	0x31, 0x5e, 0x00, 0xe2, 0x07, 0x40, 0x9c, 0xc4, 0x06, 0xb6, 0xc8, 0x18, 0x10, 0x00, 0x00, 0xff,
+	0xff, 0xd0, 0x8c, 0xc5, 0xcd, 0xcf, 0x00, 0x00, 0x00,
 }

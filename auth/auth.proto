@@ -2,6 +2,7 @@ syntax = "proto3";
 package auth;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/common/common.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;
@@ -23,7 +24,7 @@ message User {
   }
 
   message UserCert {
-    string cert = 1;
+    common.CertChain chain = 1;
     string pkey = 2;
   }
 }

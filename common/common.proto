@@ -14,3 +14,9 @@ message IPRange {
   // Prefix length: 0->32
   uint32 plen = 2;
 }
+
+/* Certificate chain */
+message CertChain {
+  // Cert chain, idx 0 should be last cert.
+  repeated string cert = 1;
+}
