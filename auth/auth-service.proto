@@ -3,7 +3,6 @@ package auth;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/synrobo/proto/auth/auth.proto";
-import "github.com/synrobo/proto/common/common.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;

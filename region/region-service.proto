@@ -2,7 +2,6 @@ syntax = "proto3";
 package region;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "github.com/synrobo/proto/common/common.proto";
 import "github.com/synrobo/proto/identify/identify.proto";
 import "github.com/synrobo/proto/region/region.proto";
 
@@ -18,6 +17,15 @@ message ListRegionsResponse {
   repeated Region region = 1;
 }
 
+message CreateRegionRequest {
+  Region region = 1;
+}
+
+message CreateRegionResponse {
+  Region created_region = 1;
+}
+
 service RegionService {
   rpc ListRegions(ListRegionsRequest) returns (ListRegionsResponse);
+  rpc CreateRegion(CreateRegionRequest) returns (CreateRegionResponse);
 }
