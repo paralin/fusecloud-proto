@@ -20,14 +20,9 @@ message AuthWithPasswordRequest {
   int32 timestamp = 3;
 }
 
-message AuthWithPasswordSuccess {
+message AuthWithPasswordResponse {
   User.UserCert cert = 1;
   User.UserMetadata meta = 2;
-}
-
-message AuthWithPasswordResponse {
-  bool success = 1;
-  AuthWithPasswordSuccess data = 2;
 }
 
 service AuthService {
