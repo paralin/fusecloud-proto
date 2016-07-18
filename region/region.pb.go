@@ -2,15 +2,6 @@
 // source: github.com/synrobo/proto/region/region.proto
 // DO NOT EDIT!
 
-/*
-	Package region is a generated protocol buffer package.
-
-	It is generated from these files:
-		github.com/synrobo/proto/region/region.proto
-
-	It has these top-level messages:
-		Region
-*/
 package region
 
 import proto "github.com/gogo/protobuf/proto"
@@ -26,12 +17,8 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-const _ = proto.GoGoProtoPackageIsVersion1
-
 //
-// Region: a self contained, isolated, installation with IP ranges.
+// Get all regions
 type Region struct {
 	// slug / ID
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`

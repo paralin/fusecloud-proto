@@ -9,7 +9,7 @@ option (gogoproto.marshaler_all) = true;
 option (gogoproto.sizer_all) = true;
 
 /*
-  Region: a self contained, isolated, installation with IP ranges.
+  Get all regions
 */
 message Region {
   // slug / ID

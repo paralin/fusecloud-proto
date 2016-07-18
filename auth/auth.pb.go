@@ -2,17 +2,6 @@
 // source: github.com/synrobo/proto/auth/auth.proto
 // DO NOT EDIT!
 
-/*
-	Package auth is a generated protocol buffer package.
-
-	It is generated from these files:
-		github.com/synrobo/proto/auth/auth.proto
-
-	It has these top-level messages:
-		User
-		AuthWithPassword
-		AuthWithPasswordSuccess
-*/
 package auth
 
 import proto "github.com/gogo/protobuf/proto"
@@ -27,10 +16,6 @@ import io "io"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-const _ = proto.GoGoProtoPackageIsVersion1
 
 //
 // User: a standard user with username, email, password
@@ -88,51 +73,10 @@ func (m *User_UserCert) GetChain() *common.CertChain {
 	return nil
 }
 
-//
-// AuthWithPassword: auth attempt with password
-// where sha256() returns lowercase, 64 char hex string
-// Password is: sha256(timestamp + sha256(sha256(username) + plaintext password))
-type AuthWithPassword struct {
-	Username  string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	Password  string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Timestamp int32  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-}
-
-func (m *AuthWithPassword) Reset()                    { *m = AuthWithPassword{} }
-func (m *AuthWithPassword) String() string            { return proto.CompactTextString(m) }
-func (*AuthWithPassword) ProtoMessage()               {}
-func (*AuthWithPassword) Descriptor() ([]byte, []int) { return fileDescriptorAuth, []int{1} }
-
-type AuthWithPasswordSuccess struct {
-	Cert *User_UserCert     `protobuf:"bytes,1,opt,name=cert" json:"cert,omitempty"`
-	Meta *User_UserMetadata `protobuf:"bytes,2,opt,name=meta" json:"meta,omitempty"`
-}
-
-func (m *AuthWithPasswordSuccess) Reset()                    { *m = AuthWithPasswordSuccess{} }
-func (m *AuthWithPasswordSuccess) String() string            { return proto.CompactTextString(m) }
-func (*AuthWithPasswordSuccess) ProtoMessage()               {}
-func (*AuthWithPasswordSuccess) Descriptor() ([]byte, []int) { return fileDescriptorAuth, []int{2} }
-
-func (m *AuthWithPasswordSuccess) GetCert() *User_UserCert {
-	if m != nil {
-		return m.Cert
-	}
-	return nil
-}
-
-func (m *AuthWithPasswordSuccess) GetMeta() *User_UserMetadata {
-	if m != nil {
-		return m.Meta
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*User)(nil), "auth.User")
 	proto.RegisterType((*User_UserMetadata)(nil), "auth.User.UserMetadata")
 	proto.RegisterType((*User_UserCert)(nil), "auth.User.UserCert")
-	proto.RegisterType((*AuthWithPassword)(nil), "auth.AuthWithPassword")
-	proto.RegisterType((*AuthWithPasswordSuccess)(nil), "auth.AuthWithPasswordSuccess")
 }
 func (m *User) Marshal() (data []byte, err error) {
 	size := m.Size()
@@ -250,79 +194,6 @@ func (m *User_UserCert) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
-func (m *AuthWithPassword) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *AuthWithPassword) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Username) > 0 {
-		data[i] = 0xa
-		i++
-		i = encodeVarintAuth(data, i, uint64(len(m.Username)))
-		i += copy(data[i:], m.Username)
-	}
-	if len(m.Password) > 0 {
-		data[i] = 0x12
-		i++
-		i = encodeVarintAuth(data, i, uint64(len(m.Password)))
-		i += copy(data[i:], m.Password)
-	}
-	if m.Timestamp != 0 {
-		data[i] = 0x18
-		i++
-		i = encodeVarintAuth(data, i, uint64(m.Timestamp))
-	}
-	return i, nil
-}
-
-func (m *AuthWithPasswordSuccess) Marshal() (data []byte, err error) {
-	size := m.Size()
-	data = make([]byte, size)
-	n, err := m.MarshalTo(data)
-	if err != nil {
-		return nil, err
-	}
-	return data[:n], nil
-}
-
-func (m *AuthWithPasswordSuccess) MarshalTo(data []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Cert != nil {
-		data[i] = 0xa
-		i++
-		i = encodeVarintAuth(data, i, uint64(m.Cert.Size()))
-		n3, err := m.Cert.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	if m.Meta != nil {
-		data[i] = 0x12
-		i++
-		i = encodeVarintAuth(data, i, uint64(m.Meta.Size()))
-		n4, err := m.Meta.MarshalTo(data[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
-	}
-	return i, nil
-}
-
 func encodeFixed64Auth(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	data[offset+1] = uint8(v >> 8)
@@ -397,37 +268,6 @@ func (m *User_UserCert) Size() (n int) {
 	}
 	l = len(m.Pkey)
 	if l > 0 {
-		n += 1 + l + sovAuth(uint64(l))
-	}
-	return n
-}
-
-func (m *AuthWithPassword) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Username)
-	if l > 0 {
-		n += 1 + l + sovAuth(uint64(l))
-	}
-	l = len(m.Password)
-	if l > 0 {
-		n += 1 + l + sovAuth(uint64(l))
-	}
-	if m.Timestamp != 0 {
-		n += 1 + sovAuth(uint64(m.Timestamp))
-	}
-	return n
-}
-
-func (m *AuthWithPasswordSuccess) Size() (n int) {
-	var l int
-	_ = l
-	if m.Cert != nil {
-		l = m.Cert.Size()
-		n += 1 + l + sovAuth(uint64(l))
-	}
-	if m.Meta != nil {
-		l = m.Meta.Size()
 		n += 1 + l + sovAuth(uint64(l))
 	}
 	return n
@@ -838,249 +678,6 @@ func (m *User_UserCert) Unmarshal(data []byte) error {
 	}
 	return nil
 }
-func (m *AuthWithPassword) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowAuth
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AuthWithPassword: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AuthWithPassword: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Username", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthAuth
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Username = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Password", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthAuth
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Password = string(data[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			m.Timestamp = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				m.Timestamp |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipAuth(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthAuth
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AuthWithPasswordSuccess) Unmarshal(data []byte) error {
-	l := len(data)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowAuth
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := data[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AuthWithPasswordSuccess: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AuthWithPasswordSuccess: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cert", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthAuth
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Cert == nil {
-				m.Cert = &User_UserCert{}
-			}
-			if err := m.Cert.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowAuth
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthAuth
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Meta == nil {
-				m.Meta = &User_UserMetadata{}
-			}
-			if err := m.Meta.Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipAuth(data[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthAuth
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
 func skipAuth(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
@@ -1187,27 +784,23 @@ var (
 )
 
 var fileDescriptorAuth = []byte{
-	// 337 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x9c, 0x52, 0xc1, 0x4a, 0x03, 0x31,
-	0x10, 0xa5, 0x6d, 0x2a, 0xed, 0xb4, 0x07, 0x8d, 0x42, 0x97, 0x45, 0xa4, 0xf4, 0x62, 0x41, 0xdd,
-	0x42, 0xbd, 0x78, 0xd5, 0x1e, 0x3c, 0x09, 0xb2, 0x22, 0x9e, 0xb3, 0xdb, 0xd8, 0x5d, 0x34, 0x9b,
-	0x65, 0x93, 0x45, 0xfa, 0x25, 0xfe, 0x92, 0x47, 0x3f, 0x41, 0xfc, 0x12, 0x93, 0xc9, 0x76, 0x5d,
-	0x0a, 0x05, 0xf1, 0x90, 0x64, 0x66, 0xde, 0x9b, 0xc9, 0xcc, 0x4b, 0x60, 0xba, 0x4a, 0x75, 0x52,
-	0x46, 0x41, 0x2c, 0xc5, 0x4c, 0xad, 0xb3, 0x42, 0x46, 0x72, 0x96, 0x17, 0x52, 0xcb, 0x19, 0x2b,
-	0x75, 0x82, 0x5b, 0x80, 0x3e, 0x25, 0xd6, 0xf6, 0x2f, 0x1a, 0xfc, 0x95, 0x5c, 0x55, 0xe4, 0xa8,
-	0x7c, 0x46, 0xcf, 0x65, 0x5a, 0xcb, 0x25, 0xf9, 0xe7, 0x3b, 0xcb, 0x9b, 0x88, 0x90, 0x59, 0x75,
-	0x38, 0xf6, 0xe4, 0xbd, 0x0d, 0xe4, 0x51, 0xf1, 0x82, 0xfa, 0xd0, 0x2b, 0xcd, 0x99, 0x31, 0xc1,
-	0xbd, 0xd6, 0xb8, 0x35, 0xed, 0x87, 0xb5, 0x6f, 0xb1, 0x9c, 0x29, 0xf5, 0x26, 0x8b, 0xa5, 0xd7,
-	0x76, 0xd8, 0xc6, 0xa7, 0x67, 0x40, 0x04, 0xd7, 0xcc, 0xeb, 0x98, 0xf8, 0x60, 0x3e, 0x0a, 0xb0,
-	0x7d, 0x5b, 0x11, 0xb7, 0x3b, 0x03, 0x2d, 0x99, 0x66, 0x21, 0x92, 0xe8, 0x29, 0x90, 0x98, 0x17,
-	0xda, 0x23, 0xe3, 0x8e, 0x21, 0x1f, 0x6e, 0x91, 0x17, 0x06, 0x0a, 0x91, 0xe0, 0x5f, 0xc1, 0xb0,
-	0x99, 0x4e, 0x29, 0x90, 0x46, 0x67, 0x68, 0xd3, 0x23, 0xe8, 0x72, 0xc1, 0xd2, 0xd7, 0xaa, 0x25,
-	0xe7, 0xf8, 0xb7, 0xd0, 0xdb, 0xd4, 0x32, 0xd7, 0x75, 0xe3, 0x84, 0xa5, 0x19, 0xa6, 0x0d, 0xe6,
-	0x07, 0x41, 0x35, 0xba, 0x05, 0x17, 0x16, 0x08, 0x1d, 0x6e, 0xcb, 0xe7, 0x2f, 0x7c, 0x5d, 0x55,
-	0x42, 0x7b, 0x92, 0xc0, 0xfe, 0xb5, 0x69, 0xef, 0xc9, 0xa8, 0x79, 0xbf, 0x19, 0xf6, 0xbf, 0x22,
-	0x1d, 0x43, 0x5f, 0xa7, 0x82, 0x2b, 0xcd, 0x44, 0x8e, 0x4a, 0x75, 0xc3, 0xdf, 0xc0, 0x44, 0xc2,
-	0x68, 0xfb, 0xa6, 0x87, 0x32, 0x8e, 0xb9, 0x52, 0xb5, 0x60, 0x6e, 0x80, 0xdd, 0x82, 0xd5, 0xcf,
-	0xd0, 0xfe, 0xc3, 0x33, 0xdc, 0x0c, 0x3f, 0xbe, 0x4f, 0x5a, 0x9f, 0x66, 0x7d, 0x99, 0x15, 0xed,
-	0xe1, 0x4f, 0xb8, 0xfc, 0x09, 0x00, 0x00, 0xff, 0xff, 0x83, 0x21, 0x9f, 0x8a, 0x98, 0x02, 0x00,
-	0x00,
+	// 279 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xd2, 0x48, 0xcf, 0x2c, 0xc9,
+	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0xae, 0xcc, 0x2b, 0xca, 0x4f, 0xca, 0xd7, 0x2f,
+	0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x4f, 0x2c, 0x2d, 0xc9, 0x00, 0x13, 0x7a, 0x60, 0xbe, 0x10, 0x0b,
+	0x88, 0x2d, 0xa5, 0x8b, 0xa4, 0x3e, 0x3d, 0x3f, 0x1d, 0xaa, 0x38, 0xa9, 0x34, 0x0d, 0xcc, 0x83,
+	0xe8, 0x04, 0xb1, 0x20, 0x9a, 0xa4, 0x74, 0x70, 0x1a, 0x0f, 0x14, 0xc9, 0xcd, 0xcf, 0x83, 0x52,
+	0x10, 0xd5, 0x4a, 0xd3, 0x99, 0xb8, 0x58, 0x42, 0x8b, 0x53, 0x8b, 0x84, 0xa4, 0xb8, 0x38, 0x4a,
+	0x81, 0x74, 0x5e, 0x62, 0x6e, 0xaa, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x9c, 0x0f, 0x92,
+	0x2b, 0x48, 0x2c, 0x2e, 0x2e, 0xcf, 0x2f, 0x4a, 0x91, 0x60, 0x82, 0xc8, 0xc1, 0xf8, 0x42, 0xda,
+	0x5c, 0x2c, 0xb9, 0xa9, 0x25, 0x89, 0x12, 0xcc, 0x40, 0x71, 0x6e, 0x23, 0x71, 0x3d, 0xb0, 0xf3,
+	0x41, 0x26, 0x82, 0x09, 0x5f, 0xa0, 0x54, 0x4a, 0x62, 0x49, 0x62, 0x10, 0x58, 0x91, 0x90, 0x3a,
+	0x17, 0x4b, 0x72, 0x6a, 0x51, 0x89, 0x04, 0x8b, 0x02, 0x33, 0x50, 0xb1, 0x30, 0x9a, 0x62, 0x67,
+	0xa0, 0x54, 0x10, 0x58, 0x81, 0x94, 0x05, 0x17, 0x0f, 0xb2, 0x76, 0x21, 0x21, 0x2e, 0x16, 0x24,
+	0x97, 0x81, 0xd9, 0x42, 0x22, 0x5c, 0xac, 0xa9, 0xb9, 0x89, 0x99, 0x39, 0x50, 0x27, 0x41, 0x38,
+	0x52, 0xee, 0x5c, 0x1c, 0x30, 0xb3, 0x80, 0xd6, 0xb1, 0x26, 0x67, 0x24, 0x66, 0xe6, 0x81, 0xb5,
+	0x71, 0x1b, 0x09, 0xea, 0x41, 0xbd, 0x0e, 0x92, 0x74, 0x06, 0x49, 0x04, 0x41, 0xe4, 0x41, 0xc6,
+	0x17, 0x64, 0xa7, 0x56, 0x42, 0x4d, 0x02, 0xb3, 0x9d, 0x78, 0x4e, 0x3c, 0x92, 0x63, 0xbc, 0x00,
+	0xc4, 0x0f, 0x80, 0x38, 0x89, 0x0d, 0x1c, 0x5c, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x87,
+	0x6c, 0x71, 0xfc, 0xbd, 0x01, 0x00, 0x00,
 }

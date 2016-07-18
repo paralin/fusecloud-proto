@@ -28,19 +28,3 @@ message User {
     string pkey = 2;
   }
 }
-
-/*
-  AuthWithPassword: auth attempt with password
-  where sha256() returns lowercase, 64 char hex string
-  Password is: sha256(timestamp + sha256(sha256(username) + plaintext password))
-*/
-message AuthWithPassword {
-  string username = 1;
-  string password = 2;
-  int32 timestamp = 3;
-}
-
-message AuthWithPasswordSuccess {
-  User.UserCert cert = 1;
-  User.UserMetadata meta = 2;
-}

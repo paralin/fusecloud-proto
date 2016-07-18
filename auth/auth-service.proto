@@ -1,0 +1,35 @@
+syntax = "proto3";
+package auth;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/auth/auth.proto";
+import "github.com/synrobo/proto/common/common.proto";
+
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.marshaler_all) = true;
+
+/*
+  AuthWithPassword: auth attempt with password
+  where sha256() returns lowercase, 64 char hex string
+  Password is: sha256(timestamp + sha256(sha256(username) + plaintext password))
+*/
+message AuthWithPasswordRequest {
+  string username = 1;
+  string password = 2;
+  int32 timestamp = 3;
+}
+
+message AuthWithPasswordSuccess {
+  User.UserCert cert = 1;
+  User.UserMetadata meta = 2;
+}
+
+message AuthWithPasswordResponse {
+  bool success = 1;
+  AuthWithPasswordSuccess data = 2;
+}
+
+service AuthService {
+  rpc AuthWithPassword(AuthWithPasswordRequest) returns (AuthWithPasswordResponse);
+}
