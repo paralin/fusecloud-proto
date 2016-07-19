@@ -1,0 +1,27 @@
+syntax = "proto3";
+package device;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.marshaler_all) = true;
+
+/* Device: a full-linux computer running consul, docker stack */
+message Device {
+  string hostname = 1;
+  string region = 2;
+
+  DeviceConsulSettings consul_settings = 3;
+  DeviceNetworkSettings network_settings = 4;
+
+  message DeviceConsulSettings {
+    bool is_server = 1;
+    bool prevent_bootstrap = 2;
+  }
+
+  message DeviceNetworkSettings {
+    // ip x 4 = ip address
+    repeated int32 ip = 1;
+  }
+}
