@@ -1,0 +1,33 @@
+syntax = "proto3";
+package device;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/identify/identify.proto";
+import "github.com/synrobo/proto/device/device.proto";
+
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+
+message ListDevicesRequest {
+  identify.Identify identify = 1;
+  string region = 2;
+}
+
+message ListDevicesResponse {
+  repeated Device device = 1;
+}
+
+message CreateDeviceRequest {
+  identify.Identify identify = 1;
+  Device device = 2;
+}
+
+message CreateDeviceResponse {
+  Device created_device = 1;
+}
+
+service GlobalDeviceService {
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+  rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
+}

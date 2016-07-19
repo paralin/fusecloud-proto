@@ -2,15 +2,6 @@
 // source: github.com/synrobo/proto/device/device.proto
 // DO NOT EDIT!
 
-/*
-	Package device is a generated protocol buffer package.
-
-	It is generated from these files:
-		github.com/synrobo/proto/device/device.proto
-
-	It has these top-level messages:
-		Device
-*/
 package device
 
 import proto "github.com/gogo/protobuf/proto"
@@ -24,10 +15,6 @@ import io "io"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-const _ = proto.GoGoProtoPackageIsVersion1
 
 // Device: a full-linux computer running consul, docker stack
 type Device struct {
