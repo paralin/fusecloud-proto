@@ -8,6 +8,7 @@ import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
+import common "github.com/synrobo/proto/common"
 
 import io "io"
 
@@ -22,6 +23,8 @@ type Device struct {
 	Region          string                        `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 	ConsulSettings  *Device_DeviceConsulSettings  `protobuf:"bytes,3,opt,name=consul_settings,json=consulSettings" json:"consul_settings,omitempty"`
 	NetworkSettings *Device_DeviceNetworkSettings `protobuf:"bytes,4,opt,name=network_settings,json=networkSettings" json:"network_settings,omitempty"`
+	SetupState      *Device_DeviceSetupState      `protobuf:"bytes,5,opt,name=setup_state,json=setupState" json:"setup_state,omitempty"`
+	Identity        *Device_DeviceIdentity        `protobuf:"bytes,6,opt,name=identity" json:"identity,omitempty"`
 }
 
 func (m *Device) Reset()                    { *m = Device{} }
@@ -39,6 +42,20 @@ func (m *Device) GetConsulSettings() *Device_DeviceConsulSettings {
 func (m *Device) GetNetworkSettings() *Device_DeviceNetworkSettings {
 	if m != nil {
 		return m.NetworkSettings
+	}
+	return nil
+}
+
+func (m *Device) GetSetupState() *Device_DeviceSetupState {
+	if m != nil {
+		return m.SetupState
+	}
+	return nil
+}
+
+func (m *Device) GetIdentity() *Device_DeviceIdentity {
+	if m != nil {
+		return m.Identity
 	}
 	return nil
 }
@@ -67,10 +84,40 @@ func (*Device_DeviceNetworkSettings) Descriptor() ([]byte, []int) {
 	return fileDescriptorDevice, []int{0, 1}
 }
 
+type Device_DeviceSetupState struct {
+	IdentityInited           bool `protobuf:"varint,1,opt,name=identity_inited,json=identityInited,proto3" json:"identity_inited,omitempty"`
+	ConsulServerBootstrapped bool `protobuf:"varint,2,opt,name=consul_server_bootstrapped,json=consulServerBootstrapped,proto3" json:"consul_server_bootstrapped,omitempty"`
+}
+
+func (m *Device_DeviceSetupState) Reset()                    { *m = Device_DeviceSetupState{} }
+func (m *Device_DeviceSetupState) String() string            { return proto.CompactTextString(m) }
+func (*Device_DeviceSetupState) ProtoMessage()               {}
+func (*Device_DeviceSetupState) Descriptor() ([]byte, []int) { return fileDescriptorDevice, []int{0, 2} }
+
+type Device_DeviceIdentity struct {
+	Pkey string `protobuf:"bytes,1,opt,name=pkey,proto3" json:"pkey,omitempty"`
+	// Generated certs, latest is first
+	Chain []*common.CertChain `protobuf:"bytes,2,rep,name=chain" json:"chain,omitempty"`
+}
+
+func (m *Device_DeviceIdentity) Reset()                    { *m = Device_DeviceIdentity{} }
+func (m *Device_DeviceIdentity) String() string            { return proto.CompactTextString(m) }
+func (*Device_DeviceIdentity) ProtoMessage()               {}
+func (*Device_DeviceIdentity) Descriptor() ([]byte, []int) { return fileDescriptorDevice, []int{0, 3} }
+
+func (m *Device_DeviceIdentity) GetChain() []*common.CertChain {
+	if m != nil {
+		return m.Chain
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Device)(nil), "device.Device")
 	proto.RegisterType((*Device_DeviceConsulSettings)(nil), "device.Device.DeviceConsulSettings")
 	proto.RegisterType((*Device_DeviceNetworkSettings)(nil), "device.Device.DeviceNetworkSettings")
+	proto.RegisterType((*Device_DeviceSetupState)(nil), "device.Device.DeviceSetupState")
+	proto.RegisterType((*Device_DeviceIdentity)(nil), "device.Device.DeviceIdentity")
 }
 func (m *Device) Marshal() (data []byte, err error) {
 	size := m.Size()
@@ -118,6 +165,26 @@ func (m *Device) MarshalTo(data []byte) (int, error) {
 			return 0, err
 		}
 		i += n2
+	}
+	if m.SetupState != nil {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintDevice(data, i, uint64(m.SetupState.Size()))
+		n3, err := m.SetupState.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
+	}
+	if m.Identity != nil {
+		data[i] = 0x32
+		i++
+		i = encodeVarintDevice(data, i, uint64(m.Identity.Size()))
+		n4, err := m.Identity.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
 	}
 	return i, nil
 }
@@ -185,6 +252,80 @@ func (m *Device_DeviceNetworkSettings) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
+func (m *Device_DeviceSetupState) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *Device_DeviceSetupState) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.IdentityInited {
+		data[i] = 0x8
+		i++
+		if m.IdentityInited {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	if m.ConsulServerBootstrapped {
+		data[i] = 0x10
+		i++
+		if m.ConsulServerBootstrapped {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	return i, nil
+}
+
+func (m *Device_DeviceIdentity) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *Device_DeviceIdentity) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Pkey) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintDevice(data, i, uint64(len(m.Pkey)))
+		i += copy(data[i:], m.Pkey)
+	}
+	if len(m.Chain) > 0 {
+		for _, msg := range m.Chain {
+			data[i] = 0x12
+			i++
+			i = encodeVarintDevice(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
 func encodeFixed64Device(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	data[offset+1] = uint8(v >> 8)
@@ -231,6 +372,14 @@ func (m *Device) Size() (n int) {
 		l = m.NetworkSettings.Size()
 		n += 1 + l + sovDevice(uint64(l))
 	}
+	if m.SetupState != nil {
+		l = m.SetupState.Size()
+		n += 1 + l + sovDevice(uint64(l))
+	}
+	if m.Identity != nil {
+		l = m.Identity.Size()
+		n += 1 + l + sovDevice(uint64(l))
+	}
 	return n
 }
 
@@ -252,6 +401,34 @@ func (m *Device_DeviceNetworkSettings) Size() (n int) {
 	if len(m.Ip) > 0 {
 		for _, e := range m.Ip {
 			n += 1 + sovDevice(uint64(e))
+		}
+	}
+	return n
+}
+
+func (m *Device_DeviceSetupState) Size() (n int) {
+	var l int
+	_ = l
+	if m.IdentityInited {
+		n += 2
+	}
+	if m.ConsulServerBootstrapped {
+		n += 2
+	}
+	return n
+}
+
+func (m *Device_DeviceIdentity) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Pkey)
+	if l > 0 {
+		n += 1 + l + sovDevice(uint64(l))
+	}
+	if len(m.Chain) > 0 {
+		for _, e := range m.Chain {
+			l = e.Size()
+			n += 1 + l + sovDevice(uint64(l))
 		}
 	}
 	return n
@@ -420,6 +597,72 @@ func (m *Device) Unmarshal(data []byte) error {
 				m.NetworkSettings = &Device_DeviceNetworkSettings{}
 			}
 			if err := m.NetworkSettings.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SetupState", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SetupState == nil {
+				m.SetupState = &Device_DeviceSetupState{}
+			}
+			if err := m.SetupState.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Identity", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Identity == nil {
+				m.Identity = &Device_DeviceIdentity{}
+			}
+			if err := m.Identity.Unmarshal(data[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -604,6 +847,206 @@ func (m *Device_DeviceNetworkSettings) Unmarshal(data []byte) error {
 	}
 	return nil
 }
+func (m *Device_DeviceSetupState) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeviceSetupState: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeviceSetupState: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IdentityInited", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.IdentityInited = bool(v != 0)
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ConsulServerBootstrapped", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ConsulServerBootstrapped = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDevice(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Device_DeviceIdentity) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeviceIdentity: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeviceIdentity: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pkey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Pkey = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Chain", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Chain = append(m.Chain, &common.CertChain{})
+			if err := m.Chain[len(m.Chain)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDevice(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipDevice(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
@@ -710,24 +1153,33 @@ var (
 )
 
 var fileDescriptorDevice = []byte{
-	// 294 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x6c, 0x50, 0xe1, 0x4a, 0xc3, 0x30,
-	0x10, 0xa6, 0x9d, 0x96, 0xee, 0x94, 0x6d, 0x06, 0x95, 0x52, 0x41, 0x44, 0x05, 0x07, 0x6a, 0x0b,
-	0xfa, 0x06, 0x73, 0x3f, 0x45, 0xa1, 0x7b, 0x80, 0xb9, 0xd6, 0x98, 0x05, 0x5d, 0xae, 0x24, 0x69,
-	0xc5, 0x37, 0xf4, 0xa7, 0x8f, 0x20, 0xfe, 0xf0, 0x39, 0x8c, 0x69, 0x9c, 0x1b, 0xf4, 0x47, 0xb8,
-	0xfb, 0xee, 0xbe, 0xef, 0xbb, 0xbb, 0xc0, 0x05, 0xe3, 0x7a, 0x5e, 0xe5, 0x49, 0x81, 0x8b, 0x54,
-	0xbd, 0x09, 0x89, 0x39, 0xa6, 0xa5, 0x44, 0x8d, 0xe9, 0x23, 0xad, 0x79, 0x41, 0x5d, 0x48, 0x6c,
-	0x8d, 0x04, 0x0d, 0x8a, 0x2f, 0x57, 0x54, 0x0c, 0x99, 0x93, 0xe4, 0xd5, 0x93, 0x45, 0x8d, 0xfe,
-	0x37, 0x6b, 0x64, 0xc7, 0xdf, 0x3e, 0x04, 0x63, 0xab, 0x24, 0x31, 0x84, 0x73, 0x54, 0x5a, 0xcc,
-	0x16, 0x34, 0xf2, 0x8e, 0xbc, 0x61, 0x37, 0x5b, 0x62, 0xb2, 0x0f, 0x81, 0xa4, 0x8c, 0xa3, 0x88,
-	0x7c, 0xdb, 0x71, 0x88, 0xdc, 0x42, 0xbf, 0x40, 0xa1, 0xaa, 0x97, 0xa9, 0xa2, 0x5a, 0x73, 0xc1,
-	0x54, 0xd4, 0x31, 0x84, 0xad, 0xab, 0x93, 0xc4, 0x6d, 0x37, 0x5e, 0x0d, 0x37, 0x96, 0x3b, 0x71,
-	0xd4, 0xac, 0x57, 0xac, 0x61, 0x72, 0x0f, 0x03, 0x41, 0xf5, 0x2b, 0xca, 0xe7, 0x7f, 0xbb, 0x0d,
-	0x6b, 0x77, 0xda, 0x6a, 0x77, 0xd7, 0x90, 0x97, 0x7e, 0x7d, 0xb1, 0x5e, 0x88, 0x1f, 0x60, 0xb7,
-	0x6d, 0x30, 0x39, 0x80, 0x2e, 0x57, 0x66, 0x86, 0xac, 0xa9, 0xb4, 0xb7, 0x86, 0x59, 0xc8, 0xd5,
-	0xc4, 0x62, 0x72, 0x0e, 0x3b, 0xa5, 0xa4, 0x35, 0x15, 0x7a, 0x9a, 0x23, 0x6a, 0xa5, 0xe5, 0xac,
-	0xb4, 0x67, 0x87, 0xd9, 0xc0, 0x35, 0x46, 0x7f, 0xf5, 0xf8, 0x0c, 0xf6, 0x5a, 0x77, 0x21, 0x3d,
-	0xf0, 0x79, 0x69, 0xbc, 0x3b, 0xc3, 0xcd, 0xcc, 0x64, 0xa3, 0xed, 0xf7, 0xaf, 0x43, 0xef, 0xc3,
-	0xbc, 0x4f, 0xf3, 0xf2, 0xc0, 0xfe, 0xfe, 0xf5, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7a, 0x4b,
-	0x7c, 0x95, 0xe4, 0x01, 0x00, 0x00,
+	// 440 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x74, 0x52, 0xdb, 0x8e, 0xd3, 0x30,
+	0x10, 0x55, 0xb7, 0x9b, 0x28, 0x3b, 0x8b, 0xd2, 0xae, 0x05, 0x28, 0x32, 0xe2, 0x22, 0x40, 0xda,
+	0x4a, 0x40, 0x2a, 0xc1, 0x13, 0x12, 0x0f, 0xa8, 0xed, 0x4b, 0x25, 0x2e, 0x52, 0xf2, 0x01, 0x21,
+	0x49, 0x4d, 0x6a, 0x95, 0xda, 0x91, 0xed, 0x14, 0xe5, 0xa3, 0xf8, 0x0f, 0x1e, 0xf9, 0x04, 0xc4,
+	0x97, 0xe0, 0x38, 0x4e, 0xda, 0xa2, 0xf0, 0x60, 0x79, 0x2e, 0xe7, 0x1c, 0xcf, 0x8c, 0x07, 0x5e,
+	0x16, 0x54, 0x6d, 0xab, 0x2c, 0xcc, 0xf9, 0x7e, 0x2e, 0x6b, 0x26, 0x78, 0xc6, 0xe7, 0xa5, 0xe0,
+	0x8a, 0xcf, 0x37, 0xe4, 0x40, 0x73, 0x62, 0xaf, 0xd0, 0xc4, 0x90, 0xdb, 0x7a, 0xf8, 0xd5, 0x09,
+	0xab, 0xe0, 0x85, 0xa5, 0x64, 0xd5, 0x57, 0xe3, 0xb5, 0xfc, 0xc6, 0x6a, 0x69, 0xf8, 0xff, 0x8f,
+	0xe8, 0xc8, 0x9e, 0x33, 0x7b, 0xb5, 0xe8, 0xa7, 0x3f, 0x1c, 0x70, 0x57, 0xe6, 0x1d, 0x84, 0xc1,
+	0xdb, 0x72, 0xa9, 0x58, 0xba, 0x27, 0xc1, 0xe8, 0xc9, 0x68, 0x76, 0x15, 0xf5, 0x3e, 0xba, 0x0f,
+	0xae, 0x20, 0x05, 0xe5, 0x2c, 0xb8, 0x30, 0x19, 0xeb, 0xa1, 0x0f, 0x30, 0xc9, 0x39, 0x93, 0xd5,
+	0xb7, 0x44, 0x12, 0xa5, 0x28, 0x2b, 0x64, 0x30, 0xd6, 0x80, 0xeb, 0xd7, 0xcf, 0x42, 0xdb, 0xcb,
+	0xea, 0xf4, 0x5a, 0x1a, 0x6c, 0x6c, 0xa1, 0x91, 0x9f, 0x9f, 0xf9, 0xe8, 0x33, 0x4c, 0x19, 0x51,
+	0xdf, 0xb9, 0xd8, 0x1d, 0xe5, 0x2e, 0x8d, 0xdc, 0xf3, 0x41, 0xb9, 0x4f, 0x2d, 0xb8, 0xd7, 0x9b,
+	0xb0, 0xf3, 0x00, 0x7a, 0x0f, 0xd7, 0x5a, 0xa8, 0x2a, 0x13, 0xa9, 0x52, 0x45, 0x02, 0xc7, 0x68,
+	0x3d, 0x1e, 0xd4, 0x8a, 0x1b, 0x5c, 0xdc, 0xc0, 0x22, 0x90, 0xbd, 0x8d, 0xde, 0x82, 0x47, 0x37,
+	0x84, 0x29, 0xaa, 0xea, 0xc0, 0x35, 0xf4, 0x87, 0x83, 0xf4, 0xb5, 0x05, 0x45, 0x3d, 0x1c, 0x7f,
+	0x81, 0xbb, 0x43, 0x5d, 0xa3, 0x07, 0x70, 0x45, 0xa5, 0x6e, 0x50, 0x1c, 0x88, 0x30, 0x83, 0xf6,
+	0x34, 0x49, 0xc6, 0xc6, 0x47, 0x2f, 0xe0, 0xa6, 0x14, 0xe4, 0xa0, 0x25, 0x92, 0x8c, 0x73, 0x25,
+	0x95, 0x48, 0x4b, 0x33, 0x73, 0x2f, 0x9a, 0xda, 0xc4, 0xa2, 0x8b, 0xe3, 0x5b, 0xb8, 0x37, 0x38,
+	0x08, 0xe4, 0xc3, 0x05, 0x2d, 0xb5, 0xf6, 0x78, 0xe6, 0x44, 0xda, 0xc2, 0x35, 0x4c, 0xff, 0xed,
+	0x12, 0xdd, 0xc2, 0xa4, 0x2b, 0x35, 0xa1, 0x8c, 0x2a, 0xb2, 0xb1, 0xc5, 0xf8, 0x5d, 0x78, 0x6d,
+	0xa2, 0xe8, 0x1d, 0xe0, 0xfe, 0x8f, 0x9b, 0x1a, 0x8f, 0x85, 0x95, 0x9a, 0xd3, 0xd6, 0x16, 0x74,
+	0x3f, 0xd9, 0x00, 0x16, 0x27, 0x79, 0xfc, 0x11, 0xfc, 0xf3, 0x09, 0x21, 0x04, 0x97, 0xe5, 0x8e,
+	0xd4, 0x76, 0xc7, 0x8c, 0xad, 0x8b, 0x71, 0xf2, 0x6d, 0x4a, 0x9b, 0xf5, 0x1a, 0xeb, 0x19, 0xdf,
+	0x84, 0x76, 0x49, 0x97, 0x44, 0xa8, 0x65, 0x93, 0x88, 0xda, 0xfc, 0xe2, 0xce, 0xcf, 0x3f, 0x8f,
+	0x46, 0xbf, 0xf4, 0xf9, 0xad, 0x4f, 0xe6, 0x9a, 0x25, 0x7e, 0xf3, 0x37, 0x00, 0x00, 0xff, 0xff,
+	0xfd, 0xd6, 0xe4, 0xaa, 0x59, 0x03, 0x00, 0x00,
 }

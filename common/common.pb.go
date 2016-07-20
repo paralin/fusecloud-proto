@@ -11,6 +11,7 @@
 	It has these top-level messages:
 		IPRange
 		CertChain
+		GeoLocation
 */
 package common
 
@@ -46,7 +47,8 @@ func (*IPRange) Descriptor() ([]byte, []int) { return fileDescriptorCommon, []in
 // Certificate chain
 type CertChain struct {
 	// Cert chain, idx 0 should be last cert.
-	Cert []string `protobuf:"bytes,1,rep,name=cert" json:"cert,omitempty"`
+	Cert       []string `protobuf:"bytes,1,rep,name=cert" json:"cert,omitempty"`
+	ValidUntil int64    `protobuf:"varint,2,opt,name=valid_until,json=validUntil,proto3" json:"valid_until,omitempty"`
 }
 
 func (m *CertChain) Reset()                    { *m = CertChain{} }
@@ -54,9 +56,24 @@ func (m *CertChain) String() string            { return proto.CompactTextString(
 func (*CertChain) ProtoMessage()               {}
 func (*CertChain) Descriptor() ([]byte, []int) { return fileDescriptorCommon, []int{1} }
 
+type GeoLocation struct {
+	Latitude  float64 `protobuf:"fixed64,1,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude float64 `protobuf:"fixed64,2,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	// optional, if using gps coords
+	Timestamp int64 `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// optional, if using a map
+	Zoomlevel int32 `protobuf:"varint,4,opt,name=zoomlevel,proto3" json:"zoomlevel,omitempty"`
+}
+
+func (m *GeoLocation) Reset()                    { *m = GeoLocation{} }
+func (m *GeoLocation) String() string            { return proto.CompactTextString(m) }
+func (*GeoLocation) ProtoMessage()               {}
+func (*GeoLocation) Descriptor() ([]byte, []int) { return fileDescriptorCommon, []int{2} }
+
 func init() {
 	proto.RegisterType((*IPRange)(nil), "common.IPRange")
 	proto.RegisterType((*CertChain)(nil), "common.CertChain")
+	proto.RegisterType((*GeoLocation)(nil), "common.GeoLocation")
 }
 func (m *IPRange) Marshal() (data []byte, err error) {
 	size := m.Size()
@@ -128,6 +145,49 @@ func (m *CertChain) MarshalTo(data []byte) (int, error) {
 			i += copy(data[i:], s)
 		}
 	}
+	if m.ValidUntil != 0 {
+		data[i] = 0x10
+		i++
+		i = encodeVarintCommon(data, i, uint64(m.ValidUntil))
+	}
+	return i, nil
+}
+
+func (m *GeoLocation) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *GeoLocation) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Latitude != 0 {
+		data[i] = 0x9
+		i++
+		i = encodeFixed64Common(data, i, uint64(math.Float64bits(float64(m.Latitude))))
+	}
+	if m.Longitude != 0 {
+		data[i] = 0x11
+		i++
+		i = encodeFixed64Common(data, i, uint64(math.Float64bits(float64(m.Longitude))))
+	}
+	if m.Timestamp != 0 {
+		data[i] = 0x18
+		i++
+		i = encodeVarintCommon(data, i, uint64(m.Timestamp))
+	}
+	if m.Zoomlevel != 0 {
+		data[i] = 0x20
+		i++
+		i = encodeVarintCommon(data, i, uint64(m.Zoomlevel))
+	}
 	return i, nil
 }
 
@@ -182,6 +242,27 @@ func (m *CertChain) Size() (n int) {
 			l = len(s)
 			n += 1 + l + sovCommon(uint64(l))
 		}
+	}
+	if m.ValidUntil != 0 {
+		n += 1 + sovCommon(uint64(m.ValidUntil))
+	}
+	return n
+}
+
+func (m *GeoLocation) Size() (n int) {
+	var l int
+	_ = l
+	if m.Latitude != 0 {
+		n += 9
+	}
+	if m.Longitude != 0 {
+		n += 9
+	}
+	if m.Timestamp != 0 {
+		n += 1 + sovCommon(uint64(m.Timestamp))
+	}
+	if m.Zoomlevel != 0 {
+		n += 1 + sovCommon(uint64(m.Zoomlevel))
 	}
 	return n
 }
@@ -388,6 +469,149 @@ func (m *CertChain) Unmarshal(data []byte) error {
 			}
 			m.Cert = append(m.Cert, string(data[iNdEx:postIndex]))
 			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidUntil", wireType)
+			}
+			m.ValidUntil = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.ValidUntil |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipCommon(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthCommon
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GeoLocation) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowCommon
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GeoLocation: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GeoLocation: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Latitude", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += 8
+			v = uint64(data[iNdEx-8])
+			v |= uint64(data[iNdEx-7]) << 8
+			v |= uint64(data[iNdEx-6]) << 16
+			v |= uint64(data[iNdEx-5]) << 24
+			v |= uint64(data[iNdEx-4]) << 32
+			v |= uint64(data[iNdEx-3]) << 40
+			v |= uint64(data[iNdEx-2]) << 48
+			v |= uint64(data[iNdEx-1]) << 56
+			m.Latitude = float64(math.Float64frombits(v))
+		case 2:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Longitude", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += 8
+			v = uint64(data[iNdEx-8])
+			v |= uint64(data[iNdEx-7]) << 8
+			v |= uint64(data[iNdEx-6]) << 16
+			v |= uint64(data[iNdEx-5]) << 24
+			v |= uint64(data[iNdEx-4]) << 32
+			v |= uint64(data[iNdEx-3]) << 40
+			v |= uint64(data[iNdEx-2]) << 48
+			v |= uint64(data[iNdEx-1]) << 56
+			m.Longitude = float64(math.Float64frombits(v))
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			m.Timestamp = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.Timestamp |= (int64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Zoomlevel", wireType)
+			}
+			m.Zoomlevel = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCommon
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.Zoomlevel |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipCommon(data[iNdEx:])
@@ -515,16 +739,23 @@ var (
 )
 
 var fileDescriptorCommon = []byte{
-	// 169 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xd2, 0x49, 0xcf, 0x2c, 0xc9,
-	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0xae, 0xcc, 0x2b, 0xca, 0x4f, 0xca, 0xd7, 0x2f,
-	0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x07, 0x8a, 0xe4, 0xe6, 0xe7, 0x41, 0x29, 0x3d, 0xb0, 0x98, 0x10,
-	0x1b, 0x84, 0x27, 0xa5, 0x8b, 0xa4, 0x2b, 0x3d, 0x3f, 0x1d, 0xaa, 0x25, 0xa9, 0x34, 0x0d, 0xcc,
-	0x83, 0xe8, 0x07, 0xb1, 0x20, 0xda, 0x94, 0x0c, 0xb9, 0xd8, 0x3d, 0x03, 0x82, 0x12, 0xf3, 0xd2,
-	0x53, 0x85, 0x84, 0xb8, 0x98, 0x32, 0x0b, 0x24, 0x18, 0x15, 0x98, 0x35, 0x78, 0x9d, 0x98, 0x04,
-	0x18, 0x83, 0x80, 0x3c, 0xa0, 0x18, 0x4b, 0x41, 0x4e, 0x6a, 0x9e, 0x04, 0x93, 0x02, 0xa3, 0x06,
-	0x6f, 0x10, 0x98, 0xad, 0x24, 0xcf, 0xc5, 0xe9, 0x9c, 0x5a, 0x54, 0xe2, 0x9c, 0x91, 0x98, 0x99,
-	0x07, 0x52, 0x90, 0x0c, 0xe4, 0x80, 0xb5, 0x71, 0x06, 0x81, 0xd9, 0x4e, 0x3c, 0x27, 0x1e, 0xc9,
-	0x31, 0x5e, 0x00, 0xe2, 0x07, 0x40, 0x9c, 0xc4, 0x06, 0xb6, 0xc8, 0x18, 0x10, 0x00, 0x00, 0xff,
-	0xff, 0xd0, 0x8c, 0xc5, 0xcd, 0xcf, 0x00, 0x00, 0x00,
+	// 273 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x4c, 0x90, 0x41, 0x4b, 0xc3, 0x30,
+	0x18, 0x86, 0x49, 0x37, 0xa7, 0xcd, 0x1c, 0x48, 0x4e, 0x65, 0x88, 0x8e, 0x9e, 0x7a, 0xd0, 0x15,
+	0xf1, 0x0f, 0xc8, 0x76, 0x10, 0xc1, 0x83, 0x04, 0x3c, 0x4b, 0xda, 0xc5, 0x2c, 0x90, 0xe4, 0x2b,
+	0x5d, 0x3a, 0xd0, 0xab, 0x7f, 0xce, 0xa3, 0x3f, 0x41, 0xfc, 0x25, 0x26, 0x5f, 0x87, 0xf5, 0xf0,
+	0x91, 0xf7, 0x7d, 0xde, 0xbc, 0x09, 0x7c, 0xf4, 0x4a, 0x69, 0xbf, 0xed, 0xaa, 0x65, 0x0d, 0xb6,
+	0xdc, 0xbd, 0xb9, 0x16, 0x2a, 0x28, 0x9b, 0x16, 0x3c, 0x94, 0x81, 0x58, 0x70, 0x87, 0x63, 0x89,
+	0x8c, 0x4d, 0x7a, 0x37, 0xbf, 0xfe, 0xd7, 0x52, 0xa0, 0x0e, 0x95, 0xaa, 0x7b, 0x45, 0xd7, 0xf7,
+	0xa3, 0xea, 0x6b, 0xf9, 0x0d, 0x3d, 0x7e, 0x78, 0xe2, 0xc2, 0x29, 0xc9, 0x18, 0x4d, 0x74, 0x93,
+	0x91, 0xc5, 0xa8, 0x98, 0xad, 0x92, 0x33, 0xc2, 0x83, 0x0b, 0x6c, 0xdc, 0x18, 0xe9, 0xb2, 0x64,
+	0x41, 0x8a, 0x19, 0x47, 0x9d, 0xdf, 0xd1, 0x74, 0x2d, 0x5b, 0xbf, 0xde, 0x0a, 0xed, 0xe2, 0x85,
+	0x3a, 0x18, 0xac, 0xa5, 0x1c, 0x35, 0xbb, 0xa4, 0xd3, 0xbd, 0x30, 0x7a, 0xf3, 0xd2, 0x39, 0xaf,
+	0x0d, 0x76, 0x47, 0x9c, 0x22, 0x7a, 0x8e, 0x24, 0xff, 0x20, 0x74, 0x7a, 0x2f, 0xe1, 0x11, 0x6a,
+	0xe1, 0x35, 0x38, 0x36, 0xa7, 0x27, 0x26, 0x28, 0xdf, 0x6d, 0x64, 0x78, 0x88, 0x14, 0x84, 0xff,
+	0x79, 0x76, 0x4e, 0x53, 0x03, 0x4e, 0xf5, 0x61, 0x82, 0xe1, 0x00, 0x62, 0xea, 0xb5, 0x95, 0x3b,
+	0x2f, 0x6c, 0x93, 0x8d, 0xf0, 0xa3, 0x01, 0xc4, 0xf4, 0x1d, 0xc0, 0x1a, 0xb9, 0x97, 0x26, 0x1b,
+	0x87, 0xf4, 0x88, 0x0f, 0x60, 0x75, 0xfa, 0xf9, 0x73, 0x41, 0xbe, 0xc2, 0x7c, 0x87, 0xa9, 0x26,
+	0xb8, 0x8f, 0xdb, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7c, 0x6b, 0xad, 0x98, 0x76, 0x01, 0x00,
+	0x00,
 }

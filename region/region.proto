@@ -27,6 +27,9 @@ message Region {
   // Keyspaces
   repeated RegionDataKeyspace data_keyspace = 5;
 
+  // Location
+  common.GeoLocation location = 6;
+
   message RegionState {
     bool meta_keyspace_created = 1;
   }
@@ -35,5 +38,8 @@ message Region {
     string name = 1;
     bool created = 2;
     map<string, int32> replication = 3;
+  }
+
+  message RegionMapInfo {
   }
 }

@@ -2,6 +2,7 @@ syntax = "proto3";
 package device;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/common/common.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;
@@ -14,6 +15,8 @@ message Device {
 
   DeviceConsulSettings consul_settings = 3;
   DeviceNetworkSettings network_settings = 4;
+  DeviceSetupState setup_state = 5;
+  DeviceIdentity identity = 6;
 
   message DeviceConsulSettings {
     bool is_server = 1;
@@ -23,5 +26,16 @@ message Device {
   message DeviceNetworkSettings {
     // ip x 4 = ip address
     repeated int32 ip = 1;
+  }
+
+  message DeviceSetupState {
+    bool identity_inited = 1;
+    bool consul_server_bootstrapped = 2;
+  }
+
+  message DeviceIdentity {
+    string pkey = 1;
+    /* Generated certs, latest is first */
+    repeated common.CertChain chain = 2;
   }
 }
