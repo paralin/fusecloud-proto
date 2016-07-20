@@ -20,6 +20,8 @@ message CertChain {
   // Cert chain, idx 0 should be last cert.
   repeated string cert = 1;
   int64 valid_until = 2;
+  string csr = 3;
+  bool csr_waiting = 4;
 }
 
 message GeoLocation {
