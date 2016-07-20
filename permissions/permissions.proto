@@ -18,4 +18,6 @@ message SystemPermissions {
   bool manage_regions = 2;
   /* Create / delete devices */
   bool manage_devices = 3;
+  /* View / general basic access */
+  bool access = 4;
 }
