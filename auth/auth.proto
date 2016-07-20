@@ -20,9 +20,9 @@ message User {
   repeated UserCert cert = 4;
 
   // processed first
-  UserRole global_role = 5;
+  UserRoleSet global_role = 5;
   // processed second
-  map<string, UserRole> region_role = 6;
+  map<string, UserRoleSet> region_role = 6;
   // extra permissions
   repeated permissions.SystemPermissions global_extra_permission = 7;
   // per region extra permissions
@@ -44,5 +44,9 @@ message User {
 
     /* Access to everything */
     SUPERUSER = 1;
+  }
+
+  message UserRoleSet {
+    repeated UserRole role = 1;
   }
 }

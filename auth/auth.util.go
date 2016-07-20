@@ -24,10 +24,15 @@ func BuildUserPermissionTree(user *User, includeGlobal bool) *UserPermissionTree
 	}
 
 	// process global roles
-	globalRole := user.GlobalRole
-	globalRolePerms, ok := roleMap[int32(globalRole)]
-	if ok {
-		res.Global.Extend(&globalRolePerms)
+	if user.GlobalRole == nil {
+		user.GlobalRole = &User_UserRoleSet{}
+	}
+
+	for _, globalRole := range user.GlobalRole.Role {
+		globalRolePerms, ok := roleMap[int32(globalRole)]
+		if ok {
+			res.Global.Extend(&globalRolePerms)
+		}
 	}
 
 	for _, perm := range user.GlobalExtraPermission {
@@ -35,16 +40,18 @@ func BuildUserPermissionTree(user *User, includeGlobal bool) *UserPermissionTree
 	}
 
 	// Process each region
-	for regionId, regionRole := range user.RegionRole {
-		regionRoleV, ok := roleMap[int32(regionRole)]
-		if !ok {
-			continue
-		}
-		rperm := &permissions.SystemPermissions{}
-		res.ByRegion[regionId] = rperm
-		rperm.Extend(&regionRoleV)
-		if includeGlobal {
-			rperm.Extend(&globalRolePerms)
+	for regionId, regionRoleSet := range user.RegionRole {
+		for _, regionRole := range regionRoleSet.Role {
+			regionRoleV, ok := roleMap[int32(regionRole)]
+			if !ok {
+				continue
+			}
+			rperm := &permissions.SystemPermissions{}
+			res.ByRegion[regionId] = rperm
+			rperm.Extend(&regionRoleV)
+			if includeGlobal {
+				rperm.Extend(res.Global)
+			}
 		}
 	}
 
@@ -56,7 +63,7 @@ func BuildUserPermissionTree(user *User, includeGlobal bool) *UserPermissionTree
 		}
 		rperm.Extend(regionPermission)
 		if includeGlobal {
-			rperm.Extend(&globalRolePerms)
+			rperm.Extend(res.Global)
 		}
 	}
 

@@ -9,8 +9,7 @@ import (
 func BuildRoleMap() map[int32]permissions.SystemPermissions {
 	res := make(map[int32]permissions.SystemPermissions)
 
-	res[0] = permissions.SystemPermissions{
-	}
+	res[0] = permissions.SystemPermissions{}
 
 	res[1] = permissions.SystemPermissions{
 		AllPermissions: true,
