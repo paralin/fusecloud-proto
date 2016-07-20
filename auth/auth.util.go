@@ -2,15 +2,63 @@ package auth
 
 import (
 	"github.com/synrobo/proto/permissions"
+	"github.com/synrobo/proto/roles"
 )
 
+var roleMap map[int32]permissions.SystemPermissions = roles.BuildRoleMap()
+
 type UserPermissionTree struct {
-	Global   permissions.SystemPermissions
-	ByRegion map[string]permissions.SystemPermissions
+	Global   *permissions.SystemPermissions
+	ByRegion map[string]*permissions.SystemPermissions
 }
 
-func BuildUserPermissionTree(user *User) *UserPermissionTree {
-	res := &UserPermissionTree{}
+/* Builds a permission tree from a user object */
+func BuildUserPermissionTree(user *User, includeGlobal bool) *UserPermissionTree {
+	if user == nil {
+		return nil
+	}
+
+	res := &UserPermissionTree{
+		Global:   &permissions.SystemPermissions{},
+		ByRegion: make(map[string]*permissions.SystemPermissions),
+	}
+
+	// process global roles
+	globalRole := user.GlobalRole
+	globalRolePerms, ok := roleMap[int32(globalRole)]
+	if ok {
+		res.Global.Extend(&globalRolePerms)
+	}
+
+	for _, perm := range user.GlobalExtraPermission {
+		res.Global.Extend(perm)
+	}
+
+	// Process each region
+	for regionId, regionRole := range user.RegionRole {
+		regionRoleV, ok := roleMap[int32(regionRole)]
+		if !ok {
+			continue
+		}
+		rperm := &permissions.SystemPermissions{}
+		res.ByRegion[regionId] = rperm
+		rperm.Extend(&regionRoleV)
+		if includeGlobal {
+			rperm.Extend(&globalRolePerms)
+		}
+	}
+
+	for regionId, regionPermission := range user.RegionExtraPermission {
+		rperm, ok := res.ByRegion[regionId]
+		if !ok {
+			rperm = &permissions.SystemPermissions{}
+			res.ByRegion[regionId] = rperm
+		}
+		rperm.Extend(regionPermission)
+		if includeGlobal {
+			rperm.Extend(&globalRolePerms)
+		}
+	}
 
 	return res
 }

@@ -6,8 +6,8 @@ import (
 	"github.com/synrobo/proto/permissions"
 )
 
-func BuildRoleMap() map[int]permissions.SystemPermissions {
-	res := make(map[int]permissions.SystemPermissions)
+func BuildRoleMap() map[int32]permissions.SystemPermissions {
+	res := make(map[int32]permissions.SystemPermissions)
 
 	res[0] = permissions.SystemPermissions{
 	}

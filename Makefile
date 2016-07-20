@@ -3,6 +3,7 @@ COMPILE_ROLES_DIR="./_resources/compile-roles"
 
 gengo: compile-roles protogen
 	./compile-roles ./roles/roles.compiled.go
+	go install -v ./roles/
 
 protogen:
 	protowrap -I $${GOPATH}/src \
