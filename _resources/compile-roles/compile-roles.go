@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/synrobo/proto/auth"
@@ -45,6 +46,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	roleIntMap := make(map[int]permissions.SystemPermissions)
+	var sortedKeys []int
 	for k, v := range roleMap {
 		roleName := strings.ToUpper(k)
 		// find role for k
@@ -54,6 +57,13 @@ func main() {
 			continue
 		}
 
+		roleIntMap[int(roleId)] = v
+		sortedKeys = append(sortedKeys, int(roleId))
+	}
+	sort.Ints(sortedKeys)
+
+	for roleId := range sortedKeys {
+		v := roleIntMap[roleId]
 		resultBuf.WriteString(fmt.Sprintf("\tres[%d] = permissions.SystemPermissions{\n", roleId))
 		// iterate over boolean properties on the object
 		s := reflect.ValueOf(&v).Elem()
