@@ -35,8 +35,8 @@ func BuildUserPermissionTree(user *User, includeGlobal bool) *UserPermissionTree
 		}
 	}
 
-	for _, perm := range user.GlobalExtraPermission {
-		res.Global.Extend(perm)
+	if user.GlobalExtraPermission != nil {
+		res.Global.Extend(user.GlobalExtraPermission)
 	}
 
 	// Process each region

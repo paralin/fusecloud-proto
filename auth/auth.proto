@@ -24,7 +24,7 @@ message User {
   // processed second
   map<string, UserRoleSet> region_role = 6;
   // extra permissions
-  repeated permissions.SystemPermissions global_extra_permission = 7;
+  permissions.SystemPermissions global_extra_permission = 7;
   // per region extra permissions
   map<string, permissions.SystemPermissions> region_extra_permission = 8;
 
