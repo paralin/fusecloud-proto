@@ -21,6 +21,7 @@ message ListDevicesResponse {
 message CreateDeviceRequest {
   identify.Identify identify = 1;
   Device device = 2;
+  string region = 3;
 }
 
 message CreateDeviceResponse {

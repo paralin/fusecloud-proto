@@ -2,6 +2,8 @@ package device
 
 import (
 	"errors"
+	"fmt"
+	"net"
 )
 
 func (d *Device) Validate() error {
@@ -23,4 +25,11 @@ func (d *Device) Validate() error {
 	}
 
 	return nil
+}
+
+func (dn *Device_DeviceNetworkSettings) ToIP() (net.IP, error) {
+	if len(dn.Ip) < 4 {
+		return nil, errors.New("IP length is less than 4.")
+	}
+	return net.ParseIP(fmt.Sprintf("%d.%d.%d.%d", dn.Ip[0], dn.Ip[1], dn.Ip[2], dn.Ip[3])), nil
 }

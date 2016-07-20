@@ -1,6 +1,10 @@
 package common
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"net"
+)
 
 func (ipr *IPRange) Validate() error {
 	if len(ipr.Ip) != 4 {
@@ -25,4 +29,23 @@ func (ipr *IPRange) CIDRString() (string, error) {
 		return "", err
 	}
 	return fmt.Sprintf("%s/%d", ips, ipr.Plen), nil
+}
+
+func (ipr *IPRange) BuildCIDRInfo() (net.IP, *net.IPNet, error) {
+	cidrStr, err := ipr.CIDRString()
+	if err != nil {
+		return nil, nil, err
+	}
+	return net.ParseCIDR(cidrStr)
+}
+
+func (ipr *IPRange) ValidateDeviceIP(ip net.IP) error {
+	_, cidr, err := ipr.BuildCIDRInfo()
+	if err != nil {
+		return err
+	}
+	if !cidr.Contains(ip) {
+		return errors.New("Cidr does not contain IP.")
+	}
+	return nil
 }
