@@ -3,6 +3,7 @@ package auth;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/synrobo/proto/auth/auth.proto";
+import "github.com/synrobo/proto/permissions/permissions.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;
@@ -22,6 +23,11 @@ message AuthWithPasswordRequest {
 message AuthWithPasswordResponse {
   User.UserCert cert = 1;
   User.UserMetadata meta = 2;
+
+  User.UserRoleSet global_role = 3;
+  map<string, User.UserRoleSet> region_role = 4;
+  permissions.SystemPermissions global_extra_permission = 5;
+  map<string, permissions.SystemPermissions> region_extra_permission = 6;
 }
 
 service AuthService {
