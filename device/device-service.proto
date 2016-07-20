@@ -27,7 +27,18 @@ message CreateDeviceResponse {
   Device created_device = 1;
 }
 
+message GetDeviceRequest {
+  identify.Identify identify = 1;
+  string hostname = 2;
+  string region = 3;
+}
+
+message GetDeviceResponse {
+  Device device = 1;
+}
+
 service GlobalDeviceService {
   rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
   rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
+  rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
 }

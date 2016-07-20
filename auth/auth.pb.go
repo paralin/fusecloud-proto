@@ -9,6 +9,9 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import common "github.com/synrobo/proto/common"
+import permissions "github.com/synrobo/proto/permissions"
+
+import errors "errors"
 
 import io "io"
 
@@ -16,6 +19,29 @@ import io "io"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+type User_UserRole int32
+
+const (
+	// Nothing special
+	User_NONE User_UserRole = 0
+	// Access to everything
+	User_SUPERUSER User_UserRole = 1
+)
+
+var User_UserRole_name = map[int32]string{
+	0: "NONE",
+	1: "SUPERUSER",
+}
+var User_UserRole_value = map[string]int32{
+	"NONE":      0,
+	"SUPERUSER": 1,
+}
+
+func (x User_UserRole) String() string {
+	return proto.EnumName(User_UserRole_name, int32(x))
+}
+func (User_UserRole) EnumDescriptor() ([]byte, []int) { return fileDescriptorAuth, []int{0, 0} }
 
 //
 // User: a standard user with username, email, password
@@ -25,6 +51,14 @@ type User struct {
 	Meta     *User_UserMetadata `protobuf:"bytes,3,opt,name=meta" json:"meta,omitempty"`
 	// certificates, latest at index 0
 	Cert []*User_UserCert `protobuf:"bytes,4,rep,name=cert" json:"cert,omitempty"`
+	// processed first
+	GlobalRole User_UserRole `protobuf:"varint,5,opt,name=global_role,json=globalRole,proto3,enum=auth.User_UserRole" json:"global_role,omitempty"`
+	// processed second
+	RegionRole map[string]User_UserRole `protobuf:"bytes,6,rep,name=region_role,json=regionRole" json:"region_role,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3,enum=auth.User_UserRole"`
+	// extra permissions
+	GlobalExtraPermission []*permissions.SystemPermissions `protobuf:"bytes,7,rep,name=global_extra_permission,json=globalExtraPermission" json:"global_extra_permission,omitempty"`
+	// per region extra permissions
+	RegionExtraPermission map[string]*permissions.SystemPermissions `protobuf:"bytes,8,rep,name=region_extra_permission,json=regionExtraPermission" json:"region_extra_permission,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
 }
 
 func (m *User) Reset()                    { *m = User{} }
@@ -46,6 +80,27 @@ func (m *User) GetCert() []*User_UserCert {
 	return nil
 }
 
+func (m *User) GetRegionRole() map[string]User_UserRole {
+	if m != nil {
+		return m.RegionRole
+	}
+	return nil
+}
+
+func (m *User) GetGlobalExtraPermission() []*permissions.SystemPermissions {
+	if m != nil {
+		return m.GlobalExtraPermission
+	}
+	return nil
+}
+
+func (m *User) GetRegionExtraPermission() map[string]*permissions.SystemPermissions {
+	if m != nil {
+		return m.RegionExtraPermission
+	}
+	return nil
+}
+
 type User_UserMetadata struct {
 	Name  string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Email string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
@@ -54,7 +109,7 @@ type User_UserMetadata struct {
 func (m *User_UserMetadata) Reset()                    { *m = User_UserMetadata{} }
 func (m *User_UserMetadata) String() string            { return proto.CompactTextString(m) }
 func (*User_UserMetadata) ProtoMessage()               {}
-func (*User_UserMetadata) Descriptor() ([]byte, []int) { return fileDescriptorAuth, []int{0, 0} }
+func (*User_UserMetadata) Descriptor() ([]byte, []int) { return fileDescriptorAuth, []int{0, 2} }
 
 type User_UserCert struct {
 	Chain *common.CertChain `protobuf:"bytes,1,opt,name=chain" json:"chain,omitempty"`
@@ -64,7 +119,7 @@ type User_UserCert struct {
 func (m *User_UserCert) Reset()                    { *m = User_UserCert{} }
 func (m *User_UserCert) String() string            { return proto.CompactTextString(m) }
 func (*User_UserCert) ProtoMessage()               {}
-func (*User_UserCert) Descriptor() ([]byte, []int) { return fileDescriptorAuth, []int{0, 1} }
+func (*User_UserCert) Descriptor() ([]byte, []int) { return fileDescriptorAuth, []int{0, 3} }
 
 func (m *User_UserCert) GetChain() *common.CertChain {
 	if m != nil {
@@ -77,6 +132,7 @@ func init() {
 	proto.RegisterType((*User)(nil), "auth.User")
 	proto.RegisterType((*User_UserMetadata)(nil), "auth.User.UserMetadata")
 	proto.RegisterType((*User_UserCert)(nil), "auth.User.UserCert")
+	proto.RegisterEnum("auth.User_UserRole", User_UserRole_name, User_UserRole_value)
 }
 func (m *User) Marshal() (data []byte, err error) {
 	size := m.Size()
@@ -125,6 +181,64 @@ func (m *User) MarshalTo(data []byte) (int, error) {
 				return 0, err
 			}
 			i += n
+		}
+	}
+	if m.GlobalRole != 0 {
+		data[i] = 0x28
+		i++
+		i = encodeVarintAuth(data, i, uint64(m.GlobalRole))
+	}
+	if len(m.RegionRole) > 0 {
+		for k, _ := range m.RegionRole {
+			data[i] = 0x32
+			i++
+			v := m.RegionRole[k]
+			mapSize := 1 + len(k) + sovAuth(uint64(len(k))) + 1 + sovAuth(uint64(v))
+			i = encodeVarintAuth(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintAuth(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x10
+			i++
+			i = encodeVarintAuth(data, i, uint64(v))
+		}
+	}
+	if len(m.GlobalExtraPermission) > 0 {
+		for _, msg := range m.GlobalExtraPermission {
+			data[i] = 0x3a
+			i++
+			i = encodeVarintAuth(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.RegionExtraPermission) > 0 {
+		for k, _ := range m.RegionExtraPermission {
+			data[i] = 0x42
+			i++
+			v := m.RegionExtraPermission[k]
+			if v == nil {
+				return 0, errors.New("proto: map has nil element")
+			}
+			msgSize := v.Size()
+			mapSize := 1 + len(k) + sovAuth(uint64(len(k))) + 1 + msgSize + sovAuth(uint64(msgSize))
+			i = encodeVarintAuth(data, i, uint64(mapSize))
+			data[i] = 0xa
+			i++
+			i = encodeVarintAuth(data, i, uint64(len(k)))
+			i += copy(data[i:], k)
+			data[i] = 0x12
+			i++
+			i = encodeVarintAuth(data, i, uint64(v.Size()))
+			n2, err := v.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n2
 		}
 	}
 	return i, nil
@@ -179,11 +293,11 @@ func (m *User_UserCert) MarshalTo(data []byte) (int, error) {
 		data[i] = 0xa
 		i++
 		i = encodeVarintAuth(data, i, uint64(m.Chain.Size()))
-		n2, err := m.Chain.MarshalTo(data[i:])
+		n3, err := m.Chain.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n2
+		i += n3
 	}
 	if len(m.Pkey) > 0 {
 		data[i] = 0x12
@@ -240,6 +354,35 @@ func (m *User) Size() (n int) {
 		for _, e := range m.Cert {
 			l = e.Size()
 			n += 1 + l + sovAuth(uint64(l))
+		}
+	}
+	if m.GlobalRole != 0 {
+		n += 1 + sovAuth(uint64(m.GlobalRole))
+	}
+	if len(m.RegionRole) > 0 {
+		for k, v := range m.RegionRole {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovAuth(uint64(len(k))) + 1 + sovAuth(uint64(v))
+			n += mapEntrySize + 1 + sovAuth(uint64(mapEntrySize))
+		}
+	}
+	if len(m.GlobalExtraPermission) > 0 {
+		for _, e := range m.GlobalExtraPermission {
+			l = e.Size()
+			n += 1 + l + sovAuth(uint64(l))
+		}
+	}
+	if len(m.RegionExtraPermission) > 0 {
+		for k, v := range m.RegionExtraPermission {
+			_ = k
+			_ = v
+			l = 0
+			if v != nil {
+				l = v.Size()
+			}
+			mapEntrySize := 1 + len(k) + sovAuth(uint64(len(k))) + 1 + l + sovAuth(uint64(l))
+			n += mapEntrySize + 1 + sovAuth(uint64(mapEntrySize))
 		}
 	}
 	return n
@@ -436,6 +579,273 @@ func (m *User) Unmarshal(data []byte) error {
 			if err := m.Cert[len(m.Cert)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GlobalRole", wireType)
+			}
+			m.GlobalRole = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.GlobalRole |= (User_UserRole(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RegionRole", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthAuth
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var mapvalue User_UserRole
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				mapvalue |= (User_UserRole(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if m.RegionRole == nil {
+				m.RegionRole = make(map[string]User_UserRole)
+			}
+			m.RegionRole[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GlobalExtraPermission", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GlobalExtraPermission = append(m.GlobalExtraPermission, &permissions.SystemPermissions{})
+			if err := m.GlobalExtraPermission[len(m.GlobalExtraPermission)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RegionExtraPermission", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthAuth
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthAuth
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(data[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			var valuekey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				valuekey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var mapmsglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowAuth
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				mapmsglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if mapmsglen < 0 {
+				return ErrInvalidLengthAuth
+			}
+			postmsgIndex := iNdEx + mapmsglen
+			if mapmsglen < 0 {
+				return ErrInvalidLengthAuth
+			}
+			if postmsgIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapvalue := &permissions.SystemPermissions{}
+			if err := mapvalue.Unmarshal(data[iNdEx:postmsgIndex]); err != nil {
+				return err
+			}
+			iNdEx = postmsgIndex
+			if m.RegionExtraPermission == nil {
+				m.RegionExtraPermission = make(map[string]*permissions.SystemPermissions)
+			}
+			m.RegionExtraPermission[mapkey] = mapvalue
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -784,23 +1194,36 @@ var (
 )
 
 var fileDescriptorAuth = []byte{
-	// 279 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xd2, 0x48, 0xcf, 0x2c, 0xc9,
-	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0xae, 0xcc, 0x2b, 0xca, 0x4f, 0xca, 0xd7, 0x2f,
-	0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x4f, 0x2c, 0x2d, 0xc9, 0x00, 0x13, 0x7a, 0x60, 0xbe, 0x10, 0x0b,
-	0x88, 0x2d, 0xa5, 0x8b, 0xa4, 0x3e, 0x3d, 0x3f, 0x1d, 0xaa, 0x38, 0xa9, 0x34, 0x0d, 0xcc, 0x83,
-	0xe8, 0x04, 0xb1, 0x20, 0x9a, 0xa4, 0x74, 0x70, 0x1a, 0x0f, 0x14, 0xc9, 0xcd, 0xcf, 0x83, 0x52,
-	0x10, 0xd5, 0x4a, 0xd3, 0x99, 0xb8, 0x58, 0x42, 0x8b, 0x53, 0x8b, 0x84, 0xa4, 0xb8, 0x38, 0x4a,
-	0x81, 0x74, 0x5e, 0x62, 0x6e, 0xaa, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x9c, 0x0f, 0x92,
-	0x2b, 0x48, 0x2c, 0x2e, 0x2e, 0xcf, 0x2f, 0x4a, 0x91, 0x60, 0x82, 0xc8, 0xc1, 0xf8, 0x42, 0xda,
-	0x5c, 0x2c, 0xb9, 0xa9, 0x25, 0x89, 0x12, 0xcc, 0x40, 0x71, 0x6e, 0x23, 0x71, 0x3d, 0xb0, 0xf3,
-	0x41, 0x26, 0x82, 0x09, 0x5f, 0xa0, 0x54, 0x4a, 0x62, 0x49, 0x62, 0x10, 0x58, 0x91, 0x90, 0x3a,
-	0x17, 0x4b, 0x72, 0x6a, 0x51, 0x89, 0x04, 0x8b, 0x02, 0x33, 0x50, 0xb1, 0x30, 0x9a, 0x62, 0x67,
-	0xa0, 0x54, 0x10, 0x58, 0x81, 0x94, 0x05, 0x17, 0x0f, 0xb2, 0x76, 0x21, 0x21, 0x2e, 0x16, 0x24,
-	0x97, 0x81, 0xd9, 0x42, 0x22, 0x5c, 0xac, 0xa9, 0xb9, 0x89, 0x99, 0x39, 0x50, 0x27, 0x41, 0x38,
-	0x52, 0xee, 0x5c, 0x1c, 0x30, 0xb3, 0x80, 0xd6, 0xb1, 0x26, 0x67, 0x24, 0x66, 0xe6, 0x81, 0xb5,
-	0x71, 0x1b, 0x09, 0xea, 0x41, 0xbd, 0x0e, 0x92, 0x74, 0x06, 0x49, 0x04, 0x41, 0xe4, 0x41, 0xc6,
-	0x17, 0x64, 0xa7, 0x56, 0x42, 0x4d, 0x02, 0xb3, 0x9d, 0x78, 0x4e, 0x3c, 0x92, 0x63, 0xbc, 0x00,
-	0xc4, 0x0f, 0x80, 0x38, 0x89, 0x0d, 0x1c, 0x5c, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x87,
-	0x6c, 0x71, 0xfc, 0xbd, 0x01, 0x00, 0x00,
+	// 485 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x84, 0x53, 0x5f, 0x6f, 0xd3, 0x30,
+	0x10, 0x27, 0x6b, 0x5a, 0xba, 0xeb, 0x80, 0x62, 0x98, 0x1a, 0xe5, 0x61, 0x9a, 0x86, 0x10, 0x43,
+	0x40, 0x2a, 0x8d, 0x09, 0x4d, 0xf0, 0xc6, 0x14, 0xf1, 0xc4, 0x98, 0x5c, 0x95, 0x37, 0x34, 0x39,
+	0x9d, 0x49, 0x23, 0x92, 0xb8, 0x72, 0x1c, 0xa0, 0xdf, 0x87, 0x0f, 0xc3, 0x23, 0x1f, 0x01, 0xf1,
+	0x49, 0xb0, 0xcf, 0xd9, 0x6a, 0xb5, 0x8b, 0xf6, 0x90, 0xe4, 0xee, 0x7e, 0x7f, 0x7c, 0x76, 0xce,
+	0x70, 0x98, 0x66, 0x6a, 0x5e, 0x27, 0xd1, 0x4c, 0x14, 0xe3, 0x6a, 0x59, 0x4a, 0x91, 0x88, 0xf1,
+	0x42, 0x0a, 0x25, 0xc6, 0xac, 0x56, 0x73, 0x7c, 0x45, 0x98, 0x13, 0xdf, 0xc4, 0xe1, 0x2b, 0x87,
+	0x9f, 0x8a, 0xb4, 0x21, 0x27, 0xf5, 0x57, 0xcc, 0xac, 0xd2, 0x44, 0x56, 0x14, 0xbe, 0x6c, 0xb5,
+	0xd7, 0x95, 0x42, 0x94, 0xcd, 0xa7, 0x61, 0xbf, 0x69, 0x65, 0x2f, 0xb8, 0x2c, 0xb2, 0xaa, 0xca,
+	0x44, 0x59, 0xb9, 0xb1, 0xd5, 0x1d, 0xfc, 0xea, 0x81, 0x3f, 0xad, 0xb8, 0x24, 0x21, 0xf4, 0x6b,
+	0xfd, 0x2d, 0x59, 0xc1, 0x03, 0x6f, 0xdf, 0x3b, 0xdc, 0xa6, 0xd7, 0xb9, 0xc1, 0x16, 0xac, 0xaa,
+	0x7e, 0x08, 0x79, 0x19, 0x6c, 0x59, 0xec, 0x2a, 0x27, 0x2f, 0xc0, 0x2f, 0xb8, 0x62, 0x41, 0x47,
+	0xd7, 0x07, 0x47, 0xa3, 0x08, 0xb7, 0x6d, 0x1c, 0xf1, 0xf5, 0x51, 0x43, 0x97, 0x4c, 0x31, 0x8a,
+	0x24, 0xf2, 0x0c, 0xfc, 0x19, 0x97, 0x2a, 0xf0, 0xf7, 0x3b, 0x9a, 0xfc, 0x68, 0x8d, 0x7c, 0xaa,
+	0x21, 0x8a, 0x04, 0x72, 0x0c, 0x83, 0x34, 0x17, 0x09, 0xcb, 0x2f, 0xa4, 0xc8, 0x79, 0xd0, 0xd5,
+	0xe6, 0xf7, 0x37, 0xf8, 0x54, 0x43, 0x14, 0x2c, 0xcf, 0xc4, 0xe4, 0x1d, 0x0c, 0x24, 0x4f, 0xf5,
+	0xee, 0xac, 0xaa, 0x87, 0xab, 0x84, 0x8e, 0x8a, 0x22, 0x6a, 0xb8, 0x71, 0xa9, 0xe4, 0x92, 0x82,
+	0xbc, 0x2e, 0x90, 0xcf, 0x30, 0x6a, 0x96, 0xe4, 0x3f, 0x95, 0x64, 0x17, 0xab, 0xb3, 0x0a, 0xee,
+	0xa2, 0xd1, 0x5e, 0xe4, 0x1e, 0xdf, 0x64, 0x59, 0x29, 0x5e, 0x9c, 0xaf, 0x2a, 0x74, 0xd7, 0xca,
+	0x63, 0xa3, 0x5e, 0xd5, 0xc9, 0x17, 0x18, 0x35, 0x4d, 0x6d, 0xf8, 0xf6, 0xd1, 0xf7, 0xe9, 0x46,
+	0x83, 0x6b, 0x16, 0xb6, 0xd7, 0x5d, 0x79, 0x13, 0x16, 0x52, 0x78, 0xb0, 0xb6, 0x2b, 0x32, 0x84,
+	0xce, 0x37, 0xbe, 0x6c, 0xfe, 0xa2, 0x09, 0xc9, 0x73, 0xe8, 0x7e, 0x67, 0x79, 0xcd, 0xf1, 0xef,
+	0xb5, 0x1c, 0xa4, 0x65, 0xbc, 0xdd, 0x3a, 0xf1, 0xc2, 0x39, 0x84, 0xed, 0x8d, 0xdc, 0x60, 0x7f,
+	0xec, 0xda, 0xdf, 0x7e, 0x50, 0xce, 0x4a, 0x27, 0xb0, 0xe3, 0x8e, 0x09, 0x21, 0xe0, 0x3b, 0x13,
+	0x88, 0x31, 0x79, 0x0c, 0x5d, 0x5e, 0xb0, 0x2c, 0x6f, 0x46, 0xcf, 0x26, 0xe1, 0x07, 0xe8, 0x5f,
+	0xcd, 0x8c, 0x1e, 0xab, 0xee, 0x6c, 0xce, 0xb2, 0x12, 0x65, 0x83, 0xa3, 0x87, 0x51, 0x73, 0x35,
+	0x0c, 0x78, 0x6a, 0x00, 0x6a, 0x71, 0x63, 0xbf, 0x30, 0xbd, 0x5b, 0x27, 0x8c, 0x0f, 0x9e, 0x58,
+	0x23, 0x9c, 0x81, 0x3e, 0xf8, 0x67, 0x9f, 0xce, 0xe2, 0xe1, 0x1d, 0x72, 0x0f, 0xb6, 0x27, 0xd3,
+	0xf3, 0x98, 0x4e, 0x27, 0x31, 0x1d, 0x7a, 0xef, 0x77, 0x7e, 0xff, 0xdb, 0xf3, 0xfe, 0xe8, 0xe7,
+	0xaf, 0x7e, 0x92, 0x1e, 0xde, 0x9d, 0xd7, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff, 0xa3, 0xa7, 0xc1,
+	0x2a, 0x02, 0x04, 0x00, 0x00,
 }

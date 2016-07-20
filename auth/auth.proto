@@ -3,6 +3,7 @@ package auth;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/synrobo/proto/common/common.proto";
+import "github.com/synrobo/proto/permissions/permissions.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;
@@ -18,6 +19,15 @@ message User {
   // certificates, latest at index 0
   repeated UserCert cert = 4;
 
+  // processed first
+  UserRole global_role = 5;
+  // processed second
+  map<string, UserRole> region_role = 6;
+  // extra permissions
+  repeated permissions.SystemPermissions global_extra_permission = 7;
+  // per region extra permissions
+  map<string, permissions.SystemPermissions> region_extra_permission = 8;
+
   message UserMetadata {
     string name = 1;
     string email = 2;
@@ -26,5 +36,13 @@ message User {
   message UserCert {
     common.CertChain chain = 1;
     string pkey = 2;
+  }
+
+  enum UserRole {
+    /* Nothing special */
+    NONE = 0;
+
+    /* Access to everything */
+    SUPERUSER = 1;
   }
 }

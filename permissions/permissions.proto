@@ -1,0 +1,21 @@
+syntax = "proto3";
+package permissions;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/common/common.proto";
+
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.marshaler_all) = true;
+
+/*
+  SystemPermissions: full list of possible permissions
+*/
+message SystemPermissions {
+  /* all permissions */
+  bool all_permissions = 1;
+  /* Create / delete regions */
+  bool manage_regions = 2;
+  /* Create / delete devices */
+  bool manage_devices = 3;
+}
