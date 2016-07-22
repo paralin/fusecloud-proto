@@ -3,6 +3,7 @@ package device;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/synrobo/proto/common/common.proto";
+import "github.com/synrobo/proto/metric/metric.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;
@@ -17,6 +18,7 @@ message Device {
   DeviceNetworkSettings network_settings = 4;
   DeviceSetupState setup_state = 5;
   DeviceIdentity identity = 6;
+  repeated metric.MetricIdentifier metric = 7;
 
   message DeviceConsulSettings {
     bool is_server = 1;
