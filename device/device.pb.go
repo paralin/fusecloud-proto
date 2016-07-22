@@ -20,8 +20,10 @@ var _ = math.Inf
 
 // Device: a full-linux computer running consul, docker stack
 type Device struct {
-	Hostname        string                        `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	Region          string                        `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
+	Hostname string `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Region   string `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
+	// Commited, unchangeable fqdn
+	Fqdn            string                        `protobuf:"bytes,8,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
 	ConsulSettings  *Device_DeviceConsulSettings  `protobuf:"bytes,3,opt,name=consul_settings,json=consulSettings" json:"consul_settings,omitempty"`
 	NetworkSettings *Device_DeviceNetworkSettings `protobuf:"bytes,4,opt,name=network_settings,json=networkSettings" json:"network_settings,omitempty"`
 	SetupState      *Device_DeviceSetupState      `protobuf:"bytes,5,opt,name=setup_state,json=setupState" json:"setup_state,omitempty"`
@@ -82,8 +84,9 @@ func (*Device_DeviceConsulSettings) Descriptor() ([]byte, []int) {
 }
 
 type Device_DeviceNetworkSettings struct {
-	// ip x 4 = ip address
-	Ip []int32 `protobuf:"varint,1,rep,name=ip" json:"ip,omitempty"`
+	Ip        *common.IPAddress               `protobuf:"bytes,1,opt,name=ip" json:"ip,omitempty"`
+	Interface []*Device_DeviceInterfaceConfig `protobuf:"bytes,2,rep,name=interface" json:"interface,omitempty"`
+	Dns       []*common.IPAddress             `protobuf:"bytes,3,rep,name=dns" json:"dns,omitempty"`
 }
 
 func (m *Device_DeviceNetworkSettings) Reset()         { *m = Device_DeviceNetworkSettings{} }
@@ -91,6 +94,54 @@ func (m *Device_DeviceNetworkSettings) String() string { return proto.CompactTex
 func (*Device_DeviceNetworkSettings) ProtoMessage()    {}
 func (*Device_DeviceNetworkSettings) Descriptor() ([]byte, []int) {
 	return fileDescriptorDevice, []int{0, 1}
+}
+
+func (m *Device_DeviceNetworkSettings) GetIp() *common.IPAddress {
+	if m != nil {
+		return m.Ip
+	}
+	return nil
+}
+
+func (m *Device_DeviceNetworkSettings) GetInterface() []*Device_DeviceInterfaceConfig {
+	if m != nil {
+		return m.Interface
+	}
+	return nil
+}
+
+func (m *Device_DeviceNetworkSettings) GetDns() []*common.IPAddress {
+	if m != nil {
+		return m.Dns
+	}
+	return nil
+}
+
+type Device_DeviceInterfaceConfig struct {
+	Devname   string            `protobuf:"bytes,1,opt,name=devname,proto3" json:"devname,omitempty"`
+	Ip        *common.IPAddress `protobuf:"bytes,2,opt,name=ip" json:"ip,omitempty"`
+	GatewayIp *common.IPAddress `protobuf:"bytes,3,opt,name=gateway_ip,json=gatewayIp" json:"gateway_ip,omitempty"`
+}
+
+func (m *Device_DeviceInterfaceConfig) Reset()         { *m = Device_DeviceInterfaceConfig{} }
+func (m *Device_DeviceInterfaceConfig) String() string { return proto.CompactTextString(m) }
+func (*Device_DeviceInterfaceConfig) ProtoMessage()    {}
+func (*Device_DeviceInterfaceConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptorDevice, []int{0, 2}
+}
+
+func (m *Device_DeviceInterfaceConfig) GetIp() *common.IPAddress {
+	if m != nil {
+		return m.Ip
+	}
+	return nil
+}
+
+func (m *Device_DeviceInterfaceConfig) GetGatewayIp() *common.IPAddress {
+	if m != nil {
+		return m.GatewayIp
+	}
+	return nil
 }
 
 type Device_DeviceSetupState struct {
@@ -101,7 +152,7 @@ type Device_DeviceSetupState struct {
 func (m *Device_DeviceSetupState) Reset()                    { *m = Device_DeviceSetupState{} }
 func (m *Device_DeviceSetupState) String() string            { return proto.CompactTextString(m) }
 func (*Device_DeviceSetupState) ProtoMessage()               {}
-func (*Device_DeviceSetupState) Descriptor() ([]byte, []int) { return fileDescriptorDevice, []int{0, 2} }
+func (*Device_DeviceSetupState) Descriptor() ([]byte, []int) { return fileDescriptorDevice, []int{0, 3} }
 
 type Device_DeviceIdentity struct {
 	// Generated certs, latest is first
@@ -112,7 +163,7 @@ type Device_DeviceIdentity struct {
 func (m *Device_DeviceIdentity) Reset()                    { *m = Device_DeviceIdentity{} }
 func (m *Device_DeviceIdentity) String() string            { return proto.CompactTextString(m) }
 func (*Device_DeviceIdentity) ProtoMessage()               {}
-func (*Device_DeviceIdentity) Descriptor() ([]byte, []int) { return fileDescriptorDevice, []int{0, 3} }
+func (*Device_DeviceIdentity) Descriptor() ([]byte, []int) { return fileDescriptorDevice, []int{0, 4} }
 
 func (m *Device_DeviceIdentity) GetChain() []*common.CertChain {
 	if m != nil {
@@ -121,12 +172,25 @@ func (m *Device_DeviceIdentity) GetChain() []*common.CertChain {
 	return nil
 }
 
+type DeviceNetworkTemplate struct {
+	Id          string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name        string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+}
+
+func (m *DeviceNetworkTemplate) Reset()                    { *m = DeviceNetworkTemplate{} }
+func (m *DeviceNetworkTemplate) String() string            { return proto.CompactTextString(m) }
+func (*DeviceNetworkTemplate) ProtoMessage()               {}
+func (*DeviceNetworkTemplate) Descriptor() ([]byte, []int) { return fileDescriptorDevice, []int{1} }
+
 func init() {
 	proto.RegisterType((*Device)(nil), "device.Device")
 	proto.RegisterType((*Device_DeviceConsulSettings)(nil), "device.Device.DeviceConsulSettings")
 	proto.RegisterType((*Device_DeviceNetworkSettings)(nil), "device.Device.DeviceNetworkSettings")
+	proto.RegisterType((*Device_DeviceInterfaceConfig)(nil), "device.Device.DeviceInterfaceConfig")
 	proto.RegisterType((*Device_DeviceSetupState)(nil), "device.Device.DeviceSetupState")
 	proto.RegisterType((*Device_DeviceIdentity)(nil), "device.Device.DeviceIdentity")
+	proto.RegisterType((*DeviceNetworkTemplate)(nil), "device.DeviceNetworkTemplate")
 }
 func (m *Device) Marshal() (data []byte, err error) {
 	size := m.Size()
@@ -207,6 +271,12 @@ func (m *Device) MarshalTo(data []byte) (int, error) {
 			i += n
 		}
 	}
+	if len(m.Fqdn) > 0 {
+		data[i] = 0x42
+		i++
+		i = encodeVarintDevice(data, i, uint64(len(m.Fqdn)))
+		i += copy(data[i:], m.Fqdn)
+	}
 	return i, nil
 }
 
@@ -263,12 +333,83 @@ func (m *Device_DeviceNetworkSettings) MarshalTo(data []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Ip) > 0 {
-		for _, num := range m.Ip {
-			data[i] = 0x8
-			i++
-			i = encodeVarintDevice(data, i, uint64(num))
+	if m.Ip != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintDevice(data, i, uint64(m.Ip.Size()))
+		n5, err := m.Ip.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
 		}
+		i += n5
+	}
+	if len(m.Interface) > 0 {
+		for _, msg := range m.Interface {
+			data[i] = 0x12
+			i++
+			i = encodeVarintDevice(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if len(m.Dns) > 0 {
+		for _, msg := range m.Dns {
+			data[i] = 0x1a
+			i++
+			i = encodeVarintDevice(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	return i, nil
+}
+
+func (m *Device_DeviceInterfaceConfig) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *Device_DeviceInterfaceConfig) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Devname) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintDevice(data, i, uint64(len(m.Devname)))
+		i += copy(data[i:], m.Devname)
+	}
+	if m.Ip != nil {
+		data[i] = 0x12
+		i++
+		i = encodeVarintDevice(data, i, uint64(m.Ip.Size()))
+		n6, err := m.Ip.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	if m.GatewayIp != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintDevice(data, i, uint64(m.GatewayIp.Size()))
+		n7, err := m.GatewayIp.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n7
 	}
 	return i, nil
 }
@@ -347,6 +488,42 @@ func (m *Device_DeviceIdentity) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
+func (m *DeviceNetworkTemplate) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *DeviceNetworkTemplate) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintDevice(data, i, uint64(len(m.Id)))
+		i += copy(data[i:], m.Id)
+	}
+	if len(m.Name) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintDevice(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Description) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintDevice(data, i, uint64(len(m.Description)))
+		i += copy(data[i:], m.Description)
+	}
+	return i, nil
+}
+
 func encodeFixed64Device(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	data[offset+1] = uint8(v >> 8)
@@ -407,6 +584,10 @@ func (m *Device) Size() (n int) {
 			n += 1 + l + sovDevice(uint64(l))
 		}
 	}
+	l = len(m.Fqdn)
+	if l > 0 {
+		n += 1 + l + sovDevice(uint64(l))
+	}
 	return n
 }
 
@@ -425,10 +606,39 @@ func (m *Device_DeviceConsulSettings) Size() (n int) {
 func (m *Device_DeviceNetworkSettings) Size() (n int) {
 	var l int
 	_ = l
-	if len(m.Ip) > 0 {
-		for _, e := range m.Ip {
-			n += 1 + sovDevice(uint64(e))
+	if m.Ip != nil {
+		l = m.Ip.Size()
+		n += 1 + l + sovDevice(uint64(l))
+	}
+	if len(m.Interface) > 0 {
+		for _, e := range m.Interface {
+			l = e.Size()
+			n += 1 + l + sovDevice(uint64(l))
 		}
+	}
+	if len(m.Dns) > 0 {
+		for _, e := range m.Dns {
+			l = e.Size()
+			n += 1 + l + sovDevice(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *Device_DeviceInterfaceConfig) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Devname)
+	if l > 0 {
+		n += 1 + l + sovDevice(uint64(l))
+	}
+	if m.Ip != nil {
+		l = m.Ip.Size()
+		n += 1 + l + sovDevice(uint64(l))
+	}
+	if m.GatewayIp != nil {
+		l = m.GatewayIp.Size()
+		n += 1 + l + sovDevice(uint64(l))
 	}
 	return n
 }
@@ -455,6 +665,24 @@ func (m *Device_DeviceIdentity) Size() (n int) {
 		}
 	}
 	l = len(m.PublicKey)
+	if l > 0 {
+		n += 1 + l + sovDevice(uint64(l))
+	}
+	return n
+}
+
+func (m *DeviceNetworkTemplate) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovDevice(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovDevice(uint64(l))
+	}
+	l = len(m.Description)
 	if l > 0 {
 		n += 1 + l + sovDevice(uint64(l))
 	}
@@ -724,6 +952,35 @@ func (m *Device) Unmarshal(data []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Fqdn", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Fqdn = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDevice(data[iNdEx:])
@@ -865,10 +1122,10 @@ func (m *Device_DeviceNetworkSettings) Unmarshal(data []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Ip", wireType)
 			}
-			var v int32
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowDevice
@@ -878,12 +1135,232 @@ func (m *Device_DeviceNetworkSettings) Unmarshal(data []byte) error {
 				}
 				b := data[iNdEx]
 				iNdEx++
-				v |= (int32(b) & 0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			m.Ip = append(m.Ip, v)
+			if msglen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Ip == nil {
+				m.Ip = &common.IPAddress{}
+			}
+			if err := m.Ip.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Interface", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Interface = append(m.Interface, &Device_DeviceInterfaceConfig{})
+			if err := m.Interface[len(m.Interface)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Dns", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Dns = append(m.Dns, &common.IPAddress{})
+			if err := m.Dns[len(m.Dns)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDevice(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Device_DeviceInterfaceConfig) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeviceInterfaceConfig: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeviceInterfaceConfig: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Devname", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Devname = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Ip", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Ip == nil {
+				m.Ip = &common.IPAddress{}
+			}
+			if err := m.Ip.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GatewayIp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.GatewayIp == nil {
+				m.GatewayIp = &common.IPAddress{}
+			}
+			if err := m.GatewayIp.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDevice(data[iNdEx:])
@@ -1105,6 +1582,143 @@ func (m *Device_DeviceIdentity) Unmarshal(data []byte) error {
 	}
 	return nil
 }
+func (m *DeviceNetworkTemplate) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDevice
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DeviceNetworkTemplate: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DeviceNetworkTemplate: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Description", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDevice
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDevice
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Description = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDevice(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDevice
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipDevice(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
@@ -1211,36 +1825,45 @@ var (
 )
 
 var fileDescriptorDevice = []byte{
-	// 491 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x84, 0x53, 0xdd, 0x6e, 0xd3, 0x30,
-	0x14, 0x56, 0xff, 0x42, 0x7a, 0x86, 0xda, 0xce, 0x02, 0x14, 0x05, 0x0d, 0x26, 0x40, 0xda, 0x24,
-	0x20, 0x45, 0x70, 0x85, 0xc4, 0x05, 0x6a, 0x77, 0x33, 0x7e, 0x25, 0xf7, 0x01, 0x42, 0x93, 0x7a,
-	0xa9, 0xb5, 0xd5, 0x8e, 0x6c, 0xa7, 0x28, 0x6f, 0xc8, 0x25, 0x8f, 0x80, 0x78, 0x08, 0xae, 0x71,
-	0x6c, 0x27, 0x6d, 0x51, 0xd0, 0x2e, 0xa2, 0xe3, 0x73, 0xce, 0xf7, 0x7d, 0x3e, 0xfe, 0xec, 0xc0,
-	0x8b, 0x8c, 0xaa, 0x75, 0x91, 0x44, 0x29, 0xdf, 0x4c, 0x65, 0xc9, 0x04, 0x4f, 0xf8, 0x34, 0x17,
-	0x5c, 0xf1, 0xe9, 0x8a, 0x6c, 0x69, 0x4a, 0x5c, 0x88, 0x4c, 0x0d, 0x79, 0x36, 0x0b, 0x5f, 0xee,
-	0xb1, 0x32, 0x9e, 0x39, 0x4a, 0x52, 0x5c, 0x99, 0xcc, 0xf2, 0xab, 0x95, 0xa5, 0x85, 0xff, 0xdf,
-	0x44, 0x57, 0x36, 0x9c, 0xb9, 0x70, 0x2b, 0x7a, 0x43, 0x94, 0xa0, 0xa9, 0x0b, 0x16, 0xfd, 0xe4,
-	0xcf, 0x00, 0xbc, 0x0b, 0x33, 0x15, 0x0a, 0xc1, 0x5f, 0x73, 0xa9, 0xd8, 0x72, 0x43, 0x82, 0xce,
-	0x69, 0xe7, 0x7c, 0x88, 0x9b, 0x1c, 0x3d, 0x00, 0x4f, 0x90, 0x8c, 0x72, 0x16, 0x74, 0x4d, 0xc7,
-	0x65, 0xe8, 0x13, 0x8c, 0x53, 0xce, 0x64, 0x71, 0x13, 0x4b, 0xa2, 0x14, 0x65, 0x99, 0x0c, 0x7a,
-	0x1a, 0x70, 0xf4, 0xfa, 0x69, 0xe4, 0x4e, 0x7e, 0xb1, 0x1f, 0xe6, 0x06, 0xbb, 0x70, 0x50, 0x3c,
-	0x4a, 0x0f, 0x72, 0xf4, 0x15, 0x26, 0x8c, 0xa8, 0xef, 0x5c, 0x5c, 0xef, 0xe4, 0xfa, 0x46, 0xee,
-	0x59, 0xab, 0xdc, 0x17, 0x0b, 0x6e, 0xf4, 0xc6, 0xec, 0xb0, 0x80, 0xde, 0xc3, 0x91, 0x16, 0x2a,
-	0xf2, 0x58, 0xaa, 0xa5, 0x22, 0xc1, 0xc0, 0x68, 0x3d, 0x6e, 0xd5, 0x5a, 0x54, 0xb8, 0x45, 0x05,
-	0xc3, 0x20, 0x9b, 0x35, 0x7a, 0x0b, 0x3e, 0x5d, 0x11, 0xa6, 0xa8, 0x2a, 0x03, 0xcf, 0xd0, 0x4f,
-	0x5a, 0xe9, 0x97, 0x0e, 0x84, 0x1b, 0x38, 0x7a, 0x05, 0x9e, 0xb5, 0x3a, 0xb8, 0x73, 0xda, 0xd3,
-	0xc4, 0x20, 0x72, 0xce, 0x7f, 0x36, 0xc1, 0x32, 0xae, 0x28, 0x11, 0xd8, 0xe1, 0xc2, 0x6f, 0x70,
-	0xaf, 0xcd, 0x27, 0xf4, 0x10, 0x86, 0x54, 0x6a, 0x4b, 0xc4, 0x96, 0x08, 0x73, 0x35, 0xbe, 0xde,
-	0x46, 0x2e, 0x4c, 0x8e, 0x9e, 0xc3, 0x71, 0x2e, 0xc8, 0x56, 0x8b, 0xc5, 0x09, 0xe7, 0x4a, 0x2a,
-	0xb1, 0xcc, 0xcd, 0x2d, 0xf9, 0x78, 0xe2, 0x1a, 0xb3, 0xba, 0x1e, 0x9e, 0xc1, 0xfd, 0x56, 0xeb,
-	0xd0, 0x08, 0xba, 0x34, 0xd7, 0xda, 0xbd, 0xf3, 0x01, 0xd6, 0xab, 0xb0, 0x84, 0xc9, 0xbf, 0xbe,
-	0xa0, 0x33, 0x18, 0xd7, 0x87, 0x8b, 0x29, 0xa3, 0x8a, 0xac, 0xdc, 0x30, 0xa3, 0xba, 0x7c, 0x69,
-	0xaa, 0xe8, 0x1d, 0x84, 0xcd, 0xab, 0xa8, 0x66, 0xdc, 0x0d, 0x96, 0x6b, 0x8e, 0x9d, 0x2d, 0xa8,
-	0xef, 0xbe, 0x02, 0xcc, 0xf6, 0xfa, 0xe1, 0x0a, 0x46, 0x87, 0x9e, 0xea, 0x8d, 0x07, 0xe9, 0x7a,
-	0x49, 0xab, 0xc7, 0x57, 0x19, 0x79, 0x1c, 0xb9, 0x07, 0x3f, 0x27, 0x42, 0xcd, 0xab, 0x06, 0xb6,
-	0x7d, 0x74, 0x02, 0x90, 0x17, 0xc9, 0x0d, 0x4d, 0xe3, 0x6b, 0x52, 0x9a, 0x97, 0x38, 0xc4, 0x43,
-	0x5b, 0xf9, 0x48, 0xca, 0x0f, 0x7d, 0xbf, 0x33, 0xe9, 0xe2, 0x7e, 0xae, 0x9b, 0xb3, 0xbb, 0x3f,
-	0x7e, 0x3f, 0xea, 0xfc, 0xd4, 0xdf, 0x2f, 0xfd, 0x25, 0x9e, 0xf9, 0x1b, 0xde, 0xfc, 0x0d, 0x00,
-	0x00, 0xff, 0xff, 0xdf, 0x47, 0x45, 0xb1, 0xd0, 0x03, 0x00, 0x00,
+	// 630 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x84, 0x54, 0xdd, 0x6e, 0xd3, 0x30,
+	0x14, 0x56, 0x9b, 0x2e, 0x4b, 0x4f, 0x51, 0xd7, 0x59, 0x80, 0xa2, 0xa0, 0xc1, 0xd8, 0x90, 0x40,
+	0x02, 0xba, 0x69, 0x5c, 0x21, 0x71, 0x01, 0xdd, 0x6e, 0xca, 0xbf, 0x52, 0x6e, 0x51, 0xc8, 0x8f,
+	0x9b, 0x59, 0x5b, 0xed, 0x60, 0xbb, 0x9b, 0xf2, 0x02, 0x5c, 0xf3, 0x0e, 0xbc, 0x0c, 0x97, 0x3c,
+	0x02, 0xe2, 0x49, 0x70, 0x6c, 0x27, 0xeb, 0xa6, 0x0c, 0x2e, 0x22, 0x9f, 0x9f, 0xef, 0xfc, 0xf8,
+	0x3b, 0x27, 0x86, 0x27, 0x39, 0x91, 0xc7, 0xcb, 0x64, 0x9c, 0xb2, 0xc5, 0x9e, 0x28, 0x29, 0x67,
+	0x09, 0xdb, 0x2b, 0x38, 0x93, 0x6c, 0x2f, 0xc3, 0x67, 0x24, 0xc5, 0xf6, 0x18, 0x6b, 0x1b, 0x72,
+	0x8d, 0x16, 0x3c, 0x5d, 0x89, 0xca, 0x59, 0x6e, 0x43, 0x92, 0xe5, 0x5c, 0x6b, 0x26, 0xbe, 0x92,
+	0x4c, 0x58, 0x70, 0x7d, 0x11, 0x65, 0x59, 0x30, 0x6a, 0x8f, 0xff, 0xa2, 0x17, 0x58, 0x72, 0x92,
+	0xda, 0xc3, 0xa0, 0x77, 0xbe, 0x7b, 0xe0, 0x1e, 0xe9, 0xae, 0x50, 0x00, 0xde, 0x31, 0x13, 0x92,
+	0xc6, 0x0b, 0xec, 0x77, 0xb6, 0x3b, 0x8f, 0xfa, 0x61, 0xa3, 0xa3, 0xdb, 0xe0, 0x72, 0x9c, 0x13,
+	0x46, 0xfd, 0xae, 0xf6, 0x58, 0x0d, 0xbd, 0x85, 0x8d, 0x94, 0x51, 0xb1, 0x3c, 0x8d, 0x04, 0x96,
+	0x92, 0xd0, 0x5c, 0xf8, 0x8e, 0x02, 0x0c, 0x0e, 0x76, 0xc7, 0xf6, 0xe6, 0x47, 0xab, 0xc7, 0xa1,
+	0xc6, 0xce, 0x2c, 0x34, 0x1c, 0xa6, 0x97, 0x74, 0xf4, 0x01, 0x46, 0x14, 0xcb, 0x73, 0xc6, 0x4f,
+	0x2e, 0xd2, 0xf5, 0x74, 0xba, 0x07, 0xad, 0xe9, 0xde, 0x1b, 0x70, 0x93, 0x6f, 0x83, 0x5e, 0x36,
+	0xa0, 0x97, 0x30, 0x50, 0x89, 0x96, 0x45, 0x24, 0x64, 0x2c, 0xb1, 0xbf, 0xa6, 0x73, 0xdd, 0x6b,
+	0xcd, 0x35, 0xab, 0x70, 0xb3, 0x0a, 0x16, 0x82, 0x68, 0x64, 0xf4, 0x1c, 0x3c, 0x92, 0x61, 0x2a,
+	0x89, 0x2c, 0x7d, 0x57, 0x87, 0x6f, 0xb5, 0x86, 0x4f, 0x2d, 0x28, 0x6c, 0xe0, 0x68, 0x1f, 0x5c,
+	0x43, 0xb5, 0xbf, 0xbe, 0xed, 0xa8, 0x40, 0x7f, 0x6c, 0x99, 0x7f, 0xa7, 0x0f, 0x13, 0x31, 0x27,
+	0x98, 0x87, 0x16, 0x87, 0x10, 0xf4, 0xe6, 0x5f, 0x33, 0xea, 0x7b, 0x9a, 0x63, 0x2d, 0x07, 0x5f,
+	0xe0, 0x66, 0x1b, 0x77, 0xe8, 0x0e, 0xf4, 0x89, 0x50, 0x34, 0xf1, 0x33, 0xcc, 0xf5, 0xb8, 0x3c,
+	0x55, 0x5a, 0xcc, 0xb4, 0x8e, 0x1e, 0xc3, 0x66, 0xc1, 0xf1, 0x99, 0x2a, 0x10, 0x25, 0x8c, 0x49,
+	0x21, 0x79, 0x5c, 0xe8, 0xc9, 0x79, 0xe1, 0xc8, 0x3a, 0x26, 0xb5, 0x3d, 0xf8, 0xd1, 0x81, 0x5b,
+	0xad, 0x7c, 0xa2, 0xfb, 0xd0, 0x25, 0x85, 0x4e, 0x3e, 0x38, 0xd8, 0x1c, 0xdb, 0x2d, 0x9b, 0x7e,
+	0x7c, 0x95, 0x65, 0x1c, 0x0b, 0x11, 0x2a, 0x27, 0x9a, 0xa8, 0x36, 0xa8, 0xc4, 0x7c, 0x1e, 0xa7,
+	0x58, 0x55, 0x70, 0xae, 0x9d, 0xd5, 0xb4, 0x46, 0xa9, 0x7b, 0xcc, 0x49, 0x1e, 0x5e, 0x84, 0xa1,
+	0x5d, 0x70, 0x32, 0x5a, 0x2d, 0x8e, 0xd3, 0x5e, 0xa7, 0xf2, 0x06, 0xdf, 0x9a, 0x2e, 0xaf, 0x64,
+	0x42, 0x3e, 0xac, 0xab, 0x82, 0x2b, 0x6b, 0x5b, 0xab, 0xb6, 0xff, 0xee, 0xbf, 0xfa, 0xdf, 0x07,
+	0xc8, 0xd5, 0x9c, 0xcf, 0xe3, 0x32, 0x52, 0x50, 0xe7, 0x3a, 0x68, 0xdf, 0x82, 0xa6, 0x45, 0x50,
+	0xc2, 0xe8, 0xea, 0xc6, 0xa0, 0x87, 0xb0, 0x51, 0x8f, 0x3d, 0x22, 0x94, 0x48, 0x9c, 0xd9, 0x91,
+	0x0c, 0x6b, 0xf3, 0x54, 0x5b, 0xd1, 0x0b, 0x08, 0x9a, 0xff, 0xa5, 0x9a, 0xd4, 0xc5, 0x78, 0x0a,
+	0x15, 0x63, 0x26, 0xe4, 0xd7, 0x7f, 0x45, 0x05, 0x98, 0xac, 0xf8, 0x83, 0x0c, 0x86, 0x97, 0xb7,
+	0x4d, 0x15, 0x5e, 0x4b, 0x8f, 0x63, 0x42, 0x2d, 0xf5, 0x4d, 0xe7, 0x87, 0x98, 0xcb, 0xc3, 0xca,
+	0x11, 0x1a, 0x3f, 0xda, 0x02, 0x28, 0x96, 0xc9, 0x29, 0x49, 0xa3, 0x13, 0x5c, 0xea, 0x7b, 0xf6,
+	0xc3, 0xbe, 0xb1, 0xbc, 0xc1, 0xe5, 0xeb, 0x9e, 0xd7, 0x19, 0x75, 0xc3, 0x5e, 0xa1, 0x9c, 0x3b,
+	0x9f, 0xaf, 0xac, 0xc3, 0x27, 0xbc, 0x28, 0x4e, 0xab, 0x5b, 0x0e, 0x15, 0x9d, 0x99, 0xe5, 0x58,
+	0x49, 0xd5, 0xba, 0x6a, 0xd6, 0xcd, 0x93, 0xa0, 0x65, 0xb4, 0x0d, 0x83, 0x0c, 0x8b, 0x94, 0x93,
+	0x42, 0x56, 0xaf, 0x85, 0x29, 0xb4, 0x6a, 0x9a, 0xdc, 0xf8, 0xf9, 0xe7, 0x6e, 0xe7, 0x97, 0xfa,
+	0x7e, 0xab, 0x2f, 0x71, 0xf5, 0x33, 0xf4, 0xec, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x6d, 0x4e,
+	0x4f, 0x87, 0x49, 0x05, 0x00, 0x00,
 }

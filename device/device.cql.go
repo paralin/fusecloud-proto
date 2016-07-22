@@ -4,5 +4,6 @@ var DevicesTable string = "devices"
 var DevicesTableTemplate map[string]interface{} = map[string]interface{}{
 	"hostname": "",
 	"region":   "",
+	"fqdn":     "",
 	"proto":    []byte{},
 }

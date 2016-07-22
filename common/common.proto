@@ -10,9 +10,13 @@ option (gogoproto.sizer_all) = true;
 /* IP address CIDR */
 message IPRange {
   // IP data
-  repeated uint32 ip = 1[packed=true];
+  IPAddress ip = 1;
   // Prefix length: 0->32
   uint32 plen = 2;
+}
+
+message IPAddress {
+  repeated uint32 address = 1[packed=true];
 }
 
 /* Certificate chain */

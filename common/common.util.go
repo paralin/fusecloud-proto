@@ -6,9 +6,16 @@ import (
 	"net"
 )
 
+func (ip *IPAddress) Validate() error {
+	if ip == nil || len(ip.Address) != 4 {
+		return errors.New("IP address invalid.")
+	}
+	return nil
+}
+
 func (ipr *IPRange) Validate() error {
-	if len(ipr.Ip) != 4 {
-		return fmt.Errorf("Ip length %d != 4", len(ipr.Ip))
+	if err := ipr.Ip.Validate(); err != nil {
+		return err
 	}
 	if ipr.Plen > 32 {
 		return fmt.Errorf("Prefix length %d is invalid.", ipr.Plen)
@@ -16,15 +23,23 @@ func (ipr *IPRange) Validate() error {
 	return nil
 }
 
-func (ipr *IPRange) IPString() (string, error) {
-	if err := ipr.Validate(); err != nil {
+func (ip *IPAddress) IPString() (string, error) {
+	if err := ip.Validate(); err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("%d.%d.%d.%d", ipr.Ip[0], ipr.Ip[1], ipr.Ip[2], ipr.Ip[3]), nil
+	return fmt.Sprintf("%d.%d.%d.%d", ip.Address[0], ip.Address[1], ip.Address[2], ip.Address[3]), nil
+}
+
+func (ip *IPAddress) ToIPAddr() (net.IP, error) {
+	ipstr, err := ip.IPString()
+	if err != nil {
+		return nil, err
+	}
+	return net.ParseIP(ipstr), nil
 }
 
 func (ipr *IPRange) CIDRString() (string, error) {
-	ips, err := ipr.IPString()
+	ips, err := ipr.Ip.IPString()
 	if err != nil {
 		return "", err
 	}

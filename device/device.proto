@@ -14,6 +14,9 @@ message Device {
   string hostname = 1;
   string region = 2;
 
+  /* Commited, unchangeable fqdn */
+  string fqdn = 8;
+
   DeviceConsulSettings consul_settings = 3;
   DeviceNetworkSettings network_settings = 4;
   DeviceSetupState setup_state = 5;
@@ -26,8 +29,15 @@ message Device {
   }
 
   message DeviceNetworkSettings {
-    // ip x 4 = ip address
-    repeated int32 ip = 1;
+    common.IPAddress ip = 1;
+    repeated DeviceInterfaceConfig interface = 2;
+    repeated common.IPAddress dns = 3;
+  }
+
+  message DeviceInterfaceConfig {
+    string devname = 1;
+    common.IPAddress ip = 2;
+    common.IPAddress gateway_ip = 3;
   }
 
   message DeviceSetupState {
@@ -36,11 +46,15 @@ message Device {
   }
 
   message DeviceIdentity {
-    /* Unused fields */
-    reserved "pkey";
-    reserved 1;
+    /* Unused fields: 1 pkey */
     /* Generated certs, latest is first */
     repeated common.CertChain chain = 2;
     string public_key = 3;
   }
+}
+
+message DeviceNetworkTemplate {
+  string id = 1;
+  string name = 2;
+  string description = 3;
 }

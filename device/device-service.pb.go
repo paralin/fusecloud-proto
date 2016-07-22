@@ -17,6 +17,7 @@
 		GetDeviceRequest
 		GetDeviceResponse
 		Device
+		DeviceNetworkTemplate
 */
 package device
 

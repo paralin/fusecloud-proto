@@ -41,10 +41,10 @@ func (d *Device) Validate() error {
 }
 
 func (dn *Device_DeviceNetworkSettings) ToIP() (net.IP, error) {
-	if len(dn.Ip) < 4 {
-		return nil, errors.New("IP length is less than 4.")
+	if err := dn.Ip.Validate(); err != nil {
+		return nil, err
 	}
-	return net.ParseIP(fmt.Sprintf("%d.%d.%d.%d", dn.Ip[0], dn.Ip[1], dn.Ip[2], dn.Ip[3])), nil
+	return dn.Ip.ToIPAddr()
 }
 
 func (di *Device_DeviceIdentity) GenerateKey() (*rsa.PrivateKey, error) {
