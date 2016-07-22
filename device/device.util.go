@@ -1,6 +1,7 @@
 package device
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -126,6 +127,39 @@ func (ddev *Device) BuildCertificateRequest(regionName string, devicesDomain str
 	}
 
 	return x509.CreateCertificateRequest(rand.Reader, reqTmpl, pkey)
+}
+
+func (ns *Device_DeviceInterfaceConfig) BuildSystemdNetworkdFile() string {
+	var res bytes.Buffer
+	res.WriteString("[Match]\nName=")
+	res.WriteString(ns.Devname)
+	res.WriteString("\n\n[Network]\n")
+
+	var ips string
+
+	if ns.Ip != nil {
+		ips, _ = ns.Ip.IPString()
+	} else {
+		ips = ""
+	}
+	if ips != "" {
+		res.WriteString("Address=")
+		res.WriteString(ips)
+		res.WriteString("/24\n")
+	}
+
+	if ns.GatewayIp != nil {
+		ips, _ = ns.GatewayIp.IPString()
+	}
+	if ips != "" {
+		res.WriteString("Gateway=")
+		res.WriteString(ips)
+		res.WriteString("\n")
+	} else {
+		res.WriteString("DHCP=ipv4")
+	}
+
+	return res.String()
 }
 
 func DeviceCertExpiryTime(from time.Time) time.Time {
