@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"time"
 
 	"encoding/pem"
 	"errors"
@@ -15,6 +16,8 @@ import (
 )
 
 var DevicesDomain string = "devices.synrobo.com"
+var DeviceKeyUsage x509.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageContentCommitment | x509.KeyUsageKeyEncipherment
+var DeviceExtKeyUsage []x509.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageEmailProtection}
 
 func (d *Device) Validate() error {
 	hnlen := len(d.Hostname)
@@ -44,76 +47,52 @@ func (dn *Device_DeviceNetworkSettings) ToIP() (net.IP, error) {
 	return net.ParseIP(fmt.Sprintf("%d.%d.%d.%d", dn.Ip[0], dn.Ip[1], dn.Ip[2], dn.Ip[3])), nil
 }
 
-func (di *Device_DeviceIdentity) GenerateKey() error {
+func (di *Device_DeviceIdentity) GenerateKey() (*rsa.PrivateKey, error) {
 	pkey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	di.Pkey = string(pem.EncodeToMemory(&pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(pkey),
+	pkd, err := x509.MarshalPKIXPublicKey(pkey.Public())
+	if err != nil {
+		return nil, err
+	}
+	di.PublicKey = string(pem.EncodeToMemory(&pem.Block{
+		Type:  "PUBLIC KEY",
+		Bytes: pkd,
 	}))
-	return nil
+	return pkey, nil
 }
 
-func (ddev *Device_DeviceIdentity) EnsureKey() error {
-	if ddev.Pkey == "" {
-		return ddev.GenerateKey()
-	}
-	return nil
-}
-
-func (ddev *Device_DeviceIdentity) ParsePkey() (*rsa.PrivateKey, error) {
-	if ddev.Pkey == "" {
+func (ddev *Device_DeviceIdentity) ParsePublicKey() (*rsa.PublicKey, error) {
+	if ddev.PublicKey == "" {
 		return nil, errors.New("Device has no private key.")
 	}
-	blk, _ := pem.Decode([]byte(ddev.Pkey))
+	blk, _ := pem.Decode([]byte(ddev.PublicKey))
 	if blk == nil {
 		return nil, errors.New("Private key pem failed to parse")
 	}
-	if blk.Type != "RSA PRIVATE KEY" {
-		return nil, fmt.Errorf("Pkey pem type %s is not RSA PRIVATE KEY.", blk.Type)
+	if blk.Type != "PUBLIC KEY" {
+		return nil, fmt.Errorf("Public key pem type %s is not PUBLIC KEY.", blk.Type)
 	}
-	return x509.ParsePKCS1PrivateKey(blk.Bytes)
-}
-
-func (dev *Device) EnsureIdentity() error {
-	if dev.Identity == nil {
-		dev.Identity = &Device_DeviceIdentity{}
+	pkr, err := x509.ParsePKIXPublicKey(blk.Bytes)
+	if err != nil {
+		return nil, err
 	}
-	return dev.Identity.EnsureKey()
+	return pkr.(*rsa.PublicKey), nil
 }
 
 /* Generates a CSR and adds it to the beginning of the list. */
 /* Devices domain MUST be something like devices.synrobo.com */
-func (ddev *Device) AddCert(devicesDomain, regionName string) error {
-	if err := ddev.EnsureIdentity(); err != nil {
-		return err
-	}
-
-	pkey, err := ddev.Identity.ParsePkey()
-	if err != nil {
-		return err
+func (ddev *Device) AddCert(devicesDomain, regionName string, pkey *rsa.PrivateKey) error {
+	if ddev.Identity == nil {
+		ddev.Identity = &Device_DeviceIdentity{}
 	}
 
 	newCert := &common.CertChain{
 		CsrWaiting: true,
 	}
 
-	// generate csr
-	reqTmpl := &x509.CertificateRequest{
-		Subject: pkix.Name{
-			Country:            []string{"United States"},
-			Province:           []string{"California"},
-			Locality:           []string{regionName},
-			Organization:       []string{"Synergy Robotics"},
-			OrganizationalUnit: []string{"devices:" + ddev.Region},
-			CommonName:         fmt.Sprintf("%s.%s.%s", ddev.Hostname, ddev.Region, devicesDomain),
-		},
-		SignatureAlgorithm: x509.SHA256WithRSA,
-	}
-
-	csr, err := x509.CreateCertificateRequest(rand.Reader, reqTmpl, pkey)
+	csr, err := ddev.BuildCertificateRequest(regionName, devicesDomain, pkey)
 	if err != nil {
 		return err
 	}
@@ -128,12 +107,27 @@ func (ddev *Device) AddCert(devicesDomain, regionName string) error {
 	return nil
 }
 
-func (dev *Device) EnsureIdentityAndCert(regionName string) error {
-	if err := dev.EnsureIdentity(); err != nil {
-		return err
+func (ddev *Device) BuildSubject(regionName string, devicesDomain string) pkix.Name {
+	return pkix.Name{
+		Country:            []string{"United States"},
+		Province:           []string{"California"},
+		Locality:           []string{regionName},
+		Organization:       []string{"Synergy Robotics"},
+		OrganizationalUnit: []string{"devices:" + ddev.Region},
+		CommonName:         fmt.Sprintf("%s.%s.%s", ddev.Hostname, ddev.Region, devicesDomain),
 	}
-	if len(dev.Identity.Chain) == 0 {
-		return dev.AddCert(DevicesDomain, regionName)
+}
+
+func (ddev *Device) BuildCertificateRequest(regionName string, devicesDomain string, pkey *rsa.PrivateKey) ([]byte, error) {
+	// generate csr
+	reqTmpl := &x509.CertificateRequest{
+		Subject:            ddev.BuildSubject(regionName, devicesDomain),
+		SignatureAlgorithm: x509.SHA256WithRSA,
 	}
-	return nil
+
+	return x509.CreateCertificateRequest(rand.Reader, reqTmpl, pkey)
+}
+
+func DeviceCertExpiryTime(from time.Time) time.Time {
+	return from.Add(time.Duration(375) * 24 * time.Hour)
 }
