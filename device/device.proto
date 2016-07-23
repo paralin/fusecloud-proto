@@ -38,6 +38,22 @@ message Device {
     string devname = 1;
     common.IPAddress ip = 2;
     common.IPAddress gateway_ip = 3;
+    WifiConfig wifi_settings = 4;
+
+    message WifiConfig {
+      repeated WifiNetwork network = 1;
+      string extra_options = 2;
+
+      message WifiNetwork {
+        string ssid = 1;
+        string proto = 2;
+        string key_mgmt = 3;
+        string pairwise = 4;
+        string group = 5;
+        string psk = 6;
+        string extra_options = 7;
+      }
+    }
   }
 
   message DeviceSetupState {
