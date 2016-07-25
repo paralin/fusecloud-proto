@@ -38,8 +38,20 @@ message GetDeviceResponse {
   Device device = 1;
 }
 
+message GetConsulPeersRequest {
+  identify.Identify identify = 1;
+}
+
+message GetConsulPeersResponse {
+  repeated string server_peer = 1;
+  repeated string agent_peer = 2;
+}
+
 service GlobalDeviceService {
   rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
   rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
   rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
+
+  // Methods called by devices
+  rpc GetConsulPeers(GetConsulPeersRequest) returns (GetConsulPeersResponse);
 }

@@ -36,6 +36,7 @@ message User {
   message UserCert {
     common.CertChain chain = 1;
     string pkey = 2;
+    string public_key = 3;
   }
 
   enum UserRole {
