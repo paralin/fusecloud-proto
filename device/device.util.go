@@ -22,14 +22,14 @@ var DeviceKeyUsage x509.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsage
 var DeviceExtKeyUsage []x509.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageEmailProtection}
 
 func ParseFqdn(fqdn string) (hostname string, region string, err error) {
-	n, err := fmt.Sscanf(fqdn, fmt.Sprintf("%%s.%%s.%s", DevicesDomain), &hostname, &region)
-	if err != nil {
-		return "", "", err
+	fqdnParts := strings.Split(fqdn, ".") // 2 + domainParts
+	fqdnLen := len(fqdnParts)
+	domainParts := strings.Split(DevicesDomain, ".") // 3
+	domainLen := len(domainParts)
+	if fqdnLen != 2+domainLen {
+		return "", "", errors.New("Unexpected domain parts length.")
 	}
-	if n != 2 {
-		return "", "", errors.New("Failed to parse fqdn.")
-	}
-	return hostname, region, nil
+	return fqdnParts[0], fqdnParts[1], nil
 }
 
 func (d *Device) GenerateFqdn(domain string) string {

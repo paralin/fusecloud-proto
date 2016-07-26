@@ -7,6 +7,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/synrobo/proto/permissions"
@@ -27,14 +28,14 @@ func (user *User) GenerateFqdn(authDomain string) string {
 }
 
 func ParseFqdn(fqdn string) (username string, err error) {
-	n, err := fmt.Sscanf(fqdn, fmt.Sprintf("%%s.%s", AuthDomain), &username)
-	if err != nil {
-		return "", err
+	fqdnParts := strings.Split(fqdn, ".") // 1 + domainParts
+	fqdnLen := len(fqdnParts)
+	domainParts := strings.Split(AuthDomain, ".") // 3
+	domainLen := len(domainParts)
+	if fqdnLen != 1+domainLen {
+		return "", errors.New("Unexpected domain parts length.")
 	}
-	if n < 1 {
-		return "", fmt.Errorf("FQDN %s failed to parse.", fqdn)
-	}
-	return username, nil
+	return fqdnParts[0], nil
 }
 
 func (usr *User_UserCert) ParsePublicKey() (*rsa.PublicKey, error) {

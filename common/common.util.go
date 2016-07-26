@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"strconv"
+	"strings"
 )
 
 func (ip *IPAddress) Validate() error {
@@ -36,6 +38,22 @@ func (ip *IPAddress) ToIPAddr() (net.IP, error) {
 		return nil, err
 	}
 	return net.ParseIP(ipstr), nil
+}
+
+// Really stupid implementation, will make something better later
+func FromIPAddr(ip net.IP) *IPAddress {
+	parts := strings.Split(ip.String(), ".")
+	res := &IPAddress{
+		Address: []uint32{},
+	}
+	for _, part := range parts {
+		i, err := strconv.Atoi(part)
+		if err != nil {
+			continue
+		}
+		res.Address = append(res.Address, uint32(i))
+	}
+	return res
 }
 
 func (ipr *IPRange) CIDRString() (string, error) {

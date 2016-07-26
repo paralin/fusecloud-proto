@@ -2,6 +2,7 @@ syntax = "proto3";
 package device;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/common/common.proto";
 import "github.com/synrobo/proto/identify/identify.proto";
 import "github.com/synrobo/proto/device/device.proto";
 
@@ -43,8 +44,9 @@ message GetConsulPeersRequest {
 }
 
 message GetConsulPeersResponse {
-  repeated string server_peer = 1;
-  repeated string agent_peer = 2;
+  repeated common.IPAddress server_peer = 1;
+  repeated common.IPAddress agent_peer = 2;
+  repeated common.IPAddress wan_peer = 3;
 }
 
 service GlobalDeviceService {
