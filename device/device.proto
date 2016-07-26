@@ -25,7 +25,7 @@ message Device {
 
   message DeviceConsulSettings {
     bool is_server = 1;
-    bool prevent_bootstrap = 2;
+    bool bootstrap = 2;
   }
 
   message DeviceNetworkSettings {

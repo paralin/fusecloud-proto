@@ -32,7 +32,7 @@ message Region {
 
   message RegionState {
     bool meta_keyspace_created = 1;
-    bool consul_bootstrapped = 2;
+    bool consul_bootstrapper_created = 2;
   }
 
   message RegionDataKeyspace {
