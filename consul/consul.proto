@@ -21,5 +21,19 @@ message ConsulHealthCheck {
   string notes = 5;
   string output = 6;
   string service_id = 7;
-  string service_name = 8;
+  string service_name = 8; }
+
+message ConsulAgentService {
+  string id = 1;
+  string service_name = 2;
+  repeated string tags = 3;
+  uint32 port = 4;
+  string address = 5;
+  bool enable_tag_override = 6;
+}
+
+message ConsulServiceHealth {
+  ConsulNode node = 1;
+  repeated ConsulHealthCheck checks = 2;
+  ConsulAgentService svc = 3;
 }

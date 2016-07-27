@@ -34,8 +34,73 @@ func (m *ConsulNode) GetAddress() *common.IPAddress {
 	return nil
 }
 
+type ConsulHealthCheck struct {
+	Node        string `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
+	CheckId     string `protobuf:"bytes,2,opt,name=check_id,json=checkId,proto3" json:"check_id,omitempty"`
+	Name        string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Status      string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
+	Notes       string `protobuf:"bytes,5,opt,name=notes,proto3" json:"notes,omitempty"`
+	Output      string `protobuf:"bytes,6,opt,name=output,proto3" json:"output,omitempty"`
+	ServiceId   string `protobuf:"bytes,7,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
+	ServiceName string `protobuf:"bytes,8,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
+}
+
+func (m *ConsulHealthCheck) Reset()                    { *m = ConsulHealthCheck{} }
+func (m *ConsulHealthCheck) String() string            { return proto.CompactTextString(m) }
+func (*ConsulHealthCheck) ProtoMessage()               {}
+func (*ConsulHealthCheck) Descriptor() ([]byte, []int) { return fileDescriptorConsul, []int{1} }
+
+type ConsulAgentService struct {
+	Id                string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ServiceName       string   `protobuf:"bytes,2,opt,name=service_name,json=serviceName,proto3" json:"service_name,omitempty"`
+	Tags              []string `protobuf:"bytes,3,rep,name=tags" json:"tags,omitempty"`
+	Port              uint32   `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
+	Address           string   `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
+	EnableTagOverride bool     `protobuf:"varint,6,opt,name=enable_tag_override,json=enableTagOverride,proto3" json:"enable_tag_override,omitempty"`
+}
+
+func (m *ConsulAgentService) Reset()                    { *m = ConsulAgentService{} }
+func (m *ConsulAgentService) String() string            { return proto.CompactTextString(m) }
+func (*ConsulAgentService) ProtoMessage()               {}
+func (*ConsulAgentService) Descriptor() ([]byte, []int) { return fileDescriptorConsul, []int{2} }
+
+type ConsulServiceHealth struct {
+	Node   *ConsulNode          `protobuf:"bytes,1,opt,name=node" json:"node,omitempty"`
+	Checks []*ConsulHealthCheck `protobuf:"bytes,2,rep,name=checks" json:"checks,omitempty"`
+	Svc    *ConsulAgentService  `protobuf:"bytes,3,opt,name=svc" json:"svc,omitempty"`
+}
+
+func (m *ConsulServiceHealth) Reset()                    { *m = ConsulServiceHealth{} }
+func (m *ConsulServiceHealth) String() string            { return proto.CompactTextString(m) }
+func (*ConsulServiceHealth) ProtoMessage()               {}
+func (*ConsulServiceHealth) Descriptor() ([]byte, []int) { return fileDescriptorConsul, []int{3} }
+
+func (m *ConsulServiceHealth) GetNode() *ConsulNode {
+	if m != nil {
+		return m.Node
+	}
+	return nil
+}
+
+func (m *ConsulServiceHealth) GetChecks() []*ConsulHealthCheck {
+	if m != nil {
+		return m.Checks
+	}
+	return nil
+}
+
+func (m *ConsulServiceHealth) GetSvc() *ConsulAgentService {
+	if m != nil {
+		return m.Svc
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*ConsulNode)(nil), "consul.ConsulNode")
+	proto.RegisterType((*ConsulHealthCheck)(nil), "consul.ConsulHealthCheck")
+	proto.RegisterType((*ConsulAgentService)(nil), "consul.ConsulAgentService")
+	proto.RegisterType((*ConsulServiceHealth)(nil), "consul.ConsulServiceHealth")
 }
 func (m *ConsulNode) Marshal() (data []byte, err error) {
 	size := m.Size()
@@ -67,6 +132,188 @@ func (m *ConsulNode) MarshalTo(data []byte) (int, error) {
 			return 0, err
 		}
 		i += n1
+	}
+	return i, nil
+}
+
+func (m *ConsulHealthCheck) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ConsulHealthCheck) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Node) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.Node)))
+		i += copy(data[i:], m.Node)
+	}
+	if len(m.CheckId) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.CheckId)))
+		i += copy(data[i:], m.CheckId)
+	}
+	if len(m.Name) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.Status) > 0 {
+		data[i] = 0x22
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.Status)))
+		i += copy(data[i:], m.Status)
+	}
+	if len(m.Notes) > 0 {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.Notes)))
+		i += copy(data[i:], m.Notes)
+	}
+	if len(m.Output) > 0 {
+		data[i] = 0x32
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.Output)))
+		i += copy(data[i:], m.Output)
+	}
+	if len(m.ServiceId) > 0 {
+		data[i] = 0x3a
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.ServiceId)))
+		i += copy(data[i:], m.ServiceId)
+	}
+	if len(m.ServiceName) > 0 {
+		data[i] = 0x42
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.ServiceName)))
+		i += copy(data[i:], m.ServiceName)
+	}
+	return i, nil
+}
+
+func (m *ConsulAgentService) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ConsulAgentService) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.Id) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.Id)))
+		i += copy(data[i:], m.Id)
+	}
+	if len(m.ServiceName) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.ServiceName)))
+		i += copy(data[i:], m.ServiceName)
+	}
+	if len(m.Tags) > 0 {
+		for _, s := range m.Tags {
+			data[i] = 0x1a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				data[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			data[i] = uint8(l)
+			i++
+			i += copy(data[i:], s)
+		}
+	}
+	if m.Port != 0 {
+		data[i] = 0x20
+		i++
+		i = encodeVarintConsul(data, i, uint64(m.Port))
+	}
+	if len(m.Address) > 0 {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintConsul(data, i, uint64(len(m.Address)))
+		i += copy(data[i:], m.Address)
+	}
+	if m.EnableTagOverride {
+		data[i] = 0x30
+		i++
+		if m.EnableTagOverride {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	return i, nil
+}
+
+func (m *ConsulServiceHealth) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *ConsulServiceHealth) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Node != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintConsul(data, i, uint64(m.Node.Size()))
+		n2, err := m.Node.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if len(m.Checks) > 0 {
+		for _, msg := range m.Checks {
+			data[i] = 0x12
+			i++
+			i = encodeVarintConsul(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.Svc != nil {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintConsul(data, i, uint64(m.Svc.Size()))
+		n3, err := m.Svc.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n3
 	}
 	return i, nil
 }
@@ -107,6 +354,94 @@ func (m *ConsulNode) Size() (n int) {
 	}
 	if m.Address != nil {
 		l = m.Address.Size()
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	return n
+}
+
+func (m *ConsulHealthCheck) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Node)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	l = len(m.CheckId)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	l = len(m.Notes)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	l = len(m.Output)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	l = len(m.ServiceId)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	l = len(m.ServiceName)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	return n
+}
+
+func (m *ConsulAgentService) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	l = len(m.ServiceName)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	if len(m.Tags) > 0 {
+		for _, s := range m.Tags {
+			l = len(s)
+			n += 1 + l + sovConsul(uint64(l))
+		}
+	}
+	if m.Port != 0 {
+		n += 1 + sovConsul(uint64(m.Port))
+	}
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	if m.EnableTagOverride {
+		n += 2
+	}
+	return n
+}
+
+func (m *ConsulServiceHealth) Size() (n int) {
+	var l int
+	_ = l
+	if m.Node != nil {
+		l = m.Node.Size()
+		n += 1 + l + sovConsul(uint64(l))
+	}
+	if len(m.Checks) > 0 {
+		for _, e := range m.Checks {
+			l = e.Size()
+			n += 1 + l + sovConsul(uint64(l))
+		}
+	}
+	if m.Svc != nil {
+		l = m.Svc.Size()
 		n += 1 + l + sovConsul(uint64(l))
 	}
 	return n
@@ -237,6 +572,640 @@ func (m *ConsulNode) Unmarshal(data []byte) error {
 	}
 	return nil
 }
+func (m *ConsulHealthCheck) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowConsul
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ConsulHealthCheck: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ConsulHealthCheck: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Node", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Node = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CheckId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CheckId = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Status = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Notes", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Notes = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Output", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Output = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ServiceId = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ServiceName = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipConsul(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthConsul
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ConsulAgentService) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowConsul
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ConsulAgentService: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ConsulAgentService: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ServiceName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ServiceName = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tags", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Tags = append(m.Tags, string(data[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Port", wireType)
+			}
+			m.Port = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				m.Port |= (uint32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EnableTagOverride", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.EnableTagOverride = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipConsul(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthConsul
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ConsulServiceHealth) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowConsul
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ConsulServiceHealth: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ConsulServiceHealth: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Node", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Node == nil {
+				m.Node = &ConsulNode{}
+			}
+			if err := m.Node.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Checks", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Checks = append(m.Checks, &ConsulHealthCheck{})
+			if err := m.Checks[len(m.Checks)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Svc", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsul
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthConsul
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Svc == nil {
+				m.Svc = &ConsulAgentService{}
+			}
+			if err := m.Svc.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipConsul(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthConsul
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipConsul(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
@@ -343,16 +1312,33 @@ var (
 )
 
 var fileDescriptorConsul = []byte{
-	// 169 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0xd2, 0x49, 0xcf, 0x2c, 0xc9,
-	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0xae, 0xcc, 0x2b, 0xca, 0x4f, 0xca, 0xd7, 0x2f,
-	0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x4f, 0xce, 0xcf, 0x2b, 0x2e, 0xcd, 0x81, 0x52, 0x7a, 0x60, 0x31,
-	0x21, 0x36, 0x08, 0x4f, 0x4a, 0x17, 0x49, 0x57, 0x7a, 0x7e, 0x3a, 0x54, 0x4b, 0x52, 0x69, 0x1a,
-	0x98, 0x07, 0xd1, 0x0f, 0x62, 0x41, 0xb4, 0x49, 0xe1, 0xb3, 0x24, 0x37, 0x37, 0x3f, 0x0f, 0x4a,
-	0x41, 0x54, 0x2b, 0xf9, 0x72, 0x71, 0x39, 0x83, 0xad, 0xf1, 0xcb, 0x4f, 0x49, 0x15, 0x12, 0xe2,
-	0x62, 0xc9, 0x4b, 0xcc, 0x4d, 0x95, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x02, 0xb3, 0x85, 0xb4,
-	0xb9, 0xd8, 0x13, 0x53, 0x52, 0x8a, 0x52, 0x8b, 0x8b, 0x25, 0x98, 0x80, 0xc2, 0xdc, 0x46, 0x82,
-	0x7a, 0x50, 0x13, 0x3c, 0x03, 0x1c, 0x21, 0x12, 0x41, 0x30, 0x15, 0x4e, 0x3c, 0x27, 0x1e, 0xc9,
-	0x31, 0x5e, 0x00, 0xe2, 0x07, 0x40, 0x9c, 0xc4, 0x06, 0xb6, 0xc3, 0x18, 0x10, 0x00, 0x00, 0xff,
-	0xff, 0x14, 0x09, 0x3f, 0xd5, 0xf8, 0x00, 0x00, 0x00,
+	// 442 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x7c, 0x52, 0xdd, 0xaa, 0xd3, 0x40,
+	0x10, 0x26, 0xcd, 0x39, 0x69, 0x3b, 0x39, 0x0a, 0xdd, 0x23, 0x92, 0x53, 0x50, 0x34, 0x17, 0x22,
+	0x58, 0x53, 0xac, 0x4f, 0x50, 0x7b, 0x63, 0x2f, 0xac, 0x12, 0xbd, 0x2f, 0xf9, 0x59, 0xd3, 0x60,
+	0x93, 0x2d, 0xd9, 0x4d, 0xc1, 0x97, 0xf1, 0x3d, 0x7c, 0x03, 0x2f, 0x7d, 0x02, 0x11, 0x9f, 0xc4,
+	0xdd, 0x99, 0x6d, 0x9b, 0x52, 0x38, 0x17, 0x21, 0xf3, 0xf3, 0xcd, 0x37, 0xf3, 0xed, 0x0c, 0x4c,
+	0x8a, 0x52, 0x6d, 0xda, 0x34, 0xca, 0x44, 0x35, 0x95, 0xdf, 0xeb, 0x46, 0xa4, 0x62, 0xba, 0x6b,
+	0x84, 0x12, 0xd3, 0x4c, 0xd4, 0xb2, 0xdd, 0xda, 0x5f, 0x84, 0x31, 0xe6, 0x91, 0x37, 0x7e, 0xdd,
+	0xa9, 0x2a, 0x44, 0x61, 0x4b, 0xd2, 0xf6, 0x2b, 0x7a, 0x54, 0x6f, 0x2c, 0x2a, 0x1b, 0xdf, 0xd7,
+	0xa4, 0xaa, 0x44, 0x6d, 0x7f, 0x84, 0x0e, 0x3f, 0x00, 0x2c, 0xb0, 0xcd, 0x4a, 0xe4, 0x9c, 0x31,
+	0xb8, 0xaa, 0x93, 0x8a, 0x07, 0xce, 0x33, 0xe7, 0xe5, 0x30, 0x46, 0x9b, 0xbd, 0x82, 0x7e, 0x92,
+	0xe7, 0x0d, 0x97, 0x32, 0xe8, 0xe9, 0xb0, 0x3f, 0x1b, 0x45, 0x96, 0x61, 0xf9, 0x69, 0x4e, 0x89,
+	0xf8, 0x80, 0x08, 0xff, 0x38, 0x30, 0x22, 0xbe, 0xf7, 0x3c, 0xd9, 0xaa, 0xcd, 0x62, 0xc3, 0xb3,
+	0x6f, 0x48, 0xab, 0xe9, 0x8f, 0xb4, 0xa6, 0xd5, 0x1d, 0x0c, 0x32, 0x93, 0x5c, 0x97, 0x39, 0xf2,
+	0x0e, 0xe3, 0x3e, 0xfa, 0xcb, 0xfc, 0x38, 0x85, 0xdb, 0x99, 0xe2, 0x31, 0x78, 0x52, 0x25, 0xaa,
+	0x95, 0xc1, 0x15, 0x46, 0xad, 0xc7, 0x1e, 0xc1, 0x75, 0x2d, 0x14, 0x97, 0xc1, 0x35, 0x86, 0xc9,
+	0x31, 0x68, 0xd1, 0xaa, 0x5d, 0xab, 0x02, 0x8f, 0xd0, 0xe4, 0xb1, 0x27, 0x00, 0x92, 0x37, 0xfb,
+	0x32, 0xe3, 0xa6, 0x6d, 0x1f, 0x73, 0x43, 0x1b, 0xd1, 0x8d, 0x9f, 0xc3, 0xcd, 0x21, 0x8d, 0x03,
+	0x0c, 0x10, 0xe0, 0xdb, 0xd8, 0x4a, 0x87, 0xc2, 0x9f, 0x0e, 0x30, 0x12, 0x38, 0x2f, 0x78, 0xad,
+	0x3e, 0x53, 0x8a, 0x3d, 0x84, 0x9e, 0x26, 0x24, 0x7d, 0xda, 0xba, 0x60, 0xea, 0x5d, 0x30, 0x19,
+	0x95, 0x2a, 0x29, 0xa4, 0x56, 0xe9, 0x1a, 0x95, 0xc6, 0x36, 0xb1, 0x9d, 0x68, 0x14, 0x6a, 0x7c,
+	0x10, 0xa3, 0xcd, 0x82, 0xd3, 0xfb, 0x93, 0xc6, 0x83, 0xcb, 0x22, 0xb8, 0xe5, 0x75, 0x92, 0x6e,
+	0xf9, 0x5a, 0x17, 0xaf, 0xc5, 0x9e, 0x37, 0x4d, 0xa9, 0x5f, 0xd9, 0x48, 0x1e, 0xc4, 0x23, 0x4a,
+	0x7d, 0x49, 0x8a, 0x8f, 0x36, 0x11, 0xfe, 0x70, 0xe0, 0x96, 0x66, 0xb7, 0x63, 0xd3, 0x8e, 0xd8,
+	0x8b, 0xce, 0x7a, 0xfc, 0x19, 0x8b, 0xec, 0x15, 0x9e, 0xee, 0xc2, 0xae, 0xec, 0x0d, 0x78, 0xb8,
+	0x22, 0x73, 0x08, 0xae, 0x46, 0xde, 0x9d, 0x23, 0x3b, 0x1b, 0x8f, 0x2d, 0x90, 0x4d, 0xc0, 0x95,
+	0xfb, 0x0c, 0x37, 0xe9, 0xcf, 0xc6, 0xe7, 0xf8, 0xee, 0x03, 0xc6, 0x06, 0xf6, 0xee, 0xe6, 0xd7,
+	0xbf, 0xa7, 0xce, 0x6f, 0xfd, 0xfd, 0xd5, 0x5f, 0xea, 0xe1, 0x85, 0xbe, 0xfd, 0x1f, 0x00, 0x00,
+	0xff, 0xff, 0xeb, 0xa5, 0xb6, 0x8c, 0x36, 0x03, 0x00, 0x00,
 }
