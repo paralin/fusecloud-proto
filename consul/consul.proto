@@ -1,0 +1,25 @@
+syntax = "proto3";
+package consul;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/common/common.proto";
+
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+option (gogoproto.marshaler_all) = true;
+
+message ConsulNode {
+  string name = 1;
+  common.IPAddress address = 2;
+}
+
+message ConsulHealthCheck {
+  string node = 1;
+  string check_id = 2;
+  string name = 3;
+  string status = 4;
+  string notes = 5;
+  string output = 6;
+  string service_id = 7;
+  string service_name = 8;
+}

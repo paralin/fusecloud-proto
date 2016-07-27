@@ -15,6 +15,13 @@ import (
 )
 
 const AuthDomain string = "users.synrobo.com"
+const AuthTable string = "users"
+
+var AuthTableTmpl map[string]interface{} = map[string]interface{}{
+	"username": "",
+	"password": "",
+	"proto":    []byte{},
+}
 
 var roleMap map[int32]permissions.SystemPermissions = roles.BuildRoleMap()
 

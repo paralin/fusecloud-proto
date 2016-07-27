@@ -41,8 +41,8 @@ func (ip *IPAddress) ToIPAddr() (net.IP, error) {
 }
 
 // Really stupid implementation, will make something better later
-func FromIPAddr(ip net.IP) *IPAddress {
-	parts := strings.Split(ip.String(), ".")
+func FromIPString(ip string) *IPAddress {
+	parts := strings.Split(ip, ".")
 	res := &IPAddress{
 		Address: []uint32{},
 	}
@@ -54,6 +54,10 @@ func FromIPAddr(ip net.IP) *IPAddress {
 		res.Address = append(res.Address, uint32(i))
 	}
 	return res
+}
+
+func FromIPAddr(ip net.IP) *IPAddress {
+	return FromIPString(ip.String())
 }
 
 func (ipr *IPRange) CIDRString() (string, error) {

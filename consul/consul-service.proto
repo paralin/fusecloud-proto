@@ -1,0 +1,26 @@
+syntax = "proto3";
+package consul;
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/synrobo/proto/consul/consul.proto";
+import "github.com/synrobo/proto/identify/identify.proto";
+
+option (gogoproto.unmarshaler_all) = true;
+option (gogoproto.marshaler_all) = true;
+option (gogoproto.sizer_all) = true;
+
+message ListNodesRequest {
+  identify.Identify identify = 1;
+  string region = 2;
+  string near = 3;
+}
+
+message ListNodesResponse {
+  repeated ConsulNode node = 1;
+}
+
+// Proxied calls to Consul
+service ConsulService {
+  // Devices are called nodes in Consul
+  rpc ListNodes(ListNodesRequest) returns (ListNodesResponse);
+}
