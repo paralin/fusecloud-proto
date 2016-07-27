@@ -21,7 +21,8 @@ message ConsulHealthCheck {
   string notes = 5;
   string output = 6;
   string service_id = 7;
-  string service_name = 8; }
+  string service_name = 8;
+}
 
 message ConsulAgentService {
   string id = 1;
@@ -36,4 +37,11 @@ message ConsulServiceHealth {
   ConsulNode node = 1;
   repeated ConsulHealthCheck checks = 2;
   ConsulAgentService svc = 3;
+}
+
+message ConsulQueryMeta {
+  uint64 last_index = 1;
+  int64 last_contact = 2;
+  bool known_leader = 3;
+  int64 request_time = 4;
 }

@@ -17,18 +17,22 @@ message ListNodesRequest {
 
 message ListNodesResponse {
   repeated ConsulNode node = 1;
+  ConsulQueryMeta meta = 2;
 }
 
 message ServiceHealthRequest {
   identify.Identify identify = 1;
   string service_name = 2;
   string region = 3;
+  string tag = 4;
+  bool passingOnly = 5;
 }
 
 message ServiceHealthResponse {
   string service_name = 1;
   string region = 2;
   repeated ConsulServiceHealth health = 3;
+  ConsulQueryMeta meta = 4;
 }
 
 // Proxied calls to Consul
