@@ -49,6 +49,15 @@ message GetConsulPeersResponse {
   repeated common.IPAddress wan_peer = 3;
 }
 
+message CheckBootstrapperExistsRequest {
+  identify.Identify identify = 1;
+  string region = 2;
+}
+
+message CheckBootstrapperExistsResponse {
+  bool changes_made = 1;
+}
+
 service GlobalDeviceService {
   rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
   rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
@@ -56,4 +65,5 @@ service GlobalDeviceService {
 
   // Methods called by devices
   rpc GetConsulPeers(GetConsulPeersRequest) returns (GetConsulPeersResponse);
+  rpc CheckBootstrapperExists(CheckBootstrapperExistsRequest) returns (CheckBootstrapperExistsResponse);
 }
