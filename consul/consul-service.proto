@@ -25,7 +25,7 @@ message ServiceHealthRequest {
   string service_name = 2;
   string region = 3;
   string tag = 4;
-  bool passingOnly = 5;
+  bool passing_only = 5;
 }
 
 message ServiceHealthResponse {
