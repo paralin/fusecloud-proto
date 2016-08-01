@@ -15,7 +15,6 @@ func GetDevices(ctx *cassandra.CassandraContext) ([]*device.Device, error) {
 	var result []*device.Device
 
 	b := cqlpb.BindQuery(ctx.Session.Query(fmt.Sprintf("SELECT * FROM %s", device.DevicesTable)))
-	defer b.Close()
 
 	var itr *device.Device
 	for {
@@ -23,6 +22,7 @@ func GetDevices(ctx *cassandra.CassandraContext) ([]*device.Device, error) {
 		hasMore, err := b.Scan(itr)
 
 		if err != nil {
+			defer b.Close()
 			return nil, err
 		}
 
@@ -37,7 +37,7 @@ func GetDevices(ctx *cassandra.CassandraContext) ([]*device.Device, error) {
 		result = []*device.Device{}
 	}
 
-	return result, nil
+	return result, b.Close()
 }
 
 func GetDeviceByHostname(ctx *cassandra.CassandraContext, id string) (error, *device.Device) {

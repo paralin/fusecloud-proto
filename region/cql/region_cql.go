@@ -15,7 +15,6 @@ func GetAllRegions(ctx *cassandra.CassandraContext) (error, []*region.Region) {
 	var result []*region.Region
 
 	b := cqlpb.BindQuery(ctx.Session.Query(fmt.Sprintf("SELECT * FROM %s", region.RegionTable)))
-	defer b.Close()
 
 	var itr *region.Region
 	for {
@@ -37,15 +36,19 @@ func GetAllRegions(ctx *cassandra.CassandraContext) (error, []*region.Region) {
 		result = []*region.Region{}
 	}
 
-	return nil, result
+	return b.Close(), result
 }
 
 func GetRegionById(ctx *cassandra.CassandraContext, id string) (error, *region.Region) {
 	b := cqlpb.BindQuery(ctx.Session.Query(fmt.Sprintf("SELECT * FROM %s WHERE id = ? LIMIT 1", region.RegionTable), id))
-	defer b.Close()
 
 	nreg := &region.Region{}
 	succ, err := b.Scan(nreg)
+	if err == nil {
+		err = b.Close()
+	} else {
+		defer b.Close()
+	}
 	if err != nil {
 		return err, nil
 	}

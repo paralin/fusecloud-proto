@@ -18,6 +18,6 @@ func (p *SystemPermissions) Extend(other *SystemPermissions) {
 		if !fieldValue {
 			continue
 		}
-		targetVo.Set(reflect.Value(sourceField))
+		targetVo.Field(i).Set(reflect.Value(sourceField))
 	}
 }

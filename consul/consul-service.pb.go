@@ -14,6 +14,8 @@
 		ListNodesResponse
 		ServiceHealthRequest
 		ServiceHealthResponse
+		NodeChecksRequest
+		NodeChecksResponse
 		ConsulNode
 		ConsulHealthCheck
 		ConsulAgentService
@@ -136,11 +138,57 @@ func (m *ServiceHealthResponse) GetMeta() *ConsulQueryMeta {
 	return nil
 }
 
+type NodeChecksRequest struct {
+	Identify *identify.Identify `protobuf:"bytes,1,opt,name=identify" json:"identify,omitempty"`
+	NodeName string             `protobuf:"bytes,2,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
+	Region   string             `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+}
+
+func (m *NodeChecksRequest) Reset()                    { *m = NodeChecksRequest{} }
+func (m *NodeChecksRequest) String() string            { return proto.CompactTextString(m) }
+func (*NodeChecksRequest) ProtoMessage()               {}
+func (*NodeChecksRequest) Descriptor() ([]byte, []int) { return fileDescriptorConsulService, []int{4} }
+
+func (m *NodeChecksRequest) GetIdentify() *identify.Identify {
+	if m != nil {
+		return m.Identify
+	}
+	return nil
+}
+
+type NodeChecksResponse struct {
+	NodeName string               `protobuf:"bytes,1,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
+	Region   string               `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
+	Health   []*ConsulHealthCheck `protobuf:"bytes,3,rep,name=health" json:"health,omitempty"`
+	Meta     *ConsulQueryMeta     `protobuf:"bytes,4,opt,name=meta" json:"meta,omitempty"`
+}
+
+func (m *NodeChecksResponse) Reset()                    { *m = NodeChecksResponse{} }
+func (m *NodeChecksResponse) String() string            { return proto.CompactTextString(m) }
+func (*NodeChecksResponse) ProtoMessage()               {}
+func (*NodeChecksResponse) Descriptor() ([]byte, []int) { return fileDescriptorConsulService, []int{5} }
+
+func (m *NodeChecksResponse) GetHealth() []*ConsulHealthCheck {
+	if m != nil {
+		return m.Health
+	}
+	return nil
+}
+
+func (m *NodeChecksResponse) GetMeta() *ConsulQueryMeta {
+	if m != nil {
+		return m.Meta
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*ListNodesRequest)(nil), "consul.ListNodesRequest")
 	proto.RegisterType((*ListNodesResponse)(nil), "consul.ListNodesResponse")
 	proto.RegisterType((*ServiceHealthRequest)(nil), "consul.ServiceHealthRequest")
 	proto.RegisterType((*ServiceHealthResponse)(nil), "consul.ServiceHealthResponse")
+	proto.RegisterType((*NodeChecksRequest)(nil), "consul.NodeChecksRequest")
+	proto.RegisterType((*NodeChecksResponse)(nil), "consul.NodeChecksResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -157,6 +205,7 @@ type ConsulServiceClient interface {
 	// Devices are called nodes in Consul
 	ListNodes(ctx context.Context, in *ListNodesRequest, opts ...grpc.CallOption) (*ListNodesResponse, error)
 	ServiceHealth(ctx context.Context, in *ServiceHealthRequest, opts ...grpc.CallOption) (*ServiceHealthResponse, error)
+	NodeChecks(ctx context.Context, in *NodeChecksRequest, opts ...grpc.CallOption) (*NodeChecksResponse, error)
 }
 
 type consulServiceClient struct {
@@ -185,12 +234,22 @@ func (c *consulServiceClient) ServiceHealth(ctx context.Context, in *ServiceHeal
 	return out, nil
 }
 
+func (c *consulServiceClient) NodeChecks(ctx context.Context, in *NodeChecksRequest, opts ...grpc.CallOption) (*NodeChecksResponse, error) {
+	out := new(NodeChecksResponse)
+	err := grpc.Invoke(ctx, "/consul.ConsulService/NodeChecks", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for ConsulService service
 
 type ConsulServiceServer interface {
 	// Devices are called nodes in Consul
 	ListNodes(context.Context, *ListNodesRequest) (*ListNodesResponse, error)
 	ServiceHealth(context.Context, *ServiceHealthRequest) (*ServiceHealthResponse, error)
+	NodeChecks(context.Context, *NodeChecksRequest) (*NodeChecksResponse, error)
 }
 
 func RegisterConsulServiceServer(s *grpc.Server, srv ConsulServiceServer) {
@@ -233,6 +292,24 @@ func _ConsulService_ServiceHealth_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ConsulService_NodeChecks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeChecksRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ConsulServiceServer).NodeChecks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/consul.ConsulService/NodeChecks",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ConsulServiceServer).NodeChecks(ctx, req.(*NodeChecksRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _ConsulService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "consul.ConsulService",
 	HandlerType: (*ConsulServiceServer)(nil),
@@ -244,6 +321,10 @@ var _ConsulService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ServiceHealth",
 			Handler:    _ConsulService_ServiceHealth_Handler,
+		},
+		{
+			MethodName: "NodeChecks",
+			Handler:    _ConsulService_NodeChecks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -438,6 +519,98 @@ func (m *ServiceHealthResponse) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
+func (m *NodeChecksRequest) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *NodeChecksRequest) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Identify != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintConsulService(data, i, uint64(m.Identify.Size()))
+		n5, err := m.Identify.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	if len(m.NodeName) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintConsulService(data, i, uint64(len(m.NodeName)))
+		i += copy(data[i:], m.NodeName)
+	}
+	if len(m.Region) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintConsulService(data, i, uint64(len(m.Region)))
+		i += copy(data[i:], m.Region)
+	}
+	return i, nil
+}
+
+func (m *NodeChecksResponse) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *NodeChecksResponse) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.NodeName) > 0 {
+		data[i] = 0xa
+		i++
+		i = encodeVarintConsulService(data, i, uint64(len(m.NodeName)))
+		i += copy(data[i:], m.NodeName)
+	}
+	if len(m.Region) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintConsulService(data, i, uint64(len(m.Region)))
+		i += copy(data[i:], m.Region)
+	}
+	if len(m.Health) > 0 {
+		for _, msg := range m.Health {
+			data[i] = 0x1a
+			i++
+			i = encodeVarintConsulService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.Meta != nil {
+		data[i] = 0x22
+		i++
+		i = encodeVarintConsulService(data, i, uint64(m.Meta.Size()))
+		n6, err := m.Meta.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	return i, nil
+}
+
 func encodeFixed64ConsulService(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	data[offset+1] = uint8(v >> 8)
@@ -528,6 +701,48 @@ func (m *ServiceHealthResponse) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.ServiceName)
+	if l > 0 {
+		n += 1 + l + sovConsulService(uint64(l))
+	}
+	l = len(m.Region)
+	if l > 0 {
+		n += 1 + l + sovConsulService(uint64(l))
+	}
+	if len(m.Health) > 0 {
+		for _, e := range m.Health {
+			l = e.Size()
+			n += 1 + l + sovConsulService(uint64(l))
+		}
+	}
+	if m.Meta != nil {
+		l = m.Meta.Size()
+		n += 1 + l + sovConsulService(uint64(l))
+	}
+	return n
+}
+
+func (m *NodeChecksRequest) Size() (n int) {
+	var l int
+	_ = l
+	if m.Identify != nil {
+		l = m.Identify.Size()
+		n += 1 + l + sovConsulService(uint64(l))
+	}
+	l = len(m.NodeName)
+	if l > 0 {
+		n += 1 + l + sovConsulService(uint64(l))
+	}
+	l = len(m.Region)
+	if l > 0 {
+		n += 1 + l + sovConsulService(uint64(l))
+	}
+	return n
+}
+
+func (m *NodeChecksResponse) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.NodeName)
 	if l > 0 {
 		n += 1 + l + sovConsulService(uint64(l))
 	}
@@ -1178,6 +1393,319 @@ func (m *ServiceHealthResponse) Unmarshal(data []byte) error {
 	}
 	return nil
 }
+func (m *NodeChecksRequest) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowConsulService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: NodeChecksRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: NodeChecksRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Identify", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsulService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Identify == nil {
+				m.Identify = &identify.Identify{}
+			}
+			if err := m.Identify.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsulService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodeName = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Region", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsulService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Region = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipConsulService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *NodeChecksResponse) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowConsulService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: NodeChecksResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: NodeChecksResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsulService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodeName = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Region", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsulService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Region = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Health", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsulService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Health = append(m.Health, &ConsulHealthCheck{})
+			if err := m.Health[len(m.Health)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Meta", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowConsulService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Meta == nil {
+				m.Meta = &ConsulQueryMeta{}
+			}
+			if err := m.Meta.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipConsulService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthConsulService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipConsulService(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
@@ -1284,32 +1812,36 @@ var (
 )
 
 var fileDescriptorConsulService = []byte{
-	// 420 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x9c, 0x53, 0x5b, 0x4a, 0xf3, 0x40,
-	0x14, 0x26, 0x7f, 0xf2, 0x87, 0x76, 0xd2, 0x42, 0x1d, 0xbc, 0xc4, 0x78, 0x41, 0xf3, 0x20, 0x82,
-	0x36, 0x95, 0xd6, 0x05, 0x88, 0xbe, 0x28, 0xd4, 0x8a, 0x71, 0x01, 0x25, 0x69, 0xa7, 0x49, 0xa0,
-	0x9d, 0xa9, 0x99, 0x89, 0x90, 0xd5, 0xb8, 0x09, 0x71, 0x0d, 0x3e, 0xba, 0x04, 0x71, 0x25, 0x4e,
-	0x26, 0xd3, 0xd0, 0x94, 0x56, 0x8a, 0x0f, 0xc3, 0x9c, 0xf9, 0xce, 0x77, 0x6e, 0xdf, 0x49, 0xc0,
-	0x65, 0x10, 0xb1, 0x30, 0xf1, 0x9d, 0x01, 0x99, 0xb4, 0x68, 0x8a, 0x63, 0xe2, 0x93, 0xd6, 0x34,
-	0x26, 0x8c, 0xb4, 0x06, 0x04, 0xd3, 0x64, 0x2c, 0xaf, 0x26, 0x45, 0xf1, 0x4b, 0x34, 0x40, 0x8e,
-	0xf0, 0x41, 0x3d, 0x47, 0xad, 0xe6, 0x5c, 0x74, 0x40, 0x02, 0x19, 0xea, 0x27, 0x23, 0xf1, 0xca,
-	0xf3, 0x64, 0x56, 0x1e, 0x66, 0x9d, 0xaf, 0x57, 0x4c, 0xb2, 0x2f, 0x56, 0xb2, 0xa3, 0x21, 0xc2,
-	0x2c, 0x1a, 0xa5, 0x85, 0x91, 0x47, 0xd8, 0x18, 0x34, 0xba, 0x11, 0x65, 0x3d, 0x32, 0x44, 0xd4,
-	0x45, 0xcf, 0x09, 0xa2, 0x0c, 0x3a, 0xa0, 0x32, 0x63, 0x99, 0xca, 0x91, 0x72, 0x6a, 0xb4, 0xa1,
-	0x53, 0x84, 0xdd, 0x49, 0xc3, 0x2d, 0x38, 0x70, 0x1b, 0xe8, 0x31, 0x0a, 0x22, 0x82, 0xcd, 0x7f,
-	0x9c, 0x5d, 0x75, 0xe5, 0x0b, 0x42, 0xa0, 0x61, 0xe4, 0xc5, 0xa6, 0x2a, 0x50, 0x61, 0xdb, 0x21,
-	0xd8, 0x98, 0xab, 0x47, 0xa7, 0xbc, 0x7b, 0x04, 0x4f, 0x38, 0x91, 0x03, 0xbc, 0x98, 0x2a, 0x8a,
-	0xc9, 0x99, 0x6e, 0xc4, 0x95, 0x51, 0x5d, 0xe1, 0x87, 0x67, 0x40, 0x9b, 0x20, 0xe6, 0x89, 0x32,
-	0x46, 0x7b, 0xa7, 0xcc, 0x7b, 0x4c, 0x50, 0x9c, 0xde, 0x73, 0xb7, 0x2b, 0x48, 0xf6, 0xbb, 0x02,
-	0x36, 0x9f, 0xf2, 0x15, 0xdc, 0x22, 0x6f, 0xcc, 0xc2, 0xbf, 0x8e, 0x77, 0x0c, 0x6a, 0x72, 0x95,
-	0x7d, 0xec, 0x4d, 0x90, 0x1c, 0xd2, 0x90, 0x58, 0x8f, 0x43, 0x73, 0x0a, 0xa8, 0x25, 0x05, 0x1a,
-	0x40, 0x65, 0x5e, 0x60, 0x6a, 0x02, 0xcc, 0xcc, 0x2c, 0xd9, 0xd4, 0xa3, 0x34, 0xc2, 0x41, 0x9f,
-	0xe0, 0x71, 0x6a, 0xfe, 0xe7, 0xae, 0x8a, 0x6b, 0x48, 0xec, 0x81, 0x43, 0xf6, 0x9b, 0x02, 0xb6,
-	0x16, 0x1a, 0x97, 0x3a, 0x2d, 0x76, 0xa2, 0xfc, 0xd6, 0x49, 0x79, 0x17, 0x1d, 0xa0, 0x87, 0x22,
-	0x19, 0xef, 0x30, 0x13, 0x79, 0xaf, 0x2c, 0x5e, 0xb9, 0x9e, 0xa4, 0x16, 0x7a, 0x6b, 0x6b, 0xe8,
-	0xdd, 0x7e, 0x55, 0x40, 0xbd, 0x94, 0x0c, 0x5e, 0x81, 0x6a, 0xb1, 0x6b, 0x68, 0xce, 0xa2, 0x17,
-	0x3f, 0x37, 0x6b, 0x77, 0x89, 0x47, 0x0e, 0xdc, 0x05, 0xf5, 0x52, 0x67, 0x70, 0x7f, 0xc6, 0x5d,
-	0xb6, 0x59, 0xeb, 0x60, 0x85, 0x37, 0xcf, 0x76, 0x5d, 0xfb, 0xf8, 0x3e, 0x54, 0x3e, 0xf9, 0xf9,
-	0xe2, 0xc7, 0xd7, 0xc5, 0x0f, 0xd0, 0xf9, 0x09, 0x00, 0x00, 0xff, 0xff, 0xeb, 0x61, 0x02, 0x72,
-	0xcf, 0x03, 0x00, 0x00,
+	// 492 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x9c, 0x54, 0xdd, 0x6e, 0xd3, 0x30,
+	0x14, 0x96, 0x69, 0x89, 0xda, 0x93, 0x4d, 0xda, 0x2c, 0x7e, 0xb2, 0x0c, 0x10, 0xe4, 0x02, 0x21,
+	0xc1, 0x52, 0xe8, 0x78, 0x00, 0x44, 0x6f, 0x40, 0x1a, 0x43, 0x84, 0x07, 0x98, 0x92, 0xcc, 0x4b,
+	0x22, 0x5a, 0xbb, 0xc4, 0x0e, 0x22, 0x8f, 0xc4, 0x3d, 0xe2, 0x19, 0xb8, 0xe4, 0x11, 0x10, 0xe2,
+	0x41, 0xb0, 0x1d, 0x37, 0xc4, 0x59, 0x3b, 0x4d, 0xbd, 0x88, 0xe2, 0x7c, 0xe7, 0x3b, 0xe7, 0x3b,
+	0xe7, 0x3b, 0x49, 0xe0, 0x65, 0x56, 0x88, 0xbc, 0x4a, 0xc2, 0x94, 0x2d, 0x26, 0xbc, 0xa6, 0x25,
+	0x4b, 0xd8, 0x64, 0x59, 0x32, 0xc1, 0x26, 0x29, 0xa3, 0xbc, 0x9a, 0x9b, 0xdb, 0x11, 0x27, 0xe5,
+	0x97, 0x22, 0x25, 0xa1, 0x8e, 0x61, 0xa7, 0x41, 0xfd, 0xa3, 0x4e, 0x76, 0xc6, 0x32, 0x93, 0x9a,
+	0x54, 0x17, 0xfa, 0xa9, 0xa9, 0xa3, 0x4e, 0x4d, 0x9a, 0xff, 0xec, 0x7a, 0x62, 0x86, 0xfd, 0x7c,
+	0x23, 0xbb, 0x38, 0x27, 0x54, 0x14, 0x17, 0x75, 0x7b, 0x68, 0x32, 0x02, 0x0a, 0x7b, 0x27, 0x05,
+	0x17, 0xa7, 0xec, 0x9c, 0xf0, 0x88, 0x7c, 0xae, 0x08, 0x17, 0x38, 0x84, 0xd1, 0x8a, 0xe5, 0xa1,
+	0x87, 0xe8, 0x89, 0x3b, 0xc5, 0x61, 0x9b, 0xf6, 0xd6, 0x1c, 0xa2, 0x96, 0x83, 0xef, 0x80, 0x53,
+	0x92, 0xac, 0x60, 0xd4, 0xbb, 0x21, 0xd9, 0xe3, 0xc8, 0x3c, 0x61, 0x0c, 0x43, 0x4a, 0xe2, 0xd2,
+	0x1b, 0x68, 0x54, 0x9f, 0x83, 0x1c, 0xf6, 0x3b, 0x7a, 0x7c, 0x29, 0xbb, 0x27, 0xf8, 0xb1, 0x24,
+	0x4a, 0x40, 0x8a, 0x0d, 0xb4, 0x98, 0x99, 0x69, 0xa6, 0x6f, 0x8a, 0x1a, 0xe9, 0x38, 0x7e, 0x0a,
+	0xc3, 0x05, 0x11, 0xb1, 0x96, 0x71, 0xa7, 0x77, 0x6d, 0xde, 0x87, 0x8a, 0x94, 0xf5, 0x3b, 0x19,
+	0x8e, 0x34, 0x29, 0xf8, 0x81, 0xe0, 0xd6, 0xc7, 0x66, 0x05, 0x6f, 0x48, 0x3c, 0x17, 0xf9, 0xb6,
+	0xe3, 0x3d, 0x82, 0x1d, 0xb3, 0xca, 0x33, 0x1a, 0x2f, 0x88, 0x19, 0xd2, 0x35, 0xd8, 0xa9, 0x84,
+	0x3a, 0x0e, 0x0c, 0x2c, 0x07, 0xf6, 0x60, 0x20, 0xe2, 0xcc, 0x1b, 0x6a, 0x50, 0x1d, 0x55, 0xb1,
+	0x65, 0xcc, 0x79, 0x41, 0xb3, 0x33, 0x46, 0xe7, 0xb5, 0x77, 0x53, 0x86, 0x46, 0x91, 0x6b, 0xb0,
+	0xf7, 0x12, 0x0a, 0xbe, 0x23, 0xb8, 0xdd, 0x6b, 0xdc, 0xf8, 0xd4, 0xef, 0x04, 0x5d, 0xd5, 0x89,
+	0xbd, 0x8b, 0x63, 0x70, 0x72, 0x5d, 0x4c, 0x76, 0xa8, 0x4c, 0x3e, 0xb4, 0xcd, 0xb3, 0xf5, 0x0c,
+	0xb5, 0xf5, 0x7b, 0x78, 0x1d, 0xbf, 0xbf, 0xc2, 0xbe, 0x5a, 0xd5, 0x2c, 0x27, 0xe9, 0xa7, 0xad,
+	0x5f, 0xa5, 0x43, 0x18, 0xab, 0x4d, 0x77, 0x8d, 0x1e, 0x29, 0xe0, 0x2a, 0x97, 0x83, 0x6f, 0x08,
+	0x70, 0x57, 0xda, 0xb8, 0x65, 0xd5, 0x42, 0x1b, 0x6b, 0xd9, 0x3e, 0xbd, 0xe8, 0xf9, 0x74, 0x60,
+	0x0f, 0xdd, 0x18, 0xa4, 0x85, 0xb6, 0x72, 0x69, 0xfa, 0x17, 0xc1, 0xae, 0x65, 0x39, 0x7e, 0x05,
+	0xe3, 0xf6, 0x8b, 0xc0, 0xde, 0x2a, 0xbb, 0xff, 0x51, 0xfa, 0x07, 0x6b, 0x22, 0x66, 0xd0, 0x13,
+	0xd8, 0xb5, 0xf6, 0x87, 0xef, 0xad, 0xb8, 0xeb, 0xde, 0x7f, 0xff, 0xfe, 0x86, 0xa8, 0xa9, 0x36,
+	0x03, 0xf8, 0x6f, 0x26, 0x6e, 0x65, 0x2f, 0xed, 0xd6, 0xf7, 0xd7, 0x85, 0x9a, 0x22, 0xaf, 0x77,
+	0x7e, 0xfe, 0x79, 0x80, 0x7e, 0xc9, 0xeb, 0xb7, 0xbc, 0x12, 0x47, 0xff, 0x6b, 0x8e, 0xff, 0x05,
+	0x00, 0x00, 0xff, 0xff, 0xa7, 0xe9, 0x76, 0xab, 0x3a, 0x05, 0x00, 0x00,
 }
