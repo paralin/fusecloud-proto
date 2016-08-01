@@ -22,6 +22,7 @@ message Device {
   DeviceSetupState setup_state = 5;
   DeviceIdentity identity = 6;
   repeated metric.MetricIdentifier metric = 7;
+  common.CommitState commit_state = 9;
 
   message DeviceConsulSettings {
     bool is_server = 1;

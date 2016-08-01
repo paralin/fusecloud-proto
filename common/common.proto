@@ -36,3 +36,8 @@ message GeoLocation {
   /* optional, if using a map */
   int32 zoomlevel = 4;
 }
+
+message CommitState {
+  int32 current_index = 1;
+  int32 consul_index = 2;
+}
