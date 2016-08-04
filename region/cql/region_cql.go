@@ -1,7 +1,6 @@
 package region_cql
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/paralin/cqlpb"
@@ -53,7 +52,7 @@ func GetRegionById(ctx *cassandra.CassandraContext, id string) (error, *region.R
 		return err, nil
 	}
 	if !succ {
-		return errors.New("Not found."), nil
+		return fmt.Errorf("Region %s not found.", id), nil
 	}
 	return nil, nreg
 }

@@ -42,10 +42,14 @@ func GetDevices(ctx *cassandra.CassandraContext) ([]*device.Device, error) {
 
 func GetDeviceByHostname(ctx *cassandra.CassandraContext, id string) (error, *device.Device) {
 	b := cqlpb.BindQuery(ctx.Session.Query(fmt.Sprintf("SELECT * FROM %s WHERE hostname = ? LIMIT 1", device.DevicesTable), id))
-	defer b.Close()
 
 	nreg := &device.Device{}
 	succ, err := b.Scan(nreg)
+	if err != nil {
+		defer b.Close()
+		return err, nil
+	}
+	err = b.Close()
 	if err != nil {
 		return err, nil
 	}

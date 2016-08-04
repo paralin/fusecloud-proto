@@ -14,6 +14,8 @@
 		ListDevicesResponse
 		CreateDeviceRequest
 		CreateDeviceResponse
+		SaveDeviceRequest
+		SaveDeviceResponse
 		GetDeviceRequest
 		GetDeviceResponse
 		GetConsulPeersRequest
@@ -124,6 +126,41 @@ func (m *CreateDeviceResponse) GetCreatedDevice() *Device {
 	return nil
 }
 
+type SaveDeviceRequest struct {
+	Identify        *identify.Identify            `protobuf:"bytes,1,opt,name=identify" json:"identify,omitempty"`
+	Hostname        string                        `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Region          string                        `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	NetworkSettings *Device_DeviceNetworkSettings `protobuf:"bytes,4,opt,name=network_settings,json=networkSettings" json:"network_settings,omitempty"`
+}
+
+func (m *SaveDeviceRequest) Reset()                    { *m = SaveDeviceRequest{} }
+func (m *SaveDeviceRequest) String() string            { return proto.CompactTextString(m) }
+func (*SaveDeviceRequest) ProtoMessage()               {}
+func (*SaveDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptorDeviceService, []int{4} }
+
+func (m *SaveDeviceRequest) GetIdentify() *identify.Identify {
+	if m != nil {
+		return m.Identify
+	}
+	return nil
+}
+
+func (m *SaveDeviceRequest) GetNetworkSettings() *Device_DeviceNetworkSettings {
+	if m != nil {
+		return m.NetworkSettings
+	}
+	return nil
+}
+
+type SaveDeviceResponse struct {
+	Changed bool `protobuf:"varint,1,opt,name=changed,proto3" json:"changed,omitempty"`
+}
+
+func (m *SaveDeviceResponse) Reset()                    { *m = SaveDeviceResponse{} }
+func (m *SaveDeviceResponse) String() string            { return proto.CompactTextString(m) }
+func (*SaveDeviceResponse) ProtoMessage()               {}
+func (*SaveDeviceResponse) Descriptor() ([]byte, []int) { return fileDescriptorDeviceService, []int{5} }
+
 type GetDeviceRequest struct {
 	Identify *identify.Identify `protobuf:"bytes,1,opt,name=identify" json:"identify,omitempty"`
 	Hostname string             `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
@@ -133,7 +170,7 @@ type GetDeviceRequest struct {
 func (m *GetDeviceRequest) Reset()                    { *m = GetDeviceRequest{} }
 func (m *GetDeviceRequest) String() string            { return proto.CompactTextString(m) }
 func (*GetDeviceRequest) ProtoMessage()               {}
-func (*GetDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptorDeviceService, []int{4} }
+func (*GetDeviceRequest) Descriptor() ([]byte, []int) { return fileDescriptorDeviceService, []int{6} }
 
 func (m *GetDeviceRequest) GetIdentify() *identify.Identify {
 	if m != nil {
@@ -149,7 +186,7 @@ type GetDeviceResponse struct {
 func (m *GetDeviceResponse) Reset()                    { *m = GetDeviceResponse{} }
 func (m *GetDeviceResponse) String() string            { return proto.CompactTextString(m) }
 func (*GetDeviceResponse) ProtoMessage()               {}
-func (*GetDeviceResponse) Descriptor() ([]byte, []int) { return fileDescriptorDeviceService, []int{5} }
+func (*GetDeviceResponse) Descriptor() ([]byte, []int) { return fileDescriptorDeviceService, []int{7} }
 
 func (m *GetDeviceResponse) GetDevice() *Device {
 	if m != nil {
@@ -166,7 +203,7 @@ func (m *GetConsulPeersRequest) Reset()         { *m = GetConsulPeersRequest{} }
 func (m *GetConsulPeersRequest) String() string { return proto.CompactTextString(m) }
 func (*GetConsulPeersRequest) ProtoMessage()    {}
 func (*GetConsulPeersRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorDeviceService, []int{6}
+	return fileDescriptorDeviceService, []int{8}
 }
 
 func (m *GetConsulPeersRequest) GetIdentify() *identify.Identify {
@@ -186,7 +223,7 @@ func (m *GetConsulPeersResponse) Reset()         { *m = GetConsulPeersResponse{}
 func (m *GetConsulPeersResponse) String() string { return proto.CompactTextString(m) }
 func (*GetConsulPeersResponse) ProtoMessage()    {}
 func (*GetConsulPeersResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorDeviceService, []int{7}
+	return fileDescriptorDeviceService, []int{9}
 }
 
 func (m *GetConsulPeersResponse) GetServerPeer() []*common.IPAddress {
@@ -219,7 +256,7 @@ func (m *CheckBootstrapperExistsRequest) Reset()         { *m = CheckBootstrappe
 func (m *CheckBootstrapperExistsRequest) String() string { return proto.CompactTextString(m) }
 func (*CheckBootstrapperExistsRequest) ProtoMessage()    {}
 func (*CheckBootstrapperExistsRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptorDeviceService, []int{8}
+	return fileDescriptorDeviceService, []int{10}
 }
 
 func (m *CheckBootstrapperExistsRequest) GetIdentify() *identify.Identify {
@@ -237,7 +274,7 @@ func (m *CheckBootstrapperExistsResponse) Reset()         { *m = CheckBootstrapp
 func (m *CheckBootstrapperExistsResponse) String() string { return proto.CompactTextString(m) }
 func (*CheckBootstrapperExistsResponse) ProtoMessage()    {}
 func (*CheckBootstrapperExistsResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptorDeviceService, []int{9}
+	return fileDescriptorDeviceService, []int{11}
 }
 
 func init() {
@@ -245,6 +282,8 @@ func init() {
 	proto.RegisterType((*ListDevicesResponse)(nil), "device.ListDevicesResponse")
 	proto.RegisterType((*CreateDeviceRequest)(nil), "device.CreateDeviceRequest")
 	proto.RegisterType((*CreateDeviceResponse)(nil), "device.CreateDeviceResponse")
+	proto.RegisterType((*SaveDeviceRequest)(nil), "device.SaveDeviceRequest")
+	proto.RegisterType((*SaveDeviceResponse)(nil), "device.SaveDeviceResponse")
 	proto.RegisterType((*GetDeviceRequest)(nil), "device.GetDeviceRequest")
 	proto.RegisterType((*GetDeviceResponse)(nil), "device.GetDeviceResponse")
 	proto.RegisterType((*GetConsulPeersRequest)(nil), "device.GetConsulPeersRequest")
@@ -266,6 +305,7 @@ const _ = grpc.SupportPackageIsVersion3
 type GlobalDeviceServiceClient interface {
 	ListDevices(ctx context.Context, in *ListDevicesRequest, opts ...grpc.CallOption) (*ListDevicesResponse, error)
 	CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*CreateDeviceResponse, error)
+	SaveDevice(ctx context.Context, in *SaveDeviceRequest, opts ...grpc.CallOption) (*SaveDeviceResponse, error)
 	GetDevice(ctx context.Context, in *GetDeviceRequest, opts ...grpc.CallOption) (*GetDeviceResponse, error)
 	// Methods called by devices
 	GetConsulPeers(ctx context.Context, in *GetConsulPeersRequest, opts ...grpc.CallOption) (*GetConsulPeersResponse, error)
@@ -292,6 +332,15 @@ func (c *globalDeviceServiceClient) ListDevices(ctx context.Context, in *ListDev
 func (c *globalDeviceServiceClient) CreateDevice(ctx context.Context, in *CreateDeviceRequest, opts ...grpc.CallOption) (*CreateDeviceResponse, error) {
 	out := new(CreateDeviceResponse)
 	err := grpc.Invoke(ctx, "/device.GlobalDeviceService/CreateDevice", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *globalDeviceServiceClient) SaveDevice(ctx context.Context, in *SaveDeviceRequest, opts ...grpc.CallOption) (*SaveDeviceResponse, error) {
+	out := new(SaveDeviceResponse)
+	err := grpc.Invoke(ctx, "/device.GlobalDeviceService/SaveDevice", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -330,6 +379,7 @@ func (c *globalDeviceServiceClient) CheckBootstrapperExists(ctx context.Context,
 type GlobalDeviceServiceServer interface {
 	ListDevices(context.Context, *ListDevicesRequest) (*ListDevicesResponse, error)
 	CreateDevice(context.Context, *CreateDeviceRequest) (*CreateDeviceResponse, error)
+	SaveDevice(context.Context, *SaveDeviceRequest) (*SaveDeviceResponse, error)
 	GetDevice(context.Context, *GetDeviceRequest) (*GetDeviceResponse, error)
 	// Methods called by devices
 	GetConsulPeers(context.Context, *GetConsulPeersRequest) (*GetConsulPeersResponse, error)
@@ -372,6 +422,24 @@ func _GlobalDeviceService_CreateDevice_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GlobalDeviceServiceServer).CreateDevice(ctx, req.(*CreateDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GlobalDeviceService_SaveDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GlobalDeviceServiceServer).SaveDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/device.GlobalDeviceService/SaveDevice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GlobalDeviceServiceServer).SaveDevice(ctx, req.(*SaveDeviceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -441,6 +509,10 @@ var _GlobalDeviceService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateDevice",
 			Handler:    _GlobalDeviceService_CreateDevice_Handler,
+		},
+		{
+			MethodName: "SaveDevice",
+			Handler:    _GlobalDeviceService_SaveDevice_Handler,
 		},
 		{
 			MethodName: "GetDevice",
@@ -595,6 +667,84 @@ func (m *CreateDeviceResponse) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
+func (m *SaveDeviceRequest) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SaveDeviceRequest) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Identify != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintDeviceService(data, i, uint64(m.Identify.Size()))
+		n5, err := m.Identify.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	if len(m.Hostname) > 0 {
+		data[i] = 0x12
+		i++
+		i = encodeVarintDeviceService(data, i, uint64(len(m.Hostname)))
+		i += copy(data[i:], m.Hostname)
+	}
+	if len(m.Region) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintDeviceService(data, i, uint64(len(m.Region)))
+		i += copy(data[i:], m.Region)
+	}
+	if m.NetworkSettings != nil {
+		data[i] = 0x22
+		i++
+		i = encodeVarintDeviceService(data, i, uint64(m.NetworkSettings.Size()))
+		n6, err := m.NetworkSettings.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n6
+	}
+	return i, nil
+}
+
+func (m *SaveDeviceResponse) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SaveDeviceResponse) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Changed {
+		data[i] = 0x8
+		i++
+		if m.Changed {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	return i, nil
+}
+
 func (m *GetDeviceRequest) Marshal() (data []byte, err error) {
 	size := m.Size()
 	data = make([]byte, size)
@@ -614,11 +764,11 @@ func (m *GetDeviceRequest) MarshalTo(data []byte) (int, error) {
 		data[i] = 0xa
 		i++
 		i = encodeVarintDeviceService(data, i, uint64(m.Identify.Size()))
-		n5, err := m.Identify.MarshalTo(data[i:])
+		n7, err := m.Identify.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n5
+		i += n7
 	}
 	if len(m.Hostname) > 0 {
 		data[i] = 0x12
@@ -654,11 +804,11 @@ func (m *GetDeviceResponse) MarshalTo(data []byte) (int, error) {
 		data[i] = 0xa
 		i++
 		i = encodeVarintDeviceService(data, i, uint64(m.Device.Size()))
-		n6, err := m.Device.MarshalTo(data[i:])
+		n8, err := m.Device.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n6
+		i += n8
 	}
 	return i, nil
 }
@@ -682,11 +832,11 @@ func (m *GetConsulPeersRequest) MarshalTo(data []byte) (int, error) {
 		data[i] = 0xa
 		i++
 		i = encodeVarintDeviceService(data, i, uint64(m.Identify.Size()))
-		n7, err := m.Identify.MarshalTo(data[i:])
+		n9, err := m.Identify.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n7
+		i += n9
 	}
 	return i, nil
 }
@@ -764,11 +914,11 @@ func (m *CheckBootstrapperExistsRequest) MarshalTo(data []byte) (int, error) {
 		data[i] = 0xa
 		i++
 		i = encodeVarintDeviceService(data, i, uint64(m.Identify.Size()))
-		n8, err := m.Identify.MarshalTo(data[i:])
+		n10, err := m.Identify.MarshalTo(data[i:])
 		if err != nil {
 			return 0, err
 		}
-		i += n8
+		i += n10
 	}
 	if len(m.Region) > 0 {
 		data[i] = 0x12
@@ -884,6 +1034,37 @@ func (m *CreateDeviceResponse) Size() (n int) {
 	if m.CreatedDevice != nil {
 		l = m.CreatedDevice.Size()
 		n += 1 + l + sovDeviceService(uint64(l))
+	}
+	return n
+}
+
+func (m *SaveDeviceRequest) Size() (n int) {
+	var l int
+	_ = l
+	if m.Identify != nil {
+		l = m.Identify.Size()
+		n += 1 + l + sovDeviceService(uint64(l))
+	}
+	l = len(m.Hostname)
+	if l > 0 {
+		n += 1 + l + sovDeviceService(uint64(l))
+	}
+	l = len(m.Region)
+	if l > 0 {
+		n += 1 + l + sovDeviceService(uint64(l))
+	}
+	if m.NetworkSettings != nil {
+		l = m.NetworkSettings.Size()
+		n += 1 + l + sovDeviceService(uint64(l))
+	}
+	return n
+}
+
+func (m *SaveDeviceResponse) Size() (n int) {
+	var l int
+	_ = l
+	if m.Changed {
+		n += 2
 	}
 	return n
 }
@@ -1386,6 +1567,250 @@ func (m *CreateDeviceResponse) Unmarshal(data []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDeviceService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDeviceService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SaveDeviceRequest) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDeviceService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SaveDeviceRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SaveDeviceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Identify", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDeviceService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Identify == nil {
+				m.Identify = &identify.Identify{}
+			}
+			if err := m.Identify.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Hostname", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDeviceService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Hostname = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Region", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDeviceService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Region = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NetworkSettings", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthDeviceService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.NetworkSettings == nil {
+				m.NetworkSettings = &Device_DeviceNetworkSettings{}
+			}
+			if err := m.NetworkSettings.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDeviceService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthDeviceService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SaveDeviceResponse) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDeviceService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SaveDeviceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SaveDeviceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Changed", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDeviceService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Changed = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDeviceService(data[iNdEx:])
@@ -2145,41 +2570,46 @@ var (
 )
 
 var fileDescriptorDeviceService = []byte{
-	// 565 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xac, 0x54, 0xc1, 0x6e, 0xd3, 0x40,
-	0x10, 0x55, 0x12, 0x29, 0x24, 0x93, 0x10, 0xd1, 0x0d, 0x94, 0x60, 0x20, 0x80, 0x0f, 0x85, 0x43,
-	0xeb, 0x54, 0x01, 0x4e, 0x08, 0x09, 0x9a, 0x42, 0x14, 0x89, 0x8a, 0xca, 0x5c, 0x91, 0x22, 0x27,
-	0xde, 0xda, 0x86, 0xc4, 0x6b, 0x76, 0x37, 0x85, 0x7e, 0x00, 0xdf, 0xc2, 0x85, 0x0f, 0xe1, 0xc8,
-	0x27, 0x20, 0xbe, 0x84, 0xb5, 0x77, 0x62, 0xec, 0xd6, 0x6e, 0xa5, 0xc2, 0xc1, 0xda, 0xdd, 0x99,
-	0xf7, 0xde, 0xec, 0xec, 0xcc, 0x18, 0x9e, 0x78, 0x81, 0xf4, 0x57, 0x33, 0x6b, 0xce, 0x96, 0x03,
-	0x71, 0x12, 0x72, 0x36, 0x63, 0x83, 0x88, 0x33, 0xc9, 0x06, 0x2e, 0x3d, 0x0e, 0xe6, 0x14, 0x97,
-	0x1d, 0x41, 0x79, 0xbc, 0x5a, 0x89, 0x8f, 0xd4, 0xb5, 0xd5, 0xd8, 0xc9, 0xb0, 0x3d, 0xe6, 0x21,
-	0x75, 0xb6, 0x3a, 0x4a, 0x4e, 0x5a, 0x27, 0xde, 0x69, 0x9a, 0xb1, 0x5d, 0x1a, 0x4c, 0x59, 0x96,
-	0x2c, 0xc4, 0x05, 0xd1, 0xbb, 0xa5, 0xe8, 0xc0, 0xa5, 0xa1, 0x0c, 0x8e, 0x4e, 0xd2, 0xcd, 0x85,
-	0xfa, 0xb9, 0x64, 0x34, 0xda, 0x7c, 0x0f, 0xe4, 0x4d, 0x20, 0xe4, 0x7e, 0x62, 0x13, 0x36, 0xfd,
-	0xb4, 0xa2, 0x42, 0x12, 0x0b, 0x1a, 0x6b, 0xd5, 0x5e, 0xe5, 0x7e, 0xe5, 0x51, 0x6b, 0x48, 0xac,
-	0x34, 0xcc, 0x04, 0x37, 0x76, 0x8a, 0x21, 0x9b, 0x50, 0xe7, 0xd4, 0x0b, 0x58, 0xd8, 0xab, 0x2a,
-	0x74, 0xd3, 0xc6, 0x93, 0xf9, 0x1c, 0xba, 0x39, 0x75, 0x11, 0xb1, 0x50, 0x50, 0xb2, 0x05, 0xf8,
-	0x76, 0x4a, 0xbc, 0xa6, 0xc4, 0x3b, 0x16, 0xde, 0x49, 0x03, 0x6d, 0xf4, 0x9a, 0x5f, 0x2b, 0xd0,
-	0x1d, 0x71, 0xea, 0x48, 0x8a, 0x8e, 0x4b, 0x5e, 0xef, 0x6f, 0xbc, 0x6a, 0x82, 0x2e, 0x89, 0x97,
-	0x49, 0xa3, 0x96, 0x4b, 0xe3, 0x00, 0xae, 0xe7, 0xaf, 0x81, 0x79, 0x3c, 0x85, 0xce, 0x3c, 0xb1,
-	0xbb, 0xd3, 0x34, 0x9f, 0x22, 0xfd, 0xab, 0x88, 0xd2, 0x47, 0xf3, 0x18, 0xae, 0x8d, 0xa9, 0xfc,
-	0xb7, 0x94, 0x0c, 0x68, 0xf8, 0x4c, 0xc8, 0xd0, 0x59, 0x52, 0x7c, 0xf3, 0xf4, 0x5c, 0x9a, 0xc6,
-	0x33, 0xd8, 0xc8, 0xc4, 0x2d, 0xa8, 0xc5, 0x39, 0x6f, 0x63, 0x8e, 0xe1, 0x86, 0x22, 0x8f, 0x14,
-	0x67, 0xb5, 0x38, 0xa4, 0x94, 0x5f, 0xb6, 0x57, 0xcc, 0xef, 0x15, 0xd8, 0x3c, 0xad, 0x84, 0x77,
-	0x19, 0x42, 0x2b, 0x1e, 0x31, 0xca, 0xa7, 0x91, 0xb2, 0x63, 0x73, 0x6c, 0x58, 0x38, 0x10, 0x93,
-	0xc3, 0x97, 0xae, 0xcb, 0xa9, 0x10, 0x36, 0x68, 0x54, 0x4c, 0x26, 0xbb, 0x00, 0x8e, 0xa7, 0xa4,
-	0x35, 0xa5, 0x5a, 0x46, 0x69, 0x26, 0xa0, 0x84, 0xb1, 0x0d, 0x8d, 0xcf, 0x4e, 0xa8, 0xf1, 0xb5,
-	0x32, 0xfc, 0x15, 0x05, 0x89, 0xd1, 0xa6, 0x0f, 0xfd, 0x91, 0x4f, 0xe7, 0x1f, 0xf7, 0x18, 0x93,
-	0x42, 0x72, 0x27, 0x8a, 0x28, 0x7f, 0xf5, 0x45, 0x35, 0xf5, 0x7f, 0x1f, 0x96, 0x7d, 0xb8, 0x57,
-	0x1a, 0x09, 0x1f, 0xe8, 0x01, 0xb4, 0xe7, 0xbe, 0x13, 0x7a, 0x54, 0x4c, 0x97, 0x8e, 0xab, 0x4b,
-	0xd6, 0xb0, 0x5b, 0x68, 0x3b, 0x50, 0xa6, 0xe1, 0xb7, 0x1a, 0x74, 0xc7, 0x0b, 0x36, 0x73, 0x16,
-	0xba, 0x80, 0xef, 0xf4, 0x3f, 0x8b, 0xbc, 0x86, 0x56, 0x66, 0x14, 0x89, 0xb1, 0x2e, 0xf3, 0xd9,
-	0xe9, 0x37, 0x6e, 0x17, 0xfa, 0xf0, 0x0a, 0x13, 0x68, 0x67, 0x67, 0x81, 0xa4, 0xe0, 0x82, 0x41,
-	0x35, 0xee, 0x14, 0x3b, 0x51, 0xea, 0x05, 0x34, 0xd3, 0x7e, 0x24, 0xbd, 0x35, 0xf4, 0xf4, 0x68,
-	0x18, 0xb7, 0x0a, 0x3c, 0xa8, 0xf0, 0x16, 0x3a, 0xf9, 0x56, 0x22, 0x77, 0x33, 0xe0, 0xb3, 0xcd,
-	0x6a, 0xf4, 0xcb, 0xdc, 0x28, 0xf8, 0x01, 0x6e, 0x96, 0xd4, 0x80, 0x6c, 0xa5, 0xb9, 0x9c, 0xdb,
-	0x0e, 0xc6, 0xc3, 0x0b, 0x71, 0x3a, 0xd6, 0x5e, 0xfb, 0xc7, 0xef, 0x7e, 0xe5, 0xa7, 0xfa, 0x7e,
-	0xa9, 0x6f, 0x56, 0x4f, 0xfe, 0xc7, 0x8f, 0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x8e, 0xe8,
-	0xe3, 0x8c, 0x06, 0x00, 0x00,
+	// 644 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xbc, 0x55, 0xc1, 0x6e, 0xd3, 0x40,
+	0x10, 0x95, 0x1b, 0xd4, 0xa6, 0x93, 0x10, 0x9a, 0x0d, 0x94, 0xd4, 0x40, 0x00, 0x0b, 0x15, 0x0e,
+	0xad, 0x53, 0x05, 0x38, 0x21, 0x24, 0x68, 0x0a, 0x51, 0x24, 0x4a, 0x2b, 0xe7, 0x8a, 0x14, 0x39,
+	0xf1, 0xd6, 0x31, 0x4d, 0xbc, 0xc1, 0xbb, 0x49, 0xe9, 0x07, 0xf0, 0x37, 0x7c, 0x48, 0x8f, 0x7c,
+	0x02, 0xe2, 0xcc, 0x47, 0xb0, 0xf1, 0x4e, 0x5c, 0xbb, 0xb1, 0x5b, 0xa9, 0x20, 0x0e, 0xd6, 0xee,
+	0xce, 0xbc, 0x79, 0x33, 0xb3, 0x3b, 0x33, 0x86, 0x17, 0xae, 0x27, 0x06, 0x93, 0x9e, 0xd9, 0x67,
+	0xa3, 0x3a, 0x3f, 0xf5, 0x03, 0xd6, 0x63, 0xf5, 0x71, 0xc0, 0x04, 0xab, 0x3b, 0x74, 0xea, 0xf5,
+	0x29, 0x2e, 0xdb, 0x9c, 0x06, 0xb3, 0xd5, 0x0c, 0x75, 0x64, 0x59, 0x49, 0xf5, 0xed, 0x98, 0xb5,
+	0xcb, 0x5c, 0x34, 0xed, 0x4d, 0x8e, 0xc2, 0x93, 0xe2, 0x99, 0xed, 0x94, 0x99, 0xbe, 0x95, 0xe9,
+	0x4c, 0x4a, 0x46, 0xcc, 0xc7, 0x05, 0xd1, 0x3b, 0x99, 0x68, 0xcf, 0xa1, 0xbe, 0xf0, 0x8e, 0x4e,
+	0xa3, 0xcd, 0x95, 0xfc, 0x89, 0x64, 0x14, 0xda, 0xf8, 0x04, 0xe4, 0x83, 0xc7, 0xc5, 0x5e, 0x28,
+	0xe3, 0x16, 0xfd, 0x32, 0xa1, 0x5c, 0x10, 0x13, 0xf2, 0x73, 0xd6, 0xaa, 0xf6, 0x48, 0x7b, 0x56,
+	0x68, 0x10, 0x33, 0x72, 0xd3, 0xc6, 0x8d, 0x15, 0x61, 0xc8, 0x3a, 0x2c, 0x07, 0xd4, 0xf5, 0x98,
+	0x5f, 0x5d, 0x92, 0xe8, 0x55, 0x0b, 0x4f, 0xc6, 0x6b, 0xa8, 0x24, 0xd8, 0xf9, 0x98, 0xf9, 0x9c,
+	0x92, 0x4d, 0xc0, 0xbb, 0x93, 0xe4, 0x39, 0x49, 0x5e, 0x32, 0x31, 0x26, 0x05, 0xb4, 0x50, 0x6b,
+	0x7c, 0xd3, 0xa0, 0xd2, 0x0c, 0xa8, 0x2d, 0x28, 0x2a, 0xae, 0x19, 0xde, 0xb9, 0xbf, 0xa5, 0x10,
+	0x9d, 0xe1, 0x2f, 0x96, 0x46, 0x2e, 0x91, 0xc6, 0x3e, 0xdc, 0x4e, 0x86, 0x81, 0x79, 0xbc, 0x84,
+	0x52, 0x3f, 0x94, 0x3b, 0xdd, 0x28, 0x9f, 0x34, 0xfe, 0x9b, 0x88, 0x52, 0x47, 0xe3, 0x4c, 0x83,
+	0x72, 0xc7, 0x9e, 0xfe, 0x65, 0x52, 0x3a, 0xe4, 0x07, 0x8c, 0x0b, 0xdf, 0x1e, 0x51, 0xbc, 0xf5,
+	0xe8, 0x9c, 0x95, 0x08, 0x39, 0x80, 0x35, 0x9f, 0x8a, 0x13, 0x16, 0x1c, 0x77, 0x39, 0x15, 0xc2,
+	0xf3, 0x5d, 0x5e, 0xbd, 0x11, 0xfa, 0x7a, 0x92, 0x0c, 0x19, 0x97, 0x8f, 0x0a, 0xdc, 0x41, 0xac,
+	0x75, 0xcb, 0x4f, 0x0a, 0x0c, 0x13, 0x48, 0x3c, 0x13, 0xbc, 0x97, 0x2a, 0xac, 0xf4, 0x07, 0xb6,
+	0xef, 0x52, 0x27, 0xcc, 0x24, 0x6f, 0xcd, 0x8f, 0xc6, 0x14, 0xd6, 0x5a, 0x54, 0xfc, 0xf7, 0xc4,
+	0x8d, 0x57, 0x50, 0x8e, 0xf9, 0x4d, 0x29, 0xc3, 0x4b, 0xca, 0xc2, 0x68, 0xc1, 0x1d, 0x69, 0xdc,
+	0x94, 0x36, 0x93, 0xe1, 0x21, 0xa5, 0xc1, 0x75, 0xdb, 0xc4, 0xf8, 0xae, 0xc1, 0xfa, 0x45, 0x26,
+	0x8c, 0xa5, 0x01, 0x85, 0xd9, 0x74, 0xa1, 0x41, 0x77, 0x2c, 0xe5, 0xd8, 0x17, 0x65, 0x13, 0x67,
+	0x41, 0xfb, 0xf0, 0xad, 0xe3, 0x04, 0x94, 0x73, 0x0b, 0x14, 0x6a, 0x66, 0x4c, 0x76, 0x00, 0x6c,
+	0x57, 0x52, 0x2b, 0x93, 0xa5, 0x2c, 0x93, 0xd5, 0x10, 0x14, 0x5a, 0x6c, 0x41, 0xfe, 0xc4, 0xf6,
+	0x15, 0x3e, 0x97, 0x85, 0x5f, 0x91, 0x90, 0x19, 0xda, 0x18, 0x40, 0xad, 0x39, 0xa0, 0xfd, 0xe3,
+	0x5d, 0xc6, 0x04, 0x17, 0x81, 0x3d, 0x1e, 0xd3, 0xe0, 0xdd, 0x57, 0xd9, 0xcf, 0xff, 0x7c, 0x4e,
+	0xec, 0xc1, 0xc3, 0x4c, 0x4f, 0x78, 0x41, 0x8f, 0xa1, 0xa8, 0x8a, 0x88, 0x77, 0x47, 0xb6, 0x43,
+	0xb1, 0xb0, 0x0a, 0x28, 0xdb, 0x97, 0xa2, 0xc6, 0xef, 0x1c, 0x54, 0x5a, 0x43, 0xd6, 0xb3, 0x87,
+	0xea, 0x01, 0x3b, 0x6a, 0x5c, 0x93, 0xf7, 0x50, 0x88, 0x4d, 0x21, 0xa2, 0xcf, 0x9f, 0x79, 0x71,
+	0xf0, 0xe9, 0xf7, 0x52, 0x75, 0x18, 0x42, 0x1b, 0x8a, 0xf1, 0x31, 0x40, 0x22, 0x70, 0xca, 0x8c,
+	0xd2, 0xef, 0xa7, 0x2b, 0x91, 0xaa, 0x09, 0x70, 0xde, 0x37, 0x64, 0x63, 0x8e, 0x5d, 0x98, 0x0a,
+	0xba, 0x9e, 0xa6, 0x42, 0x92, 0x37, 0xb0, 0x1a, 0x15, 0x35, 0xa9, 0xce, 0x81, 0x17, 0xfb, 0x4b,
+	0xdf, 0x48, 0xd1, 0x20, 0xc3, 0x01, 0x94, 0x92, 0xf5, 0x48, 0x1e, 0xc4, 0xc0, 0x8b, 0x15, 0xaf,
+	0xd7, 0xb2, 0xd4, 0x48, 0xf8, 0x19, 0xee, 0x66, 0x3c, 0x24, 0xd9, 0x8c, 0x2e, 0xe4, 0xd2, 0x9a,
+	0xd2, 0x9f, 0x5e, 0x89, 0x53, 0xbe, 0x76, 0x8b, 0x67, 0xbf, 0x6a, 0xda, 0x0f, 0xf9, 0xfd, 0x94,
+	0x5f, 0x6f, 0x39, 0xfc, 0x9f, 0x3d, 0xff, 0x13, 0x00, 0x00, 0xff, 0xff, 0xc0, 0x7b, 0xe3, 0xec,
+	0xcc, 0x07, 0x00, 0x00,
 }

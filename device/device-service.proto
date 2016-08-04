@@ -29,6 +29,17 @@ message CreateDeviceResponse {
   Device created_device = 1;
 }
 
+message SaveDeviceRequest {
+  identify.Identify identify = 1;
+  string hostname = 2;
+  string region = 3;
+  Device.DeviceNetworkSettings network_settings = 4;
+}
+
+message SaveDeviceResponse {
+  bool changed = 1;
+}
+
 message GetDeviceRequest {
   identify.Identify identify = 1;
   string hostname = 2;
@@ -61,6 +72,7 @@ message CheckBootstrapperExistsResponse {
 service GlobalDeviceService {
   rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
   rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
+  rpc SaveDevice(SaveDeviceRequest) returns (SaveDeviceResponse);
   rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
 
   // Methods called by devices

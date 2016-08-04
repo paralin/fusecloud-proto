@@ -47,12 +47,24 @@ message Device {
 
       message WifiNetwork {
         string ssid = 1;
+        WifiNetworkType net_type = 9;
+
+        string psk = 6;
+        bool psk_encoded = 10;
+
         string proto = 2;
         string key_mgmt = 3;
         string pairwise = 4;
         string group = 5;
-        string psk = 6;
+        string frequency = 8;
+
         string extra_options = 7;
+      }
+
+      enum WifiNetworkType {
+        // Standard wifi access point
+        AP = 0;
+        ADHOC = 1;
       }
     }
   }

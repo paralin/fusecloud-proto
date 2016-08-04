@@ -178,13 +178,26 @@ func (ns *Device_DeviceInterfaceConfig) BuildSystemdNetworkdFile() string {
 	return res.String()
 }
 
+func (wif *Device_DeviceInterfaceConfig_WifiConfig) HasAnyAdhoc() bool {
+	for _, net := range wif.Network {
+		if net.NetType == Device_DeviceInterfaceConfig_WifiConfig_ADHOC {
+			return true
+		}
+	}
+	return false
+}
+
 func (wif *Device_DeviceInterfaceConfig_WifiConfig) BuildWpaSupplicantFile() string {
 	var res bytes.Buffer
 
 	res.WriteString("ctrl_interface=/var/run/wpa_supplicant\n")
-	res.WriteString("eapol_version=1\n")
-	res.WriteString("ap_scan=1\n")
-	res.WriteString("fast_reauth=1\n")
+	if wif.HasAnyAdhoc() {
+		res.WriteString("# There is at least 1 adhoc network, use ap_scan=2\n")
+		res.WriteString("ap_scan=2\n")
+	} else {
+		res.WriteString("ap_scan=1\n")
+		res.WriteString("fast_reauth=1\n")
+	}
 
 	if wif.ExtraOptions != "" {
 		res.WriteString("\n# User-supplied extra options\n")
@@ -196,20 +209,40 @@ func (wif *Device_DeviceInterfaceConfig_WifiConfig) BuildWpaSupplicantFile() str
 	for _, net := range wif.Network {
 		res.WriteString("network={\n")
 		res.WriteString(fmt.Sprintf("  ssid=\"%s\"\n", net.Ssid))
-		if net.Proto != "" {
-			res.WriteString(fmt.Sprintf("  proto=%s\n", net.Proto))
-		}
-		if net.KeyMgmt != "" {
-			res.WriteString(fmt.Sprintf("  key_mgmt=%s\n", net.KeyMgmt))
-		}
-		if net.Pairwise != "" {
-			res.WriteString(fmt.Sprintf("  pairwise=%s\n", net.Pairwise))
-		}
-		if net.Group != "" {
-			res.WriteString(fmt.Sprintf("  group=%s\n", net.Group))
+		switch net.NetType {
+		case Device_DeviceInterfaceConfig_WifiConfig_ADHOC:
+			res.WriteString("  mode=1\n")
+			res.WriteString("  proto=WPA\n")
+			res.WriteString("  key_mgmt=WPA-NONE\n")
+			res.WriteString("  pairwise=NONE\n")
+			res.WriteString("  group=TKIP\n")
+		case Device_DeviceInterfaceConfig_WifiConfig_AP:
+			if net.Proto != "" {
+				res.WriteString(fmt.Sprintf("  proto=%s\n", net.Proto))
+			}
+			if net.KeyMgmt != "" {
+				res.WriteString(fmt.Sprintf("  key_mgmt=%s\n", net.KeyMgmt))
+			}
+			if net.Pairwise != "" {
+				res.WriteString(fmt.Sprintf("  pairwise=%s\n", net.Pairwise))
+			}
+			if net.Group != "" {
+				res.WriteString(fmt.Sprintf("  group=%s\n", net.Group))
+			}
 		}
 		if net.Psk != "" {
-			res.WriteString(fmt.Sprintf("  psk=%s\n", net.Psk))
+			res.WriteString("  psk=")
+			if !net.PskEncoded {
+				res.WriteString("\"")
+			}
+			res.WriteString(net.Psk)
+			if !net.PskEncoded {
+				res.WriteString("\"")
+			}
+			res.WriteString("\n")
+		}
+		if net.Frequency != "" {
+			res.WriteString(fmt.Sprintf("  frequency=%s\n", net.Frequency))
 		}
 		if net.ExtraOptions != "" {
 			res.WriteString("  # User supplied extra options\n")
