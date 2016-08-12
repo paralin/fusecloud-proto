@@ -178,6 +178,22 @@ func (ns *Device_DeviceInterfaceConfig) BuildSystemdNetworkdFile() string {
 		res.WriteString("DHCP=ipv4")
 	}
 
+	if len(ns.Dns) > 0 {
+		for _, item := range ns.Dns {
+			if item == nil {
+				continue
+			}
+
+			dnsstr, err := item.IPString()
+			if err != nil {
+				continue
+			}
+			res.WriteString("DNS=")
+			res.WriteString(dnsstr)
+			res.WriteString("\n")
+		}
+	}
+
 	return res.String()
 }
 
@@ -221,6 +237,10 @@ func (wif *Device_DeviceInterfaceConfig_WifiConfig) BuildWpaSupplicantFile() str
 				res.WriteString("  pairwise=NONE\n")
 				res.WriteString("  group=TKIP\n")
 			}
+			if net.Frequency == "" {
+				// Adhoc networks need a frequency, default to 2432
+				net.Frequency = "2432"
+			}
 		case Device_DeviceInterfaceConfig_WifiConfig_AP:
 			if net.Proto != "" {
 				res.WriteString(fmt.Sprintf("  proto=%s\n", net.Proto))
@@ -235,6 +255,9 @@ func (wif *Device_DeviceInterfaceConfig_WifiConfig) BuildWpaSupplicantFile() str
 				res.WriteString(fmt.Sprintf("  group=%s\n", net.Group))
 			}
 		}
+		if net.Frequency != "" {
+			res.WriteString(fmt.Sprintf("  frequency=%s\n", net.Frequency))
+		}
 		if net.Psk != "" {
 			res.WriteString("  psk=")
 			if !net.PskEncoded {
@@ -245,9 +268,6 @@ func (wif *Device_DeviceInterfaceConfig_WifiConfig) BuildWpaSupplicantFile() str
 				res.WriteString("\"")
 			}
 			res.WriteString("\n")
-		}
-		if net.Frequency != "" {
-			res.WriteString(fmt.Sprintf("  frequency=%s\n", net.Frequency))
 		}
 		if net.ExtraOptions != "" {
 			res.WriteString("  # User supplied extra options\n")
