@@ -175,7 +175,7 @@ func (ns *Device_DeviceInterfaceConfig) BuildSystemdNetworkdFile() string {
 	}
 
 	if ips == "" && ipsg == "" {
-		res.WriteString("DHCP=ipv4")
+		res.WriteString("DHCP=ipv4\n")
 	}
 
 	if len(ns.Dns) > 0 {
