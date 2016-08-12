@@ -215,10 +215,12 @@ func (wif *Device_DeviceInterfaceConfig_WifiConfig) BuildWpaSupplicantFile() str
 		switch net.NetType {
 		case Device_DeviceInterfaceConfig_WifiConfig_ADHOC:
 			res.WriteString("  mode=1\n")
-			res.WriteString("  proto=WPA\n")
-			res.WriteString("  key_mgmt=WPA-NONE\n")
-			res.WriteString("  pairwise=NONE\n")
-			res.WriteString("  group=TKIP\n")
+			if net.Psk != "" {
+				res.WriteString("  proto=WPA\n")
+				res.WriteString("  key_mgmt=WPA-NONE\n")
+				res.WriteString("  pairwise=NONE\n")
+				res.WriteString("  group=TKIP\n")
+			}
 		case Device_DeviceInterfaceConfig_WifiConfig_AP:
 			if net.Proto != "" {
 				res.WriteString(fmt.Sprintf("  proto=%s\n", net.Proto))
