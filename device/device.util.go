@@ -211,7 +211,8 @@ func (wif *Device_DeviceInterfaceConfig_WifiConfig) BuildWpaSupplicantFile() str
 
 	res.WriteString("ctrl_interface=/var/run/wpa_supplicant\n")
 	if wif.HasAnyAdhoc() {
-		res.WriteString("# There is at least 1 adhoc network, use ap_scan=2\n")
+		res.WriteString("# There is at least 1 adhoc network, use ap_scan and eapol:\n")
+		res.WriteString("eapol_version=1\n")
 		res.WriteString("ap_scan=2\n")
 	} else {
 		res.WriteString("ap_scan=1\n")
@@ -236,6 +237,9 @@ func (wif *Device_DeviceInterfaceConfig_WifiConfig) BuildWpaSupplicantFile() str
 				res.WriteString("  key_mgmt=WPA-NONE\n")
 				res.WriteString("  pairwise=NONE\n")
 				res.WriteString("  group=TKIP\n")
+			} else {
+				res.WriteString("  proto=RSN\n")
+				res.WriteString("  key_mgmt=NONE\n")
 			}
 			if net.Frequency == "" {
 				// Adhoc networks need a frequency, default to 2432
