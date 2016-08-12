@@ -163,6 +163,7 @@ func (ns *Device_DeviceInterfaceConfig) BuildSystemdNetworkdFile() string {
 		res.WriteString(ips)
 		res.WriteString("/24\n")
 	}
+	ips = ""
 
 	if ns.GatewayIp != nil {
 		ips, _ = ns.GatewayIp.IPString()
