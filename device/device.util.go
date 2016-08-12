@@ -152,6 +152,7 @@ func (ns *Device_DeviceInterfaceConfig) BuildSystemdNetworkdFile() string {
 	res.WriteString("\n\n[Network]\n")
 
 	var ips string
+	var ipsg string
 
 	if ns.Ip != nil {
 		ips, _ = ns.Ip.IPString()
@@ -163,16 +164,17 @@ func (ns *Device_DeviceInterfaceConfig) BuildSystemdNetworkdFile() string {
 		res.WriteString(ips)
 		res.WriteString("/24\n")
 	}
-	ips = ""
 
 	if ns.GatewayIp != nil {
-		ips, _ = ns.GatewayIp.IPString()
+		ipsg, _ = ns.GatewayIp.IPString()
 	}
-	if ips != "" {
+	if ipsg != "" {
 		res.WriteString("Gateway=")
-		res.WriteString(ips)
+		res.WriteString(ipsg)
 		res.WriteString("\n")
-	} else {
+	}
+
+	if ips == "" && ipsg == "" {
 		res.WriteString("DHCP=ipv4")
 	}
 
