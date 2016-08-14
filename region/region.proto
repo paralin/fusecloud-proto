@@ -39,5 +39,10 @@ message Region {
     string name = 1;
     bool created = 2;
     map<string, int32> replication = 3;
+    RegionDataKeyspaceType type = 4;
+
+    enum RegionDataKeyspaceType {
+      KAIROSDB = 0;
+    }
   }
 }
