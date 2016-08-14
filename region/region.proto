@@ -40,7 +40,4 @@ message Region {
     bool created = 2;
     map<string, int32> replication = 3;
   }
-
-  message RegionMapInfo {
-  }
 }

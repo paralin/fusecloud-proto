@@ -4,6 +4,7 @@ package region;
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/synrobo/proto/identify/identify.proto";
 import "github.com/synrobo/proto/region/region.proto";
+import "github.com/synrobo/proto/common/common.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.marshaler_all) = true;
@@ -25,7 +26,22 @@ message CreateRegionResponse {
   Region created_region = 1;
 }
 
+message SaveRegionRequest {
+  identify.Identify identify = 1;
+  string id = 3;
+  string name = 4;
+  repeated Region.RegionDataKeyspace data_keyspace = 5;
+  common.GeoLocation location = 6;
+  // If set, if data_keyspace is null will delete all of them.
+  bool allow_clear_data_keyspaces = 7;
+}
+
+message SaveRegionResponse {
+  bool changed = 1;
+}
+
 service RegionService {
   rpc ListRegions(ListRegionsRequest) returns (ListRegionsResponse);
   rpc CreateRegion(CreateRegionRequest) returns (CreateRegionResponse);
+  rpc SaveRegion(SaveRegionRequest) returns (SaveRegionResponse);
 }

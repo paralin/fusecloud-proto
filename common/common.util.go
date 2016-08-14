@@ -40,6 +40,16 @@ func (ip *IPAddress) ToIPAddr() (net.IP, error) {
 	return net.ParseIP(ipstr), nil
 }
 
+func (loc *GeoLocation) Validate() error {
+	if loc.Latitude < -90 || loc.Latitude > 90 {
+		return errors.New("Latitude is invalid.")
+	}
+	if loc.Longitude > 180 || loc.Longitude < -180 {
+		return errors.New("Longitude is invalid.")
+	}
+	return nil
+}
+
 // Really stupid implementation, will make something better later
 func FromIPString(ip string) *IPAddress {
 	parts := strings.Split(ip, ".")

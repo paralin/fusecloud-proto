@@ -14,6 +14,8 @@
 		ListRegionsResponse
 		CreateRegionRequest
 		CreateRegionResponse
+		SaveRegionRequest
+		SaveRegionResponse
 		Region
 */
 package region
@@ -23,6 +25,7 @@ import fmt "fmt"
 import math "math"
 import _ "github.com/gogo/protobuf/gogoproto"
 import identify "github.com/synrobo/proto/identify"
+import common "github.com/synrobo/proto/common"
 
 import (
 	context "golang.org/x/net/context"
@@ -106,11 +109,58 @@ func (m *CreateRegionResponse) GetCreatedRegion() *Region {
 	return nil
 }
 
+type SaveRegionRequest struct {
+	Identify     *identify.Identify           `protobuf:"bytes,1,opt,name=identify" json:"identify,omitempty"`
+	Id           string                       `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	Name         string                       `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	DataKeyspace []*Region_RegionDataKeyspace `protobuf:"bytes,5,rep,name=data_keyspace,json=dataKeyspace" json:"data_keyspace,omitempty"`
+	Location     *common.GeoLocation          `protobuf:"bytes,6,opt,name=location" json:"location,omitempty"`
+	// If set, if data_keyspace is null will delete all of them.
+	AllowClearDataKeyspaces bool `protobuf:"varint,7,opt,name=allow_clear_data_keyspaces,json=allowClearDataKeyspaces,proto3" json:"allow_clear_data_keyspaces,omitempty"`
+}
+
+func (m *SaveRegionRequest) Reset()                    { *m = SaveRegionRequest{} }
+func (m *SaveRegionRequest) String() string            { return proto.CompactTextString(m) }
+func (*SaveRegionRequest) ProtoMessage()               {}
+func (*SaveRegionRequest) Descriptor() ([]byte, []int) { return fileDescriptorRegionService, []int{4} }
+
+func (m *SaveRegionRequest) GetIdentify() *identify.Identify {
+	if m != nil {
+		return m.Identify
+	}
+	return nil
+}
+
+func (m *SaveRegionRequest) GetDataKeyspace() []*Region_RegionDataKeyspace {
+	if m != nil {
+		return m.DataKeyspace
+	}
+	return nil
+}
+
+func (m *SaveRegionRequest) GetLocation() *common.GeoLocation {
+	if m != nil {
+		return m.Location
+	}
+	return nil
+}
+
+type SaveRegionResponse struct {
+	Changed bool `protobuf:"varint,1,opt,name=changed,proto3" json:"changed,omitempty"`
+}
+
+func (m *SaveRegionResponse) Reset()                    { *m = SaveRegionResponse{} }
+func (m *SaveRegionResponse) String() string            { return proto.CompactTextString(m) }
+func (*SaveRegionResponse) ProtoMessage()               {}
+func (*SaveRegionResponse) Descriptor() ([]byte, []int) { return fileDescriptorRegionService, []int{5} }
+
 func init() {
 	proto.RegisterType((*ListRegionsRequest)(nil), "region.ListRegionsRequest")
 	proto.RegisterType((*ListRegionsResponse)(nil), "region.ListRegionsResponse")
 	proto.RegisterType((*CreateRegionRequest)(nil), "region.CreateRegionRequest")
 	proto.RegisterType((*CreateRegionResponse)(nil), "region.CreateRegionResponse")
+	proto.RegisterType((*SaveRegionRequest)(nil), "region.SaveRegionRequest")
+	proto.RegisterType((*SaveRegionResponse)(nil), "region.SaveRegionResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -126,6 +176,7 @@ const _ = grpc.SupportPackageIsVersion3
 type RegionServiceClient interface {
 	ListRegions(ctx context.Context, in *ListRegionsRequest, opts ...grpc.CallOption) (*ListRegionsResponse, error)
 	CreateRegion(ctx context.Context, in *CreateRegionRequest, opts ...grpc.CallOption) (*CreateRegionResponse, error)
+	SaveRegion(ctx context.Context, in *SaveRegionRequest, opts ...grpc.CallOption) (*SaveRegionResponse, error)
 }
 
 type regionServiceClient struct {
@@ -154,11 +205,21 @@ func (c *regionServiceClient) CreateRegion(ctx context.Context, in *CreateRegion
 	return out, nil
 }
 
+func (c *regionServiceClient) SaveRegion(ctx context.Context, in *SaveRegionRequest, opts ...grpc.CallOption) (*SaveRegionResponse, error) {
+	out := new(SaveRegionResponse)
+	err := grpc.Invoke(ctx, "/region.RegionService/SaveRegion", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for RegionService service
 
 type RegionServiceServer interface {
 	ListRegions(context.Context, *ListRegionsRequest) (*ListRegionsResponse, error)
 	CreateRegion(context.Context, *CreateRegionRequest) (*CreateRegionResponse, error)
+	SaveRegion(context.Context, *SaveRegionRequest) (*SaveRegionResponse, error)
 }
 
 func RegisterRegionServiceServer(s *grpc.Server, srv RegionServiceServer) {
@@ -201,6 +262,24 @@ func _RegionService_CreateRegion_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RegionService_SaveRegion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveRegionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RegionServiceServer).SaveRegion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/region.RegionService/SaveRegion",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RegionServiceServer).SaveRegion(ctx, req.(*SaveRegionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _RegionService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "region.RegionService",
 	HandlerType: (*RegionServiceServer)(nil),
@@ -212,6 +291,10 @@ var _RegionService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateRegion",
 			Handler:    _RegionService_CreateRegion_Handler,
+		},
+		{
+			MethodName: "SaveRegion",
+			Handler:    _RegionService_SaveRegion_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -332,6 +415,106 @@ func (m *CreateRegionResponse) MarshalTo(data []byte) (int, error) {
 	return i, nil
 }
 
+func (m *SaveRegionRequest) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SaveRegionRequest) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Identify != nil {
+		data[i] = 0xa
+		i++
+		i = encodeVarintRegionService(data, i, uint64(m.Identify.Size()))
+		n4, err := m.Identify.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n4
+	}
+	if len(m.Id) > 0 {
+		data[i] = 0x1a
+		i++
+		i = encodeVarintRegionService(data, i, uint64(len(m.Id)))
+		i += copy(data[i:], m.Id)
+	}
+	if len(m.Name) > 0 {
+		data[i] = 0x22
+		i++
+		i = encodeVarintRegionService(data, i, uint64(len(m.Name)))
+		i += copy(data[i:], m.Name)
+	}
+	if len(m.DataKeyspace) > 0 {
+		for _, msg := range m.DataKeyspace {
+			data[i] = 0x2a
+			i++
+			i = encodeVarintRegionService(data, i, uint64(msg.Size()))
+			n, err := msg.MarshalTo(data[i:])
+			if err != nil {
+				return 0, err
+			}
+			i += n
+		}
+	}
+	if m.Location != nil {
+		data[i] = 0x32
+		i++
+		i = encodeVarintRegionService(data, i, uint64(m.Location.Size()))
+		n5, err := m.Location.MarshalTo(data[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n5
+	}
+	if m.AllowClearDataKeyspaces {
+		data[i] = 0x38
+		i++
+		if m.AllowClearDataKeyspaces {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	return i, nil
+}
+
+func (m *SaveRegionResponse) Marshal() (data []byte, err error) {
+	size := m.Size()
+	data = make([]byte, size)
+	n, err := m.MarshalTo(data)
+	if err != nil {
+		return nil, err
+	}
+	return data[:n], nil
+}
+
+func (m *SaveRegionResponse) MarshalTo(data []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if m.Changed {
+		data[i] = 0x8
+		i++
+		if m.Changed {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	return i, nil
+}
+
 func encodeFixed64RegionService(data []byte, offset int, v uint64) int {
 	data[offset] = uint8(v)
 	data[offset+1] = uint8(v >> 8)
@@ -397,6 +580,46 @@ func (m *CreateRegionResponse) Size() (n int) {
 	if m.CreatedRegion != nil {
 		l = m.CreatedRegion.Size()
 		n += 1 + l + sovRegionService(uint64(l))
+	}
+	return n
+}
+
+func (m *SaveRegionRequest) Size() (n int) {
+	var l int
+	_ = l
+	if m.Identify != nil {
+		l = m.Identify.Size()
+		n += 1 + l + sovRegionService(uint64(l))
+	}
+	l = len(m.Id)
+	if l > 0 {
+		n += 1 + l + sovRegionService(uint64(l))
+	}
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovRegionService(uint64(l))
+	}
+	if len(m.DataKeyspace) > 0 {
+		for _, e := range m.DataKeyspace {
+			l = e.Size()
+			n += 1 + l + sovRegionService(uint64(l))
+		}
+	}
+	if m.Location != nil {
+		l = m.Location.Size()
+		n += 1 + l + sovRegionService(uint64(l))
+	}
+	if m.AllowClearDataKeyspaces {
+		n += 2
+	}
+	return n
+}
+
+func (m *SaveRegionResponse) Size() (n int) {
+	var l int
+	_ = l
+	if m.Changed {
+		n += 2
 	}
 	return n
 }
@@ -744,6 +967,301 @@ func (m *CreateRegionResponse) Unmarshal(data []byte) error {
 	}
 	return nil
 }
+func (m *SaveRegionRequest) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRegionService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SaveRegionRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SaveRegionRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Identify", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegionService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRegionService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Identify == nil {
+				m.Identify = &identify.Identify{}
+			}
+			if err := m.Identify.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegionService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRegionService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Id = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegionService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRegionService
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DataKeyspace", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegionService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRegionService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DataKeyspace = append(m.DataKeyspace, &Region_RegionDataKeyspace{})
+			if err := m.DataKeyspace[len(m.DataKeyspace)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegionService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRegionService
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Location == nil {
+				m.Location = &common.GeoLocation{}
+			}
+			if err := m.Location.Unmarshal(data[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AllowClearDataKeyspaces", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegionService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AllowClearDataKeyspaces = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRegionService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthRegionService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *SaveRegionResponse) Unmarshal(data []byte) error {
+	l := len(data)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRegionService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := data[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SaveRegionResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SaveRegionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Changed", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegionService
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Changed = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRegionService(data[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthRegionService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipRegionService(data []byte) (n int, err error) {
 	l := len(data)
 	iNdEx := 0
@@ -850,24 +1368,35 @@ var (
 )
 
 var fileDescriptorRegionService = []byte{
-	// 290 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0x32, 0x49, 0xcf, 0x2c, 0xc9,
-	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0xae, 0xcc, 0x2b, 0xca, 0x4f, 0xca, 0xd7, 0x2f,
-	0x28, 0xca, 0x2f, 0xc9, 0xd7, 0x2f, 0x4a, 0x4d, 0xcf, 0xcc, 0xcf, 0x83, 0x52, 0xba, 0xc5, 0xa9,
-	0x45, 0x65, 0x99, 0xc9, 0xa9, 0x7a, 0x60, 0x39, 0x21, 0x36, 0x88, 0xa8, 0x94, 0x2e, 0x92, 0xee,
-	0xf4, 0xfc, 0x74, 0xa8, 0xd6, 0xa4, 0xd2, 0x34, 0x30, 0x0f, 0x62, 0x0e, 0x88, 0x05, 0xd1, 0x26,
-	0x65, 0x80, 0xd3, 0xb2, 0xcc, 0x94, 0xd4, 0xbc, 0x92, 0xcc, 0xb4, 0x4a, 0x38, 0x03, 0xaa, 0x43,
-	0x87, 0x38, 0xe7, 0x41, 0x54, 0x2b, 0xb9, 0x70, 0x09, 0xf9, 0x64, 0x16, 0x97, 0x04, 0x81, 0xc5,
-	0x8a, 0x83, 0x52, 0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0x84, 0xf4, 0xb8, 0x38, 0x60, 0xa6, 0x4a, 0x30,
-	0x2a, 0x30, 0x6a, 0x70, 0x1b, 0x09, 0xe9, 0xc1, 0xad, 0xf1, 0x84, 0x32, 0x82, 0xe0, 0x6a, 0x94,
-	0x6c, 0xb9, 0x84, 0x51, 0x4c, 0x29, 0x2e, 0x00, 0x52, 0xa9, 0x42, 0x6a, 0x5c, 0x50, 0x5f, 0x03,
-	0x0d, 0x61, 0x06, 0x1a, 0xc2, 0xa7, 0x07, 0xb5, 0x1b, 0xa2, 0x30, 0x08, 0x2a, 0x0b, 0xd2, 0xee,
-	0x5c, 0x94, 0x9a, 0x58, 0x92, 0x0a, 0x15, 0x87, 0xba, 0x02, 0x59, 0x3b, 0x23, 0x1e, 0xed, 0xbe,
-	0x5c, 0x22, 0xa8, 0xda, 0xa1, 0xd6, 0x9b, 0x72, 0xf1, 0x25, 0x83, 0xc5, 0x53, 0xe2, 0xf1, 0x9a,
-	0xc3, 0x0b, 0x55, 0x05, 0xe1, 0x1a, 0x2d, 0x62, 0xe4, 0xe2, 0x85, 0x30, 0x83, 0x21, 0x31, 0x28,
-	0xe4, 0xc6, 0xc5, 0x8d, 0xe4, 0x3d, 0x21, 0x29, 0x98, 0x7e, 0xcc, 0x90, 0x93, 0x92, 0xc6, 0x2a,
-	0x07, 0x75, 0x90, 0x27, 0x17, 0x0f, 0xb2, 0x43, 0x85, 0xe0, 0x8a, 0xb1, 0xf8, 0x5e, 0x4a, 0x06,
-	0xbb, 0x24, 0xc4, 0x28, 0x27, 0x9e, 0x13, 0x8f, 0xe4, 0x18, 0x2f, 0x00, 0xf1, 0x03, 0x20, 0x4e,
-	0x62, 0x03, 0x47, 0xa6, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x5c, 0x70, 0x20, 0xbe, 0x9b, 0x02,
+	// 466 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x94, 0x53, 0xc1, 0x6e, 0xd4, 0x30,
+	0x10, 0x55, 0xda, 0xb2, 0x5d, 0xa6, 0xbb, 0x2b, 0xe1, 0x22, 0x11, 0x0c, 0x42, 0xb0, 0x07, 0xc4,
+	0x81, 0x26, 0xa8, 0xc0, 0x09, 0x71, 0x61, 0x2b, 0x50, 0x45, 0xb9, 0xb8, 0x1f, 0x10, 0x39, 0x89,
+	0x9b, 0x46, 0x64, 0xe3, 0x25, 0xf6, 0x16, 0xed, 0xc7, 0xf0, 0x3f, 0x1c, 0xf9, 0x04, 0xc4, 0x85,
+	0xdf, 0xc0, 0xb1, 0x27, 0x21, 0xa1, 0xa1, 0xd0, 0x43, 0xe4, 0xf1, 0xcc, 0x7b, 0xcf, 0xcf, 0x93,
+	0x31, 0xbc, 0xc8, 0x72, 0x7d, 0xbe, 0x8e, 0x83, 0x44, 0x2e, 0x43, 0xb5, 0x29, 0x2b, 0x19, 0xcb,
+	0x70, 0x55, 0x49, 0x2d, 0xc3, 0x4a, 0x64, 0xb9, 0x2c, 0x71, 0x39, 0x50, 0xa2, 0xba, 0xc8, 0x13,
+	0x11, 0xd8, 0x1a, 0x19, 0xb9, 0x2c, 0x3d, 0xe8, 0xb0, 0x33, 0x99, 0x21, 0x35, 0x5e, 0x9f, 0xd9,
+	0x9d, 0xd3, 0xa9, 0x23, 0x47, 0xa3, 0xcf, 0xfe, 0x7a, 0x58, 0x9e, 0x8a, 0x52, 0xe7, 0x67, 0x9b,
+	0x36, 0x40, 0xc6, 0xd3, 0xff, 0xb3, 0xf7, 0x4f, 0xb4, 0xc9, 0x2c, 0x0d, 0xda, 0x2d, 0x0e, 0x3d,
+	0x3f, 0x02, 0x72, 0x92, 0x2b, 0xcd, 0xac, 0x82, 0x62, 0xe2, 0xd3, 0x5a, 0x28, 0x4d, 0x02, 0x18,
+	0x37, 0x1e, 0x7c, 0xef, 0xa1, 0xf7, 0x64, 0xef, 0x90, 0x04, 0xad, 0xa9, 0x63, 0x0c, 0x58, 0x8b,
+	0x99, 0xbf, 0x86, 0xfd, 0x9e, 0x8a, 0x5a, 0x99, 0x45, 0x90, 0xc7, 0x80, 0x3d, 0x32, 0x22, 0xdb,
+	0x46, 0x64, 0x16, 0xa0, 0x53, 0x07, 0x64, 0x58, 0xad, 0xe9, 0x8b, 0x4a, 0x70, 0x2d, 0x30, 0x8f,
+	0x2e, 0xba, 0x74, 0xef, 0x0a, 0xfa, 0x07, 0xb8, 0xdd, 0xa7, 0xe3, 0xf1, 0x2f, 0x61, 0x96, 0xd8,
+	0x7c, 0x1a, 0x5d, 0xa9, 0x33, 0x45, 0x94, 0xdb, 0xce, 0xbf, 0x6c, 0xc1, 0xad, 0x53, 0x7e, 0xf1,
+	0x87, 0x99, 0x6b, 0xb6, 0x84, 0xcc, 0x60, 0x2b, 0x4f, 0xfd, 0x6d, 0x83, 0xbc, 0xc9, 0x4c, 0x44,
+	0x08, 0xec, 0x94, 0x7c, 0x29, 0xfc, 0x1d, 0x9b, 0xb1, 0x31, 0x79, 0x0b, 0xd3, 0x94, 0x6b, 0x1e,
+	0x7d, 0x14, 0x1b, 0xb5, 0xe2, 0x89, 0xf0, 0x6f, 0xd8, 0x36, 0x3d, 0xea, 0xfb, 0xc3, 0xe5, 0xc8,
+	0x20, 0xdf, 0x23, 0x90, 0x4d, 0xd2, 0xce, 0x8e, 0x84, 0x30, 0x2e, 0x64, 0xc2, 0x75, 0x7d, 0xc5,
+	0x91, 0xf5, 0xb6, 0x1f, 0xe0, 0x5f, 0x7e, 0x27, 0xe4, 0x09, 0x96, 0x58, 0x0b, 0x22, 0xaf, 0x80,
+	0xf2, 0xa2, 0x90, 0x9f, 0xa3, 0xa4, 0x10, 0xbc, 0x8a, 0x7a, 0x26, 0x94, 0xbf, 0x6b, 0x24, 0xc6,
+	0xec, 0x8e, 0x45, 0x2c, 0x6a, 0x40, 0xf7, 0x68, 0x35, 0x0f, 0x80, 0x74, 0xdb, 0x83, 0xcd, 0xf6,
+	0x61, 0x37, 0x39, 0xe7, 0x65, 0x26, 0x52, 0xdb, 0x9e, 0x31, 0x6b, 0xb6, 0x87, 0x3f, 0x3d, 0x98,
+	0x3a, 0xf0, 0xa9, 0x7b, 0x3f, 0xe6, 0xde, 0x7b, 0x9d, 0x71, 0x21, 0xb4, 0xb9, 0xef, 0xe5, 0x49,
+	0xa4, 0xf7, 0x06, 0x6b, 0x78, 0xe6, 0x31, 0x4c, 0xba, 0x3f, 0x9e, 0xb4, 0xe0, 0x81, 0x69, 0xa2,
+	0xf7, 0x87, 0x8b, 0x28, 0xb5, 0x00, 0xf8, 0x7d, 0x29, 0x72, 0xb7, 0xc1, 0x5e, 0x9a, 0x03, 0x4a,
+	0x87, 0x4a, 0x4e, 0xe4, 0xcd, 0xe4, 0xeb, 0x8f, 0x07, 0xde, 0x37, 0xf3, 0x7d, 0x37, 0x5f, 0x3c,
+	0xb2, 0x2f, 0xec, 0xf9, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xcf, 0xc3, 0x71, 0xda, 0x5e, 0x04,
 	0x00, 0x00,
 }

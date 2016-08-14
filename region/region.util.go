@@ -18,5 +18,11 @@ func (r *Region) Validate() error {
 	if r.State == nil {
 		return errors.New("State must not be null.")
 	}
+	if r.Location == nil {
+		return errors.New("Location must not be null.")
+	}
+	if err := r.Location.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
