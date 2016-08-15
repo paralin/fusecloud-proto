@@ -3,7 +3,7 @@ package roles
 /* Compiled roles to golang */
 
 import (
-	"github.com/synrobo/proto/permissions"
+	"github.com/fuserobotics/proto/permissions"
 )
 
 func BuildRoleMap() map[int32]permissions.SystemPermissions {

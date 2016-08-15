@@ -2,6 +2,7 @@ syntax = "proto3";
 package metric;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/fuserobotics/proto/common/common.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.marshaler_all) = true;
@@ -31,4 +32,12 @@ message MetricSeries {
     string title = 2;
     string description = 3;
   }
+}
+
+message MetricDatapoint {
+  string sensor_set = 1;
+  int32 sensor_id = 2;
+  string metric_name = 3;
+  int64 timestamp = 4;
+  common.GeoLocation location = 5;
 }

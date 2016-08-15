@@ -2,7 +2,7 @@ package consul
 
 import (
 	"github.com/hashicorp/consul/api"
-	"github.com/synrobo/proto/common"
+	"github.com/fuserobotics/proto/common"
 )
 
 func ToConsulNode(apinode *api.Node) *ConsulNode {

@@ -10,8 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/synrobo/proto/auth"
-	"github.com/synrobo/proto/permissions"
+	"github.com/fuserobotics/proto/auth"
+	"github.com/fuserobotics/proto/permissions"
 )
 
 var HeaderTemplatePath string = "./roles/roles.hdr.tmpl"

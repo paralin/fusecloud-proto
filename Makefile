@@ -1,4 +1,4 @@
-PACKAGE_PATH="github.com/synrobo/proto/pkg/"
+PACKAGE_PATH="github.com/fuserobotics/proto/pkg/"
 COMPILE_ROLES_DIR="./_resources/compile-roles"
 
 gengo: compile-roles protogen install-go
@@ -21,4 +21,4 @@ compile-roles:
 	go build -v $(COMPILE_ROLES_DIR)
 
 install-go:
-	for D in */; do go install -v github.com/synrobo/proto/$$D 2>/dev/null || true ; done
+	for D in */; do go install -v github.com/fuserobotics/proto/$$D 2>/dev/null || true ; done

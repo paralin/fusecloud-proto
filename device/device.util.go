@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/synrobo/proto/common"
+	"github.com/fuserobotics/proto/common"
 )
 
 var DevicesDomain string = "devices.synrobo.com"
@@ -99,7 +99,7 @@ func (ddev *Device_DeviceIdentity) ParsePublicKey() (*rsa.PublicKey, error) {
 }
 
 /* Generates a CSR and adds it to the beginning of the list. */
-/* Devices domain MUST be something like devices.synrobo.com */
+/* Devices domain MUST be something like devices.fuserobotics.com */
 func (ddev *Device) AddCert(devicesDomain, regionName string, pkey *rsa.PrivateKey) error {
 	if ddev.Identity == nil {
 		ddev.Identity = &Device_DeviceIdentity{}

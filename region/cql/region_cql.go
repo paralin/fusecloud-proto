@@ -6,8 +6,8 @@ import (
 	"github.com/paralin/cqlpb"
 	"github.com/paralin/cqlpb/marshal"
 	"github.com/relops/cqlr"
-	"github.com/synrobo/cassandra"
-	"github.com/synrobo/proto/region"
+	"github.com/fuserobotics/cassandra"
+	"github.com/fuserobotics/proto/region"
 )
 
 func GetAllRegions(ctx *cassandra.CassandraContext) (error, []*region.Region) {

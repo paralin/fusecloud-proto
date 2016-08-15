@@ -5,9 +5,9 @@ import (
 
 	"github.com/paralin/cqlpb/marshal"
 	"github.com/relops/cqlr"
-	"github.com/synrobo/proto/auth"
+	"github.com/fuserobotics/proto/auth"
 
-	cup "github.com/synrobo/cassandra"
+	cup "github.com/fuserobotics/cassandra"
 )
 
 func FetchUserByUsername(ctx *cup.CassandraContext, username string) (*auth.User, error) {

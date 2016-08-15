@@ -31,8 +31,7 @@ message CertChain {
 message GeoLocation {
   double latitude = 1;
   double longitude = 2;
-  /* optional, if using gps coords */
-  int64 timestamp = 3;
+  // reserved 3
   /* optional, if using a map */
   int32 zoomlevel = 4;
 }

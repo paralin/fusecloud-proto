@@ -7,8 +7,8 @@ import (
 	"github.com/paralin/cqlpb"
 	"github.com/paralin/cqlpb/marshal"
 	"github.com/relops/cqlr"
-	"github.com/synrobo/cassandra"
-	"github.com/synrobo/proto/device"
+	"github.com/fuserobotics/cassandra"
+	"github.com/fuserobotics/proto/device"
 )
 
 func GetDevices(ctx *cassandra.CassandraContext) ([]*device.Device, error) {

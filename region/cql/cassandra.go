@@ -3,8 +3,8 @@ package region_cql
 import (
 	"fmt"
 
-	"github.com/synrobo/cassandra"
-	"github.com/synrobo/proto/region"
+	"github.com/fuserobotics/cassandra"
+	"github.com/fuserobotics/proto/region"
 )
 
 func BuildCassandraContextForMetaRegion(reg *region.Region, cassandraIp string) (*cassandra.CassandraContext, error) {

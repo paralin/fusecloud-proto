@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/synrobo/proto/permissions"
-	"github.com/synrobo/proto/roles"
+	"github.com/fuserobotics/proto/permissions"
+	"github.com/fuserobotics/proto/roles"
 )
 
 const AuthDomain string = "users.synrobo.com"
