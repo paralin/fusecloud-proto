@@ -28,6 +28,7 @@ message CertChain {
   bool csr_waiting = 4;
 }
 
+// Equivilent to Point in RethinkDB
 message GeoLocation {
   double latitude = 1;
   double longitude = 2;
