@@ -1,0 +1,8 @@
+language: go
+
+go:
+- 1.6
+- tip
+before_install:
+- printf "machine github.com\n  login paralin\n  password ${GITHUB_TOKEN}" > ~/.netrc
+- chmod 600 ~/.netrc
