@@ -24,25 +24,27 @@ message Region {
   // State
   RegionState state = 4;
 
-  // Keyspaces
-  repeated RegionDataKeyspace data_keyspace = 5;
+  // reserved 5
 
   // Location
   common.GeoLocation location = 6;
 
   message RegionState {
-    bool meta_keyspace_created = 1;
+    // reserved 1
     bool consul_bootstrapper_created = 2;
+    bool db_created = 3;
+    bool meta_table_created = 4;
   }
+}
 
-  message RegionDataKeyspace {
-    string name = 1;
-    bool created = 2;
-    map<string, int32> replication = 3;
-    RegionDataKeyspaceType type = 4;
-
-    enum RegionDataKeyspaceType {
-      KAIROSDB = 0;
-    }
-  }
+message RegionDataTable {
+  string name = 1;
+  bool created = 2;
+  // defaults to {default: 1}
+  map<string, int32> replication = 3;
+  // defaults to "id"
+  string primary_key = 4;
+  // defaults to the first key in replication
+  string primary_replica = 5;
+  // reserved 4
 }

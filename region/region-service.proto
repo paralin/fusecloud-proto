@@ -30,10 +30,9 @@ message SaveRegionRequest {
   identify.Identify identify = 1;
   string id = 3;
   string name = 4;
-  repeated Region.RegionDataKeyspace data_keyspace = 5;
   common.GeoLocation location = 6;
-  // If set, if data_keyspace is null will delete all of them.
-  bool allow_clear_data_keyspaces = 7;
+  // reserved 5
+  // reserved 7
 }
 
 message SaveRegionResponse {

@@ -17,26 +17,6 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type Region_RegionDataKeyspace_RegionDataKeyspaceType int32
-
-const (
-	Region_RegionDataKeyspace_KAIROSDB Region_RegionDataKeyspace_RegionDataKeyspaceType = 0
-)
-
-var Region_RegionDataKeyspace_RegionDataKeyspaceType_name = map[int32]string{
-	0: "KAIROSDB",
-}
-var Region_RegionDataKeyspace_RegionDataKeyspaceType_value = map[string]int32{
-	"KAIROSDB": 0,
-}
-
-func (x Region_RegionDataKeyspace_RegionDataKeyspaceType) String() string {
-	return proto.EnumName(Region_RegionDataKeyspace_RegionDataKeyspaceType_name, int32(x))
-}
-func (Region_RegionDataKeyspace_RegionDataKeyspaceType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptorRegion, []int{0, 1, 0}
-}
-
 //
 // Get all regions
 type Region struct {
@@ -48,8 +28,6 @@ type Region struct {
 	IpRange *common.IPRange `protobuf:"bytes,3,opt,name=ip_range,json=ipRange" json:"ip_range,omitempty"`
 	// State
 	State *Region_RegionState `protobuf:"bytes,4,opt,name=state" json:"state,omitempty"`
-	// Keyspaces
-	DataKeyspace []*Region_RegionDataKeyspace `protobuf:"bytes,5,rep,name=data_keyspace,json=dataKeyspace" json:"data_keyspace,omitempty"`
 	// Location
 	Location *common.GeoLocation `protobuf:"bytes,6,opt,name=location" json:"location,omitempty"`
 }
@@ -73,13 +51,6 @@ func (m *Region) GetState() *Region_RegionState {
 	return nil
 }
 
-func (m *Region) GetDataKeyspace() []*Region_RegionDataKeyspace {
-	if m != nil {
-		return m.DataKeyspace
-	}
-	return nil
-}
-
 func (m *Region) GetLocation() *common.GeoLocation {
 	if m != nil {
 		return m.Location
@@ -88,8 +59,10 @@ func (m *Region) GetLocation() *common.GeoLocation {
 }
 
 type Region_RegionState struct {
-	MetaKeyspaceCreated       bool `protobuf:"varint,1,opt,name=meta_keyspace_created,json=metaKeyspaceCreated,proto3" json:"meta_keyspace_created,omitempty"`
+	// reserved 1
 	ConsulBootstrapperCreated bool `protobuf:"varint,2,opt,name=consul_bootstrapper_created,json=consulBootstrapperCreated,proto3" json:"consul_bootstrapper_created,omitempty"`
+	DbCreated                 bool `protobuf:"varint,3,opt,name=db_created,json=dbCreated,proto3" json:"db_created,omitempty"`
+	MetaTableCreated          bool `protobuf:"varint,4,opt,name=meta_table_created,json=metaTableCreated,proto3" json:"meta_table_created,omitempty"`
 }
 
 func (m *Region_RegionState) Reset()                    { *m = Region_RegionState{} }
@@ -97,21 +70,23 @@ func (m *Region_RegionState) String() string            { return proto.CompactTe
 func (*Region_RegionState) ProtoMessage()               {}
 func (*Region_RegionState) Descriptor() ([]byte, []int) { return fileDescriptorRegion, []int{0, 0} }
 
-type Region_RegionDataKeyspace struct {
-	Name        string                                           `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Created     bool                                             `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"`
-	Replication map[string]int32                                 `protobuf:"bytes,3,rep,name=replication" json:"replication,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
-	Type        Region_RegionDataKeyspace_RegionDataKeyspaceType `protobuf:"varint,4,opt,name=type,proto3,enum=region.Region_RegionDataKeyspace_RegionDataKeyspaceType" json:"type,omitempty"`
+type RegionDataTable struct {
+	Name    string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Created bool   `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"`
+	// defaults to {default: 1}
+	Replication map[string]int32 `protobuf:"bytes,3,rep,name=replication" json:"replication,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+	// defaults to "id"
+	PrimaryKey string `protobuf:"bytes,4,opt,name=primary_key,json=primaryKey,proto3" json:"primary_key,omitempty"`
+	// defaults to the first key in replication
+	PrimaryReplica string `protobuf:"bytes,5,opt,name=primary_replica,json=primaryReplica,proto3" json:"primary_replica,omitempty"`
 }
 
-func (m *Region_RegionDataKeyspace) Reset()         { *m = Region_RegionDataKeyspace{} }
-func (m *Region_RegionDataKeyspace) String() string { return proto.CompactTextString(m) }
-func (*Region_RegionDataKeyspace) ProtoMessage()    {}
-func (*Region_RegionDataKeyspace) Descriptor() ([]byte, []int) {
-	return fileDescriptorRegion, []int{0, 1}
-}
+func (m *RegionDataTable) Reset()                    { *m = RegionDataTable{} }
+func (m *RegionDataTable) String() string            { return proto.CompactTextString(m) }
+func (*RegionDataTable) ProtoMessage()               {}
+func (*RegionDataTable) Descriptor() ([]byte, []int) { return fileDescriptorRegion, []int{1} }
 
-func (m *Region_RegionDataKeyspace) GetReplication() map[string]int32 {
+func (m *RegionDataTable) GetReplication() map[string]int32 {
 	if m != nil {
 		return m.Replication
 	}
@@ -121,8 +96,7 @@ func (m *Region_RegionDataKeyspace) GetReplication() map[string]int32 {
 func init() {
 	proto.RegisterType((*Region)(nil), "region.Region")
 	proto.RegisterType((*Region_RegionState)(nil), "region.Region.RegionState")
-	proto.RegisterType((*Region_RegionDataKeyspace)(nil), "region.Region.RegionDataKeyspace")
-	proto.RegisterEnum("region.Region_RegionDataKeyspace_RegionDataKeyspaceType", Region_RegionDataKeyspace_RegionDataKeyspaceType_name, Region_RegionDataKeyspace_RegionDataKeyspaceType_value)
+	proto.RegisterType((*RegionDataTable)(nil), "region.RegionDataTable")
 }
 func (m *Region) Marshal() (data []byte, err error) {
 	size := m.Size()
@@ -171,18 +145,6 @@ func (m *Region) MarshalTo(data []byte) (int, error) {
 		}
 		i += n2
 	}
-	if len(m.DataKeyspace) > 0 {
-		for _, msg := range m.DataKeyspace {
-			data[i] = 0x2a
-			i++
-			i = encodeVarintRegion(data, i, uint64(msg.Size()))
-			n, err := msg.MarshalTo(data[i:])
-			if err != nil {
-				return 0, err
-			}
-			i += n
-		}
-	}
 	if m.Location != nil {
 		data[i] = 0x32
 		i++
@@ -211,16 +173,6 @@ func (m *Region_RegionState) MarshalTo(data []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.MetaKeyspaceCreated {
-		data[i] = 0x8
-		i++
-		if m.MetaKeyspaceCreated {
-			data[i] = 1
-		} else {
-			data[i] = 0
-		}
-		i++
-	}
 	if m.ConsulBootstrapperCreated {
 		data[i] = 0x10
 		i++
@@ -231,10 +183,30 @@ func (m *Region_RegionState) MarshalTo(data []byte) (int, error) {
 		}
 		i++
 	}
+	if m.DbCreated {
+		data[i] = 0x18
+		i++
+		if m.DbCreated {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
+	if m.MetaTableCreated {
+		data[i] = 0x20
+		i++
+		if m.MetaTableCreated {
+			data[i] = 1
+		} else {
+			data[i] = 0
+		}
+		i++
+	}
 	return i, nil
 }
 
-func (m *Region_RegionDataKeyspace) Marshal() (data []byte, err error) {
+func (m *RegionDataTable) Marshal() (data []byte, err error) {
 	size := m.Size()
 	data = make([]byte, size)
 	n, err := m.MarshalTo(data)
@@ -244,7 +216,7 @@ func (m *Region_RegionDataKeyspace) Marshal() (data []byte, err error) {
 	return data[:n], nil
 }
 
-func (m *Region_RegionDataKeyspace) MarshalTo(data []byte) (int, error) {
+func (m *RegionDataTable) MarshalTo(data []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
@@ -281,10 +253,17 @@ func (m *Region_RegionDataKeyspace) MarshalTo(data []byte) (int, error) {
 			i = encodeVarintRegion(data, i, uint64(v))
 		}
 	}
-	if m.Type != 0 {
-		data[i] = 0x20
+	if len(m.PrimaryKey) > 0 {
+		data[i] = 0x22
 		i++
-		i = encodeVarintRegion(data, i, uint64(m.Type))
+		i = encodeVarintRegion(data, i, uint64(len(m.PrimaryKey)))
+		i += copy(data[i:], m.PrimaryKey)
+	}
+	if len(m.PrimaryReplica) > 0 {
+		data[i] = 0x2a
+		i++
+		i = encodeVarintRegion(data, i, uint64(len(m.PrimaryReplica)))
+		i += copy(data[i:], m.PrimaryReplica)
 	}
 	return i, nil
 }
@@ -335,12 +314,6 @@ func (m *Region) Size() (n int) {
 		l = m.State.Size()
 		n += 1 + l + sovRegion(uint64(l))
 	}
-	if len(m.DataKeyspace) > 0 {
-		for _, e := range m.DataKeyspace {
-			l = e.Size()
-			n += 1 + l + sovRegion(uint64(l))
-		}
-	}
 	if m.Location != nil {
 		l = m.Location.Size()
 		n += 1 + l + sovRegion(uint64(l))
@@ -351,16 +324,19 @@ func (m *Region) Size() (n int) {
 func (m *Region_RegionState) Size() (n int) {
 	var l int
 	_ = l
-	if m.MetaKeyspaceCreated {
+	if m.ConsulBootstrapperCreated {
 		n += 2
 	}
-	if m.ConsulBootstrapperCreated {
+	if m.DbCreated {
+		n += 2
+	}
+	if m.MetaTableCreated {
 		n += 2
 	}
 	return n
 }
 
-func (m *Region_RegionDataKeyspace) Size() (n int) {
+func (m *RegionDataTable) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Name)
@@ -378,8 +354,13 @@ func (m *Region_RegionDataKeyspace) Size() (n int) {
 			n += mapEntrySize + 1 + sovRegion(uint64(mapEntrySize))
 		}
 	}
-	if m.Type != 0 {
-		n += 1 + sovRegion(uint64(m.Type))
+	l = len(m.PrimaryKey)
+	if l > 0 {
+		n += 1 + l + sovRegion(uint64(l))
+	}
+	l = len(m.PrimaryReplica)
+	if l > 0 {
+		n += 1 + l + sovRegion(uint64(l))
 	}
 	return n
 }
@@ -550,37 +531,6 @@ func (m *Region) Unmarshal(data []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DataKeyspace", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegion
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegion
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DataKeyspace = append(m.DataKeyspace, &Region_RegionDataKeyspace{})
-			if err := m.DataKeyspace[len(m.DataKeyspace)-1].Unmarshal(data[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Location", wireType)
@@ -664,26 +614,6 @@ func (m *Region_RegionState) Unmarshal(data []byte) error {
 			return fmt.Errorf("proto: RegionState: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MetaKeyspaceCreated", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegion
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := data[iNdEx]
-				iNdEx++
-				v |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.MetaKeyspaceCreated = bool(v != 0)
 		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ConsulBootstrapperCreated", wireType)
@@ -704,6 +634,46 @@ func (m *Region_RegionState) Unmarshal(data []byte) error {
 				}
 			}
 			m.ConsulBootstrapperCreated = bool(v != 0)
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DbCreated", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegion
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.DbCreated = bool(v != 0)
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MetaTableCreated", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegion
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				v |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.MetaTableCreated = bool(v != 0)
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRegion(data[iNdEx:])
@@ -725,7 +695,7 @@ func (m *Region_RegionState) Unmarshal(data []byte) error {
 	}
 	return nil
 }
-func (m *Region_RegionDataKeyspace) Unmarshal(data []byte) error {
+func (m *RegionDataTable) Unmarshal(data []byte) error {
 	l := len(data)
 	iNdEx := 0
 	for iNdEx < l {
@@ -748,10 +718,10 @@ func (m *Region_RegionDataKeyspace) Unmarshal(data []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: RegionDataKeyspace: wiretype end group for non-group")
+			return fmt.Errorf("proto: RegionDataTable: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RegionDataKeyspace: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RegionDataTable: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -905,10 +875,10 @@ func (m *Region_RegionDataKeyspace) Unmarshal(data []byte) error {
 			m.Replication[mapkey] = mapvalue
 			iNdEx = postIndex
 		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PrimaryKey", wireType)
 			}
-			m.Type = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowRegion
@@ -918,11 +888,50 @@ func (m *Region_RegionDataKeyspace) Unmarshal(data []byte) error {
 				}
 				b := data[iNdEx]
 				iNdEx++
-				m.Type |= (Region_RegionDataKeyspace_RegionDataKeyspaceType(b) & 0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRegion
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PrimaryKey = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PrimaryReplica", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegion
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := data[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRegion
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PrimaryReplica = string(data[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRegion(data[iNdEx:])
@@ -1050,34 +1059,33 @@ var (
 )
 
 var fileDescriptorRegion = []byte{
-	// 458 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x8c, 0x52, 0x41, 0x6f, 0xd3, 0x30,
-	0x14, 0x26, 0x69, 0xd3, 0x95, 0xd7, 0x32, 0xaa, 0x37, 0x40, 0x21, 0x48, 0x68, 0xec, 0x80, 0x10,
-	0x12, 0x2d, 0x94, 0xcb, 0xc4, 0x61, 0x12, 0x65, 0x80, 0xa6, 0x4d, 0x02, 0x79, 0xbb, 0x57, 0x4e,
-	0xea, 0x85, 0x88, 0x36, 0xb6, 0x1c, 0x07, 0xa9, 0x47, 0xfe, 0x1d, 0x27, 0xc4, 0x91, 0x23, 0xe2,
-	0x97, 0xe0, 0xd8, 0x6e, 0x64, 0xc6, 0xa4, 0x72, 0xb0, 0xfc, 0xde, 0xe7, 0xef, 0x7b, 0x9f, 0xdf,
-	0xb3, 0xe1, 0x45, 0x5e, 0xa8, 0x4f, 0x75, 0x3a, 0xce, 0xf8, 0x6a, 0x72, 0x59, 0x57, 0x4c, 0xf2,
-	0x94, 0xab, 0x22, 0xab, 0x26, 0x42, 0x72, 0xc5, 0x27, 0x92, 0xe5, 0x05, 0x2f, 0xdd, 0x36, 0x36,
-	0x18, 0xf6, 0x6c, 0x96, 0x3c, 0xf3, 0xa4, 0x39, 0xcf, 0xb9, 0x95, 0xa4, 0xf5, 0xa5, 0xc9, 0xac,
-	0xbe, 0x89, 0xac, 0x2c, 0xd9, 0xe2, 0xa4, 0xe1, 0x95, 0x76, 0xb2, 0x9b, 0x95, 0x1c, 0xfc, 0x8c,
-	0xa0, 0x47, 0x8c, 0x19, 0xee, 0x42, 0x58, 0x2c, 0xe2, 0x60, 0x3f, 0x78, 0x72, 0x93, 0xe8, 0x08,
-	0x11, 0xba, 0x25, 0x5d, 0xb1, 0x38, 0x34, 0x88, 0x89, 0xf1, 0x29, 0xf4, 0x0b, 0x31, 0x97, 0xb4,
-	0xcc, 0x59, 0xdc, 0xd1, 0xf8, 0x60, 0x7a, 0x7b, 0xec, 0xea, 0x9d, 0x7c, 0x24, 0x0d, 0x4c, 0x76,
-	0x0a, 0x61, 0x02, 0x7c, 0x0e, 0x51, 0xa5, 0xa8, 0x62, 0x71, 0xd7, 0x10, 0x93, 0xb1, 0x6b, 0x91,
-	0xf8, 0xdb, 0x79, 0xc3, 0x20, 0x96, 0x88, 0xef, 0xe0, 0xd6, 0x82, 0x2a, 0x3a, 0xff, 0xcc, 0xd6,
-	0x95, 0xa0, 0x19, 0x8b, 0xa3, 0xfd, 0x8e, 0x56, 0x3e, 0xba, 0x56, 0x79, 0xac, 0x99, 0xa7, 0x8e,
-	0x48, 0x86, 0x0b, 0x2f, 0xc3, 0x09, 0xf4, 0x97, 0x3c, 0xa3, 0x4a, 0xb3, 0xe2, 0x9e, 0x31, 0xdf,
-	0xdb, 0xdc, 0xf2, 0x3d, 0xe3, 0x67, 0xee, 0x88, 0xb4, 0xa4, 0xe4, 0x6b, 0x00, 0x03, 0xef, 0x3e,
-	0x38, 0x85, 0xbb, 0x2b, 0xe6, 0x5d, 0x64, 0x9e, 0x49, 0xa6, 0x71, 0x3b, 0x9d, 0x3e, 0xd9, 0x6b,
-	0x0e, 0x37, 0x6e, 0x6f, 0xec, 0x11, 0x1e, 0xc1, 0x83, 0x8c, 0x97, 0x55, 0xbd, 0x9c, 0xa7, 0x9c,
-	0xab, 0x4a, 0x49, 0x2a, 0x04, 0x93, 0xad, 0x32, 0x34, 0xca, 0xfb, 0x96, 0x32, 0xf3, 0x18, 0x4e,
-	0x9f, 0x7c, 0x0f, 0x01, 0xff, 0xed, 0xac, 0x7d, 0x85, 0xc0, 0x7b, 0x85, 0x18, 0x76, 0xfe, 0x2e,
-	0xbb, 0x49, 0xf1, 0x02, 0x06, 0x92, 0x89, 0x65, 0xe1, 0x9a, 0xef, 0x98, 0xf9, 0x4d, 0xb7, 0xce,
-	0x4f, 0x43, 0xad, 0xe8, 0x6d, 0xa9, 0xe4, 0x9a, 0xf8, 0x65, 0xf0, 0x0c, 0xba, 0x6a, 0x2d, 0xec,
-	0x43, 0xee, 0x4e, 0x0f, 0xff, 0xa7, 0xdc, 0x55, 0xe8, 0x42, 0xeb, 0x89, 0xa9, 0x92, 0x1c, 0xc1,
-	0xe8, 0xaa, 0x1d, 0x8e, 0xa0, 0xa3, 0x67, 0xed, 0x9a, 0x6c, 0x42, 0xbc, 0x03, 0xd1, 0x17, 0xba,
-	0xac, 0xed, 0xf7, 0x8b, 0x88, 0x4d, 0x5e, 0x85, 0x87, 0xc1, 0xc1, 0x63, 0xb8, 0x77, 0x7d, 0x7d,
-	0x1c, 0x42, 0xff, 0xf4, 0xf5, 0x09, 0xf9, 0x70, 0x7e, 0x3c, 0x1b, 0xdd, 0x98, 0x0d, 0xbf, 0xfd,
-	0x7e, 0x18, 0xfc, 0xd0, 0xeb, 0x97, 0x5e, 0x69, 0xcf, 0xfc, 0xf7, 0x97, 0x7f, 0x02, 0x00, 0x00,
-	0xff, 0xff, 0xab, 0x63, 0xf9, 0x65, 0x8e, 0x03, 0x00, 0x00,
+	// 442 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x84, 0x92, 0xbd, 0x8e, 0xd4, 0x30,
+	0x10, 0xc7, 0x95, 0x64, 0x77, 0x6f, 0x77, 0x82, 0x6e, 0x57, 0x86, 0x22, 0x04, 0x01, 0xa7, 0x6b,
+	0x38, 0x21, 0x48, 0xf8, 0x68, 0x10, 0xc5, 0x15, 0x07, 0x08, 0xf1, 0x51, 0x20, 0x43, 0x1f, 0xd9,
+	0x89, 0x2f, 0x58, 0x24, 0x71, 0xe4, 0x38, 0x48, 0x79, 0x10, 0x1a, 0x9e, 0x88, 0x92, 0x92, 0x12,
+	0xf1, 0x24, 0x38, 0xb6, 0x13, 0xe5, 0x68, 0x28, 0x22, 0xcf, 0xfc, 0xe7, 0xf7, 0x9f, 0xb1, 0x47,
+	0x81, 0xc7, 0x25, 0x57, 0x9f, 0x7b, 0x9a, 0xe4, 0xa2, 0x4e, 0x2f, 0xfb, 0x8e, 0x49, 0x41, 0x85,
+	0xe2, 0x79, 0x97, 0xb6, 0x52, 0x28, 0x91, 0x4a, 0x56, 0x72, 0xd1, 0xb8, 0x23, 0x31, 0x1a, 0xda,
+	0xd8, 0x2c, 0x7e, 0xb8, 0xb0, 0x96, 0xa2, 0x14, 0xd6, 0x42, 0xfb, 0x4b, 0x93, 0x59, 0xff, 0x18,
+	0x59, 0x5b, 0xfc, 0x9f, 0x49, 0x5a, 0xae, 0xf5, 0x24, 0x7b, 0x58, 0xcb, 0xe9, 0x2f, 0x1f, 0x36,
+	0xd8, 0x0c, 0x43, 0xc7, 0xe0, 0xf3, 0x22, 0xf2, 0x4e, 0xbc, 0xb3, 0x1d, 0xd6, 0x11, 0x42, 0xb0,
+	0x6a, 0x48, 0xcd, 0x22, 0xdf, 0x28, 0x26, 0x46, 0xf7, 0x61, 0xcb, 0xdb, 0x4c, 0x92, 0xa6, 0x64,
+	0x51, 0xa0, 0xf5, 0xf0, 0xc9, 0x3e, 0x71, 0xfd, 0xde, 0x7c, 0xc0, 0xa3, 0x8c, 0x8f, 0x78, 0x6b,
+	0x02, 0xf4, 0x08, 0xd6, 0x9d, 0x22, 0x8a, 0x45, 0x2b, 0x03, 0xc6, 0x89, 0x7b, 0x22, 0x5e, 0x1e,
+	0x1f, 0x47, 0x02, 0x5b, 0x10, 0xa5, 0xb0, 0xad, 0x44, 0x4e, 0x94, 0xd6, 0xa3, 0x8d, 0x31, 0x5d,
+	0x9f, 0xba, 0xbf, 0x66, 0xe2, 0xbd, 0x2b, 0xe1, 0x19, 0x8a, 0xbf, 0x7b, 0x10, 0x2e, 0xfa, 0xa0,
+	0x73, 0xb8, 0x95, 0x8b, 0xa6, 0xeb, 0xab, 0x8c, 0x0a, 0xa1, 0x3a, 0x25, 0x49, 0xdb, 0x32, 0x99,
+	0xe5, 0x92, 0xe9, 0x6a, 0x61, 0x5e, 0xb2, 0xc5, 0x37, 0x2d, 0x72, 0xb1, 0x20, 0x5e, 0x58, 0x00,
+	0xdd, 0x06, 0x28, 0xe8, 0x8c, 0x07, 0x06, 0xdf, 0x15, 0x74, 0x2a, 0x3f, 0x00, 0x54, 0x33, 0x45,
+	0x32, 0x45, 0x68, 0xc5, 0x66, 0x6c, 0x65, 0xb0, 0xc3, 0x58, 0xf9, 0x34, 0x16, 0x1c, 0x7d, 0xfa,
+	0xcd, 0x87, 0xbd, 0xbd, 0xdc, 0x4b, 0xe2, 0x4a, 0xf3, 0x4e, 0xbd, 0xc5, 0x4e, 0x23, 0x38, 0xba,
+	0x7a, 0xc1, 0x29, 0x45, 0x6f, 0x21, 0x94, 0xac, 0xad, 0xb8, 0x5b, 0x49, 0x70, 0x12, 0xe8, 0x95,
+	0x9c, 0x5d, 0xdd, 0xe3, 0xdc, 0x5b, 0xe7, 0x33, 0xfa, 0xaa, 0x51, 0x72, 0xc0, 0x4b, 0x33, 0xba,
+	0x0b, 0x61, 0x2b, 0x79, 0x4d, 0xe4, 0x90, 0x7d, 0x61, 0x83, 0xb9, 0xf4, 0x0e, 0x83, 0x93, 0xde,
+	0xb1, 0x01, 0xdd, 0x83, 0xfd, 0x04, 0x38, 0x5f, 0xb4, 0x36, 0xd0, 0xb1, 0x93, 0x5d, 0xff, 0xf8,
+	0x1c, 0x0e, 0xff, 0x8e, 0x42, 0x07, 0x08, 0xc6, 0xae, 0xf6, 0x59, 0x63, 0x88, 0x6e, 0xc0, 0xfa,
+	0x2b, 0xa9, 0x7a, 0xfb, 0xfb, 0xac, 0xb1, 0x4d, 0x9e, 0xfb, 0xcf, 0xbc, 0x8b, 0x6b, 0x3f, 0xfe,
+	0xdc, 0xf1, 0x7e, 0xea, 0xef, 0xb7, 0xfe, 0xe8, 0xc6, 0xfc, 0x87, 0x4f, 0xff, 0x06, 0x00, 0x00,
+	0xff, 0xff, 0x16, 0x2f, 0xd9, 0x8a, 0x26, 0x03, 0x00, 0x00,
 }
