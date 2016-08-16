@@ -29,6 +29,9 @@ message Region {
   // Location
   common.GeoLocation location = 6;
 
+  // Map zoom level default
+  int32 zoomlevel = 7;
+
   message RegionState {
     // reserved 1
     bool consul_bootstrapper_created = 2;
