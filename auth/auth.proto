@@ -14,7 +14,9 @@ option (gogoproto.marshaler_all) = true;
 */
 message User {
   string username = 1;
+  // Encrypted password for database
   string password = 2;
+
   UserMetadata meta = 3;
   // certificates, latest at index 0
   repeated UserCert cert = 4;

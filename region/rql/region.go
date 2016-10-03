@@ -1,6 +1,7 @@
 package rql
 
 import (
+	"errors"
 	"github.com/fuserobotics/proto/region"
 	r "gopkg.in/dancannon/gorethink.v2"
 )
@@ -32,6 +33,9 @@ func FetchRegionById(id string, rctx *r.Session) (*region.Region, error) {
 	if err != nil {
 		res.Close()
 		return nil, err
+	}
+	if res == nil {
+		return nil, errors.New("Region does not exist.")
 	}
 
 	return result, res.Close()
