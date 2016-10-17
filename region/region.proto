@@ -37,6 +37,7 @@ message Region {
     bool consul_bootstrapper_created = 2;
     bool db_created = 3;
     bool meta_table_created = 4;
+    bool streams_table_created = 5;
   }
 }
 
