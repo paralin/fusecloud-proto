@@ -46,7 +46,8 @@ func (User_UserRole) EnumDescriptor() ([]byte, []int) { return fileDescriptorAut
 //
 // User: a standard user with username, email, password
 type User struct {
-	Username string             `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	// Encrypted password for database
 	Password string             `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	Meta     *User_UserMetadata `protobuf:"bytes,3,opt,name=meta" json:"meta,omitempty"`
 	// certificates, latest at index 0

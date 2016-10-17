@@ -3,7 +3,6 @@ package device;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/fuserobotics/proto/common/common.proto";
-import "github.com/fuserobotics/rethinkts/metric/metric.proto";
 
 option (gogoproto.unmarshaler_all) = true;
 option (gogoproto.sizer_all) = true;
@@ -21,7 +20,6 @@ message Device {
   DeviceNetworkSettings network_settings = 4;
   DeviceSetupState setup_state = 5;
   DeviceIdentity identity = 6;
-  repeated metric.MetricIdentifier metric = 7;
   common.CommitState commit_state = 9;
 
   message DeviceConsulSettings {
