@@ -1,12 +1,7 @@
 syntax = "proto3";
 package identify;
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/fuserobotics/proto/common/common.proto";
-
-option (gogoproto.unmarshaler_all) = true;
-option (gogoproto.sizer_all) = true;
-option (gogoproto.marshaler_all) = true;
 
 /*
   A single message to verify identity.

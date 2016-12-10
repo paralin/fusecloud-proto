@@ -1,31 +1,15 @@
 syntax = "proto3";
 package device;
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/fuserobotics/proto/common/common.proto";
-
-option (gogoproto.unmarshaler_all) = true;
-option (gogoproto.sizer_all) = true;
-option (gogoproto.marshaler_all) = true;
 
 /* Device: a full-linux computer running consul, docker stack */
 message Device {
   string hostname = 1;
   string region = 2;
 
-  /* Commited, unchangeable fqdn */
-  string fqdn = 8;
-
-  DeviceConsulSettings consul_settings = 3;
-  DeviceNetworkSettings network_settings = 4;
-  DeviceSetupState setup_state = 5;
-  DeviceIdentity identity = 6;
-  common.CommitState commit_state = 9;
-
-  message DeviceConsulSettings {
-    bool is_server = 1;
-    bool bootstrap = 2;
-  }
+  DeviceNetworkSettings network_settings = 3;
+  DeviceIdentity identity = 4;
 
   message DeviceNetworkSettings {
     common.IPAddress ip = 1;
@@ -66,11 +50,6 @@ message Device {
         ADHOC = 1;
       }
     }
-  }
-
-  message DeviceSetupState {
-    bool identity_inited = 1;
-    bool consul_server_bootstrapped = 2;
   }
 
   message DeviceIdentity {

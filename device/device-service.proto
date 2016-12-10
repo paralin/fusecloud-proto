@@ -1,14 +1,9 @@
 syntax = "proto3";
 package device;
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/fuserobotics/proto/common/common.proto";
 import "github.com/fuserobotics/proto/identify/identify.proto";
 import "github.com/fuserobotics/proto/device/device.proto";
-
-option (gogoproto.unmarshaler_all) = true;
-option (gogoproto.marshaler_all) = true;
-option (gogoproto.sizer_all) = true;
 
 message ListDevicesRequest {
   identify.Identify identify = 1;

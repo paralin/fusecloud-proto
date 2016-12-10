@@ -17,7 +17,7 @@ import (
 	"github.com/fuserobotics/proto/common"
 )
 
-var DevicesDomain string = "devices.synrobo.com"
+var DevicesDomain string = "r.fusebot.io"
 var DeviceKeyUsage x509.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageContentCommitment | x509.KeyUsageKeyEncipherment
 var DeviceExtKeyUsage []x509.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageEmailProtection}
 
@@ -36,6 +36,10 @@ func (d *Device) GenerateFqdn(domain string) string {
 	return fmt.Sprintf("%s.%s.%s", d.Hostname, d.Region, domain)
 }
 
+func (d *Device) DefaultFqdn() string {
+	return d.GenerateFqdn(DevicesDomain)
+}
+
 func (d *Device) Validate() error {
 	hnlen := len(d.Hostname)
 	if hnlen < 2 || hnlen > 20 {
@@ -44,10 +48,6 @@ func (d *Device) Validate() error {
 
 	if d.Region == "" {
 		return errors.New("Region must be specified.")
-	}
-
-	if d.ConsulSettings == nil {
-		return errors.New("Consul settings must be specified.")
 	}
 
 	if d.NetworkSettings == nil {

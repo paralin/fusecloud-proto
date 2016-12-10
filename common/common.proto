@@ -1,12 +1,6 @@
 syntax = "proto3";
 package common;
 
-import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-
-option (gogoproto.unmarshaler_all) = true;
-option (gogoproto.marshaler_all) = true;
-option (gogoproto.sizer_all) = true;
-
 /* IP address CIDR */
 message IPRange {
   // IP data
@@ -34,9 +28,4 @@ message GeoLocation {
   double longitude = 2;
   // reserved 3
   // reserved 4
-}
-
-message CommitState {
-  int32 current_index = 1;
-  int32 consul_index = 2;
 }
