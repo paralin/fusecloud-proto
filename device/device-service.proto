@@ -11,24 +11,24 @@ message ListDevicesRequest {
 }
 
 message ListDevicesResponse {
-  repeated Device device = 1;
+  repeated device.Device device = 1;
 }
 
 message CreateDeviceRequest {
   identify.Identify identify = 1;
-  Device device = 2;
+  device.Device device = 2;
   string region = 3;
 }
 
 message CreateDeviceResponse {
-  Device created_device = 1;
+  device.Device created_device = 1;
 }
 
 message SaveDeviceRequest {
   identify.Identify identify = 1;
   string hostname = 2;
   string region = 3;
-  Device.DeviceNetworkSettings network_settings = 4;
+  device.Device.DeviceNetworkSettings network_settings = 4;
 }
 
 message SaveDeviceResponse {
@@ -42,7 +42,7 @@ message GetDeviceRequest {
 }
 
 message GetDeviceResponse {
-  Device device = 1;
+  device.Device device = 1;
 }
 
 message CheckBootstrapperExistsRequest {

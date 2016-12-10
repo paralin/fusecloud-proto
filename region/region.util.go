@@ -15,9 +15,6 @@ func (r *Region) Validate() error {
 	if err := r.IpRange.Validate(); err != nil {
 		return err
 	}
-	if r.State == nil {
-		return errors.New("State must not be null.")
-	}
 	if r.Location == nil {
 		return errors.New("Location must not be null.")
 	}

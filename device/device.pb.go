@@ -38,7 +38,7 @@ func (Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType) EnumDescriptor() 
 	return fileDescriptorDevice, []int{0, 1, 0, 0}
 }
 
-// Device: a full-linux computer running consul, docker stack
+// Device: a full-linux computer running serf, docker stack
 type Device struct {
 	Hostname        string                        `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
 	Region          string                        `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`

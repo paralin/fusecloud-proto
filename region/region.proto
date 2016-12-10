@@ -16,15 +16,9 @@ message Region {
   // IP range for devices
   common.IPRange ip_range = 3;
 
-  // State
-  RegionState state = 4;
-
   // Location
-  common.GeoLocation location = 5;
+  common.GeoLocation location = 4;
 
   // Map zoom level default
-  int32 zoomlevel = 6;
-
-  message RegionState {
-  }
+  int32 zoomlevel = 5;
 }
