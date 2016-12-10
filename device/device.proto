@@ -3,7 +3,7 @@ package device;
 
 import "github.com/fuserobotics/proto/common/common.proto";
 
-/* Device: a full-linux computer running consul, docker stack */
+/* Device: a full-linux computer running serf, docker stack */
 message Device {
   string hostname = 1;
   string region = 2;

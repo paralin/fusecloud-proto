@@ -45,16 +45,6 @@ message GetDeviceResponse {
   Device device = 1;
 }
 
-message GetConsulPeersRequest {
-  identify.Identify identify = 1;
-}
-
-message GetConsulPeersResponse {
-  repeated common.IPAddress server_peer = 1;
-  repeated common.IPAddress agent_peer = 2;
-  repeated common.IPAddress wan_peer = 3;
-}
-
 message CheckBootstrapperExistsRequest {
   identify.Identify identify = 1;
   string region = 2;
@@ -69,8 +59,4 @@ service GlobalDeviceService {
   rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
   rpc SaveDevice(SaveDeviceRequest) returns (SaveDeviceResponse);
   rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
-
-  // Methods called by devices
-  rpc GetConsulPeers(GetConsulPeersRequest) returns (GetConsulPeersResponse);
-  rpc CheckBootstrapperExists(CheckBootstrapperExistsRequest) returns (CheckBootstrapperExistsResponse);
 }
