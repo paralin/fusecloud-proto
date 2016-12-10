@@ -23,11 +23,9 @@ message CreateRegionResponse {
 
 message SaveRegionRequest {
   identify.Identify identify = 1;
-  string id = 3;
-  string name = 4;
-  common.GeoLocation location = 6;
-  // reserved 5
-  // reserved 7
+  string id = 2;
+  string name = 3;
+  common.GeoLocation location = 4;
 }
 
 message SaveRegionResponse {
