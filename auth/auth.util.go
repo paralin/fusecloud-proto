@@ -14,14 +14,7 @@ import (
 	"github.com/fuserobotics/proto/roles"
 )
 
-const AuthDomain string = "users.synrobo.com"
-const AuthTable string = "users"
-
-var AuthTableTmpl map[string]interface{} = map[string]interface{}{
-	"username": "",
-	"password": "",
-	"proto":    []byte{},
-}
+const AuthDomain string = "u.fusebot.io"
 
 var roleMap map[int32]permissions.SystemPermissions = roles.BuildRoleMap()
 
