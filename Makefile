@@ -1,14 +1,10 @@
 PACKAGE_PATH="github.com/fuserobotics/proto/pkg/"
-COMPILE_ROLES_DIR="./_resources/compile-roles"
 
-gengo: compile-roles protogen install-go
-	./compile-roles ./roles/roles.compiled.go
-	gofmt -s -w ./roles/roles.compiled.go
-	go install -v ./roles/
+gengo: protogen install-go
 
 protogen:
 	protowrap -I $${GOPATH}/src \
-		--gogo_out=plugins=grpc:$${GOPATH}/src \
+		--go_out=plugins=grpc:$${GOPATH}/src \
 		--proto_path $${GOPATH}/src \
 		--print_structure \
 		--only_specified_files \
@@ -16,9 +12,6 @@ protogen:
 
 deps:
 	go get -u github.com/square/goprotowrap/cmd/protowrap
-
-compile-roles:
-	go build -v $(COMPILE_ROLES_DIR)
 
 install-go:
 	for D in */; do go install -v github.com/fuserobotics/proto/$$D 2>/dev/null || true ; done

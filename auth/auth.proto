@@ -2,49 +2,25 @@ syntax = "proto3";
 package auth;
 
 import "github.com/fuserobotics/proto/common/common.proto";
-import "github.com/fuserobotics/proto/permissions/permissions.proto";
 
-/*
-  User: a standard user with username, email, password
-*/
-message User {
+/**
+ * UserPublicIdentity: public identity for a user.
+ */
+message UserPublicIdentity {
   string username = 1;
-  // Encrypted password for database
-  string password = 2;
-
-  UserMetadata meta = 3;
+  string public_key = 2;
   // certificates, latest at index 0
-  repeated UserCert cert = 4;
+  repeated common.CertChain cert = 3;
+}
 
-  // processed first
-  UserRoleSet global_role = 5;
-  // processed second
-  map<string, UserRoleSet> region_role = 6;
-  // extra permissions
-  permissions.SystemPermissions global_extra_permission = 7;
-  // per region extra permissions
-  map<string, permissions.SystemPermissions> region_extra_permission = 8;
-
-  message UserMetadata {
-    string name = 1;
-    string email = 2;
-  }
-
-  message UserCert {
-    common.CertChain chain = 1;
-    string pkey = 2;
-    string public_key = 3;
-  }
-
-  enum UserRole {
-    /* Nothing special */
-    NONE = 0;
-
-    /* Access to everything */
-    SUPERUSER = 1;
-  }
-
-  message UserRoleSet {
-    repeated UserRole role = 1;
-  }
+/**
+ * UserPrivateData: private data for a user.
+ */
+message UserPrivateData {
+  // sha256 of username+password plaintext
+  // Probably insecure (brute forceable)
+  // Suggest a better way to do this down the line.
+  bytes password_hash = 1;
+  // Encrypted private key
+  bytes private_key = 2;
 }
