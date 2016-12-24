@@ -1,11 +1,12 @@
 package device
 
 import (
+	"github.com/fuserobotics/proto/common"
 	"testing"
 )
 
 func TestParseFqdn(t *testing.T) {
-	fqdn := "c2.ca1." + DevicesDomain
+	fqdn := "c2.ca1." + common.RootDomain
 	hostname, region, err := ParseFqdn(fqdn)
 	if err != nil {
 		t.Error(err)
@@ -23,5 +24,18 @@ func TestParseFqdn(t *testing.T) {
 		t.Errorf("Region is wrong, %s != ca1", region)
 		t.Fail()
 		return
+	}
+}
+
+func TestBuildKVGPaths(t *testing.T) {
+	dev := &Device{
+		Hostname: "dc",
+		Region:   "sim",
+	}
+	kp := dev.BuildKVGPaths()
+
+	if kp.DeviceInfo != "/dc.sim.r.fusebot.io/device.json" {
+		t.Fatalf(kp.DeviceInfo)
+		t.Fail()
 	}
 }

@@ -1,6 +1,8 @@
 package region
 
-import "errors"
+import (
+	"errors"
+)
 
 func (r *Region) Validate() error {
 	if r.Id == "" {

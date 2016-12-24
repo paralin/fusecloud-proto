@@ -8,6 +8,21 @@ import (
 	"strings"
 )
 
+var RootDomain string = "r.fusebot.io"
+
+func RegionRootDomain(regionId string) string {
+	return fmt.Sprintf("%s.%s", regionId, RootDomain)
+}
+
+func DeviceRootDomain(devHostname, regionId string) string {
+	return fmt.Sprintf("%s.%s", devHostname, RegionRootDomain(regionId))
+}
+
+// Prepends a / for KVGossip root from FQDN.
+func KVGossipFromFQDN(fqdn string) string {
+	return fmt.Sprintf("/%s", fqdn)
+}
+
 func (ip *IPAddress) Validate() error {
 	if ip == nil || len(ip.Address) != 4 {
 		return errors.New("IP address invalid.")

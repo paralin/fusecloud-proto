@@ -6,25 +6,31 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"strings"
-	"time"
-
 	"encoding/pem"
 	"errors"
 	"fmt"
 	"net"
+	"reflect"
+	"strings"
+	"time"
 
 	"github.com/fuserobotics/proto/common"
 )
 
-var DevicesDomain string = "r.fusebot.io"
+type KVGDeviceSubKeys struct {
+	DeviceInfo string
+}
+
 var DeviceKeyUsage x509.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageContentCommitment | x509.KeyUsageKeyEncipherment
 var DeviceExtKeyUsage []x509.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageEmailProtection}
+var KVGDeviceSubKeysBase = KVGDeviceSubKeys{
+	DeviceInfo: "/",
+}
 
 func ParseFqdn(fqdn string) (hostname string, region string, err error) {
 	fqdnParts := strings.Split(fqdn, ".") // 2 + domainParts
 	fqdnLen := len(fqdnParts)
-	domainParts := strings.Split(DevicesDomain, ".") // 3
+	domainParts := strings.Split(common.RootDomain, ".") // 3
 	domainLen := len(domainParts)
 	if fqdnLen != 2+domainLen {
 		return "", "", errors.New("Unexpected domain parts length.")
@@ -32,12 +38,31 @@ func ParseFqdn(fqdn string) (hostname string, region string, err error) {
 	return fqdnParts[0], fqdnParts[1], nil
 }
 
+func (d *Device) BuildKVGPaths() *KVGDeviceSubKeys {
+	droot := common.KVGossipFromFQDN(d.DefaultFqdn())
+
+	res := &KVGDeviceSubKeys{}
+	vf := reflect.ValueOf(KVGDeviceSubKeysBase)
+
+	rvf := reflect.ValueOf(res)
+	rvfv := rvf.Elem()
+
+	for i := 0; i < rvfv.NumField(); i++ {
+		fields := vf.Field(i)
+		fieldt := rvfv.Field(i)
+		r := fmt.Sprintf("%s%s", droot, fields.Interface().(string))
+		fieldt.SetString(r)
+	}
+
+	return res
+}
+
 func (d *Device) GenerateFqdn(domain string) string {
-	return fmt.Sprintf("%s.%s.%s", d.Hostname, d.Region, domain)
+	return common.DeviceRootDomain(d.Hostname, d.Region)
 }
 
 func (d *Device) DefaultFqdn() string {
-	return d.GenerateFqdn(DevicesDomain)
+	return d.GenerateFqdn(common.RootDomain)
 }
 
 func (d *Device) Validate() error {
@@ -52,6 +77,26 @@ func (d *Device) Validate() error {
 
 	if d.NetworkSettings == nil {
 		return errors.New("Network settings must be specified")
+	}
+
+	return nil
+}
+
+// Checks if a new value is OK (only runtime-changeable things changed).
+func (old *Device) ValidateRuntimeMutation(newVal *Device) error {
+	nfqdn := newVal.DefaultFqdn()
+	ofqdn := old.DefaultFqdn()
+
+	if err := newVal.Validate(); err != nil {
+		return err
+	}
+
+	if nfqdn != ofqdn {
+		return errors.New("Mutation would change fqdn (not allowed).")
+	}
+
+	if old.Identity.PublicKey != newVal.Identity.PublicKey {
+		return errors.New("Public key would change (not allowed).")
 	}
 
 	return nil
