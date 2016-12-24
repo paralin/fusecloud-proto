@@ -24,7 +24,7 @@ type KVGDeviceSubKeys struct {
 var DeviceKeyUsage x509.KeyUsage = x509.KeyUsageDigitalSignature | x509.KeyUsageContentCommitment | x509.KeyUsageKeyEncipherment
 var DeviceExtKeyUsage []x509.ExtKeyUsage = []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageEmailProtection}
 var KVGDeviceSubKeysBase = KVGDeviceSubKeys{
-	DeviceInfo: "/",
+	DeviceInfo: "",
 }
 
 func ParseFqdn(fqdn string) (hostname string, region string, err error) {

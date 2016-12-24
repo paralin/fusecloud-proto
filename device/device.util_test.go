@@ -34,7 +34,7 @@ func TestBuildKVGPaths(t *testing.T) {
 	}
 	kp := dev.BuildKVGPaths()
 
-	if kp.DeviceInfo != "/dc.sim.r.fusebot.io/device.json" {
+	if kp.DeviceInfo != "/dc.sim.r.fusebot.io" {
 		t.Fatalf(kp.DeviceInfo)
 		t.Fail()
 	}
