@@ -26,6 +26,4 @@ message CertChain {
 message GeoLocation {
   double latitude = 1;
   double longitude = 2;
-  // reserved 3
-  // reserved 4
 }

@@ -2,6 +2,8 @@ package region
 
 import (
 	"errors"
+	"github.com/fuserobotics/proto/common"
+	"strings"
 )
 
 func (r *Region) Validate() error {
@@ -24,4 +26,15 @@ func (r *Region) Validate() error {
 		return err
 	}
 	return nil
+}
+
+func ParseFqdn(fqdn string) (region string, err error) {
+	fqdnParts := strings.Split(fqdn, ".") // 1 + domainParts
+	fqdnLen := len(fqdnParts)
+	domainParts := strings.Split(common.RootDomain, ".") // 2
+	domainLen := len(domainParts)
+	if fqdnLen != 1+domainLen {
+		return "", errors.New("Unexpected domain parts length.")
+	}
+	return fqdnParts[0], nil
 }

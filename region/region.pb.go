@@ -2,6 +2,15 @@
 // source: github.com/fuserobotics/proto/region/region.proto
 // DO NOT EDIT!
 
+/*
+Package region is a generated protocol buffer package.
+
+It is generated from these files:
+	github.com/fuserobotics/proto/region/region.proto
+
+It has these top-level messages:
+	Region
+*/
 package region
 
 import proto "github.com/golang/protobuf/proto"
@@ -13,6 +22,12 @@ import common "github.com/fuserobotics/proto/common"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 //
 // Get all regions
@@ -32,7 +47,7 @@ type Region struct {
 func (m *Region) Reset()                    { *m = Region{} }
 func (m *Region) String() string            { return proto.CompactTextString(m) }
 func (*Region) ProtoMessage()               {}
-func (*Region) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
+func (*Region) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 func (m *Region) GetId() string {
 	if m != nil {
@@ -73,9 +88,9 @@ func init() {
 	proto.RegisterType((*Region)(nil), "region.Region")
 }
 
-func init() { proto.RegisterFile("github.com/fuserobotics/proto/region/region.proto", fileDescriptor1) }
+func init() { proto.RegisterFile("github.com/fuserobotics/proto/region/region.proto", fileDescriptor0) }
 
-var fileDescriptor1 = []byte{
+var fileDescriptor0 = []byte{
 	// 210 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xe2, 0x32, 0x4c, 0xcf, 0x2c, 0xc9,
 	0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x4f, 0x2b, 0x2d, 0x4e, 0x2d, 0xca, 0x4f, 0xca, 0x2f,

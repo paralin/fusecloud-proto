@@ -14,4 +14,4 @@ deps:
 	go get -u github.com/square/goprotowrap/cmd/protowrap
 
 install-go:
-	for D in */; do go install -v github.com/fuserobotics/proto/$$D 2>/dev/null || true ; done
+	go install ./...

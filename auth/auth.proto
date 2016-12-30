@@ -9,18 +9,27 @@ import "github.com/fuserobotics/proto/common/common.proto";
 message UserPublicIdentity {
   string username = 1;
   string public_key = 2;
-  // certificates, latest at index 0
-  repeated common.CertChain cert = 3;
 }
 
 /**
  * UserPrivateData: private data for a user.
  */
 message UserPrivateData {
-  // sha256 of username+password plaintext
-  // Probably insecure (brute forceable)
-  // Suggest a better way to do this down the line.
-  bytes password_hash = 1;
-  // Encrypted private key
-  bytes private_key = 2;
+  // AES256 encrypted private key, aes key is scrypt result.
+  bytes private_key = 1;
+  PrivateKeyStrategy strategy = 2;
+  ScryptParams scrypt_params = 3;
+
+  message ScryptParams {
+    // Difficulty, power of 2. Default is 16384
+    uint32 n = 1;
+    // r * p < 2^30
+    uint32 r = 2;
+    // r * p < 2^30
+    uint32 p = 3;
+  }
+
+  enum PrivateKeyStrategy {
+    PKEY_AES256 = 0;
+  }
 }

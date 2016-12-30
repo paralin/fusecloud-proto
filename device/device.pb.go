@@ -2,6 +2,16 @@
 // source: github.com/fuserobotics/proto/device/device.proto
 // DO NOT EDIT!
 
+/*
+Package device is a generated protocol buffer package.
+
+It is generated from these files:
+	github.com/fuserobotics/proto/device/device.proto
+
+It has these top-level messages:
+	Device
+	DeviceNetworkTemplate
+*/
 package device
 
 import proto "github.com/golang/protobuf/proto"
@@ -13,6 +23,12 @@ import common "github.com/fuserobotics/proto/common"
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the proto package it is being compiled against.
+// A compilation error at this line likely means your copy of the
+// proto package needs to be updated.
+const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType int32
 
@@ -35,7 +51,7 @@ func (x Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType) String() string
 	return proto.EnumName(Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType_name, int32(x))
 }
 func (Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor1, []int{0, 1, 0, 0}
+	return fileDescriptor0, []int{0, 1, 0, 0}
 }
 
 // Device: a full-linux computer running serf, docker stack
@@ -49,7 +65,7 @@ type Device struct {
 func (m *Device) Reset()                    { *m = Device{} }
 func (m *Device) String() string            { return proto.CompactTextString(m) }
 func (*Device) ProtoMessage()               {}
-func (*Device) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0} }
+func (*Device) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 func (m *Device) GetHostname() string {
 	if m != nil {
@@ -87,7 +103,7 @@ type Device_DeviceNetworkSettings struct {
 func (m *Device_DeviceNetworkSettings) Reset()                    { *m = Device_DeviceNetworkSettings{} }
 func (m *Device_DeviceNetworkSettings) String() string            { return proto.CompactTextString(m) }
 func (*Device_DeviceNetworkSettings) ProtoMessage()               {}
-func (*Device_DeviceNetworkSettings) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0, 0} }
+func (*Device_DeviceNetworkSettings) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 0} }
 
 func (m *Device_DeviceNetworkSettings) GetIp() *common.IPAddress {
 	if m != nil {
@@ -114,7 +130,7 @@ type Device_DeviceInterfaceConfig struct {
 func (m *Device_DeviceInterfaceConfig) Reset()                    { *m = Device_DeviceInterfaceConfig{} }
 func (m *Device_DeviceInterfaceConfig) String() string            { return proto.CompactTextString(m) }
 func (*Device_DeviceInterfaceConfig) ProtoMessage()               {}
-func (*Device_DeviceInterfaceConfig) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0, 1} }
+func (*Device_DeviceInterfaceConfig) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 1} }
 
 func (m *Device_DeviceInterfaceConfig) GetDevname() string {
 	if m != nil {
@@ -162,7 +178,7 @@ func (m *Device_DeviceInterfaceConfig_WifiConfig) Reset() {
 func (m *Device_DeviceInterfaceConfig_WifiConfig) String() string { return proto.CompactTextString(m) }
 func (*Device_DeviceInterfaceConfig_WifiConfig) ProtoMessage()    {}
 func (*Device_DeviceInterfaceConfig_WifiConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor1, []int{0, 1, 0}
+	return fileDescriptor0, []int{0, 1, 0}
 }
 
 func (m *Device_DeviceInterfaceConfig_WifiConfig) GetNetwork() []*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork {
@@ -200,7 +216,7 @@ func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) String() string {
 }
 func (*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) ProtoMessage() {}
 func (*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) Descriptor() ([]byte, []int) {
-	return fileDescriptor1, []int{0, 1, 0, 0}
+	return fileDescriptor0, []int{0, 1, 0, 0}
 }
 
 func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetSsid() string {
@@ -282,7 +298,7 @@ type Device_DeviceIdentity struct {
 func (m *Device_DeviceIdentity) Reset()                    { *m = Device_DeviceIdentity{} }
 func (m *Device_DeviceIdentity) String() string            { return proto.CompactTextString(m) }
 func (*Device_DeviceIdentity) ProtoMessage()               {}
-func (*Device_DeviceIdentity) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{0, 2} }
+func (*Device_DeviceIdentity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 2} }
 
 func (m *Device_DeviceIdentity) GetChain() []*common.CertChain {
 	if m != nil {
@@ -307,7 +323,7 @@ type DeviceNetworkTemplate struct {
 func (m *DeviceNetworkTemplate) Reset()                    { *m = DeviceNetworkTemplate{} }
 func (m *DeviceNetworkTemplate) String() string            { return proto.CompactTextString(m) }
 func (*DeviceNetworkTemplate) ProtoMessage()               {}
-func (*DeviceNetworkTemplate) Descriptor() ([]byte, []int) { return fileDescriptor1, []int{1} }
+func (*DeviceNetworkTemplate) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 func (m *DeviceNetworkTemplate) GetId() string {
 	if m != nil {
@@ -341,9 +357,9 @@ func init() {
 	proto.RegisterEnum("device.Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType", Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType_name, Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType_value)
 }
 
-func init() { proto.RegisterFile("github.com/fuserobotics/proto/device/device.proto", fileDescriptor1) }
+func init() { proto.RegisterFile("github.com/fuserobotics/proto/device/device.proto", fileDescriptor0) }
 
-var fileDescriptor1 = []byte{
+var fileDescriptor0 = []byte{
 	// 645 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xa4, 0x53, 0xcb, 0x6e, 0xd3, 0x40,
 	0x14, 0x25, 0x4e, 0xf3, 0xf0, 0x4d, 0x1f, 0x61, 0x04, 0xc8, 0x58, 0x54, 0x84, 0xb6, 0x12, 0x59,
