@@ -16,6 +16,7 @@ message UserPublicIdentity {
  */
 message UserPrivateData {
   // AES256 encrypted private key, aes key is scrypt result.
+  // IV is the same scrypt operation, output length 16
   bytes private_key = 1;
   PrivateKeyStrategy strategy = 2;
   ScryptParams scrypt_params = 3;
