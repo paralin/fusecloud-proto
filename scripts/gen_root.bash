@@ -17,3 +17,5 @@ var ProtoPackages []string = []string{
 ${PACKAGES_STR}
 }
 EOF
+
+gofmt -w -s ./root.go
