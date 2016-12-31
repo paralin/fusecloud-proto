@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/fuserobotics/proto"
@@ -19,15 +20,23 @@ func main() {
 
 	// We are building a map of graphql types -> go type paths.
 	typeMap := make(map[string]string)
+	typeMapKeys := make([]string, 0)
 
 	// Also, append a function to each type that returns the graphql name.
 	packageTypeMap := make(map[string]map[string]string)
+
+	// Sort the package type map keys
+	packageTypeMapPkgKeys := make(map[string][]string)
+
+	// Sort the keys of that map too
+	packageTypeMapKeys := make([]string, 0)
 
 	for _, pak := range proto.ProtoPackages {
 		ppkg := fmt.Sprintf("github.com/fuserobotics/proto/%s", pak)
 
 		ptm := make(map[string]string)
 		packageTypeMap[pak] = ptm
+		packageTypeMapKeys = append(packageTypeMapKeys, pak)
 
 		ipak, err := importer.Import(ppkg)
 		if err != nil {
@@ -48,33 +57,48 @@ func main() {
 			fmt.Printf(" -> %s: %s\n", nam, baseName)
 			if _, ok := typeMap[baseName]; ok {
 				fmt.Printf("  ! warn: %s redefined\n", baseName)
+			} else {
+				typeMapKeys = append(typeMapKeys, baseName)
 			}
 
 			typeMap[baseName] = strings.Split(objs, " ")[1]
 			ptm[nam] = baseName
+			packageTypeMapKeys = append(packageTypeMapKeys, pak)
+			packageTypeMapPkgKeys[pak] = append(packageTypeMapPkgKeys[pak], nam)
 		}
 	}
 
 	// Build Go format map with this information.
-	typeMapGo := fmt.Sprintf("%#v\n", typeMap)
-	typeMapGo = strings.Replace(typeMapGo, ", ", ",\n\t", -1)
-	typeMapGo = strings.Replace(typeMapGo, "{", "{\n\t", -1)
-	typeMapGo = strings.Replace(typeMapGo, "}", ",\n}", -1)
-	typeMapGo = strings.Replace(typeMapGo, ":", ": ", -1)
+
+	// Output needs to be deterministic.
+	sort.Strings(typeMapKeys)
+	typeMapGo := bytes.Buffer{}
+	for _, tmk := range typeMapKeys {
+		typeMapGo.WriteString("\n\t\"")
+		typeMapGo.WriteString(tmk)
+		typeMapGo.WriteString("\": \"")
+		typeMapGo.WriteString(typeMap[tmk])
+		typeMapGo.WriteString("\",")
+	}
+
 	ioutil.WriteFile("root_gql.go", []byte(
 		fmt.Sprintf(
 			`package proto
 
 // Map of GraphQL simplified names to proto names.
-var GraphQLTypes = %s
-`, typeMapGo,
+var GraphQLTypes = map[string]string{%s
+}`, typeMapGo.String(),
 		),
 	),
 		0644,
 	)
 
 	// For each type, write a file with functions for gql type names.
-	for packageName, pakTypeMap := range packageTypeMap {
+	sort.Strings(packageTypeMapKeys)
+	for _, packageName := range packageTypeMapKeys {
+		pakTypeMap := packageTypeMap[packageName]
+		pakTypeMapKeys := packageTypeMapPkgKeys[packageName]
+
 		if len(pakTypeMap) == 0 {
 			continue
 		}
@@ -86,7 +110,10 @@ var GraphQLTypes = %s
 		outp.WriteString(packageName)
 		outp.WriteString("\n\n// WARNING: This file is auto-generated.\n")
 
-		for typeName, gqlTypeName := range pakTypeMap {
+		sort.Strings(pakTypeMapKeys)
+		for _, typeName := range pakTypeMapKeys {
+			gqlTypeName := pakTypeMap[typeName]
+
 			outp.WriteString(fmt.Sprintf(
 				"\nfunc (*%s) GraphQLTypeName() string {\n\treturn \"%s\"\n}\n",
 				typeName,
