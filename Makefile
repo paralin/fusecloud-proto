@@ -1,6 +1,12 @@
 PACKAGE_PATH="github.com/fuserobotics/proto/pkg/"
 
-gengo: protogen install-go
+gengo: protogen rootgen gqlgen install-go
+
+rootgen:
+	./scripts/gen_root.bash
+
+gqlgen:
+	./scripts/gen_gqlmap.bash
 
 protogen:
 	protowrap -I $${GOPATH}/src \
