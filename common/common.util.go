@@ -9,9 +9,18 @@ import (
 )
 
 var RootDomain string = "r.fusebot.io"
+var RootUserDomain string = "u.fusebot.io"
 
 func RegionRootDomain(regionId string) string {
 	return fmt.Sprintf("%s.%s", regionId, RootDomain)
+}
+
+func UserRootDomain(username string) string {
+	return fmt.Sprintf("%s.%s", username, RootUserDomain)
+}
+
+func KVGUserPrivate(username string) string {
+	return fmt.Sprintf("%s/private", KVGossipFromFQDN(UserRootDomain(username)))
 }
 
 func DeviceRootDomain(devHostname, regionId string) string {
