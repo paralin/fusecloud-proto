@@ -1,12 +1,15 @@
 PACKAGE_PATH="github.com/fuserobotics/proto/pkg/"
 
-gengo: protogen rootgen gqlgen install-go
+gengo: protogen rootgen gqlgen stripoe install-go
 
 rootgen:
 	./scripts/gen_root.bash
 
 gqlgen:
 	./scripts/gen_gqlmap.bash
+
+stripoe:
+	find . -name '*.pb.go' -exec sed -i -e 's/,\{0,1\}omitempty//g' {} \;
 
 protogen:
 	protowrap -I $${GOPATH}/src \

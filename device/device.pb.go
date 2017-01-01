@@ -56,10 +56,10 @@ func (Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType) EnumDescriptor() 
 
 // Device: a full-linux computer running serf, docker stack
 type Device struct {
-	Hostname        string                        `protobuf:"bytes,1,opt,name=hostname" json:"hostname,omitempty"`
-	Region          string                        `protobuf:"bytes,2,opt,name=region" json:"region,omitempty"`
-	NetworkSettings *Device_DeviceNetworkSettings `protobuf:"bytes,3,opt,name=network_settings,json=networkSettings" json:"network_settings,omitempty"`
-	Identity        *Device_DeviceIdentity        `protobuf:"bytes,4,opt,name=identity" json:"identity,omitempty"`
+	Hostname        string                        `protobuf:"bytes,1,opt,name=hostname" json:"hostname"`
+	Region          string                        `protobuf:"bytes,2,opt,name=region" json:"region"`
+	NetworkSettings *Device_DeviceNetworkSettings `protobuf:"bytes,3,opt,name=network_settings,json=networkSettings" json:"network_settings"`
+	Identity        *Device_DeviceIdentity        `protobuf:"bytes,4,opt,name=identity" json:"identity"`
 }
 
 func (m *Device) Reset()                    { *m = Device{} }
@@ -96,8 +96,8 @@ func (m *Device) GetIdentity() *Device_DeviceIdentity {
 }
 
 type Device_DeviceNetworkSettings struct {
-	Ip        *common.IPAddress               `protobuf:"bytes,1,opt,name=ip" json:"ip,omitempty"`
-	Interface []*Device_DeviceInterfaceConfig `protobuf:"bytes,2,rep,name=interface" json:"interface,omitempty"`
+	Ip        *common.IPAddress               `protobuf:"bytes,1,opt,name=ip" json:"ip"`
+	Interface []*Device_DeviceInterfaceConfig `protobuf:"bytes,2,rep,name=interface" json:"interface"`
 }
 
 func (m *Device_DeviceNetworkSettings) Reset()                    { *m = Device_DeviceNetworkSettings{} }
@@ -120,11 +120,11 @@ func (m *Device_DeviceNetworkSettings) GetInterface() []*Device_DeviceInterfaceC
 }
 
 type Device_DeviceInterfaceConfig struct {
-	Devname      string                                   `protobuf:"bytes,1,opt,name=devname" json:"devname,omitempty"`
-	Ip           *common.IPAddress                        `protobuf:"bytes,2,opt,name=ip" json:"ip,omitempty"`
-	GatewayIp    *common.IPAddress                        `protobuf:"bytes,3,opt,name=gateway_ip,json=gatewayIp" json:"gateway_ip,omitempty"`
-	WifiSettings *Device_DeviceInterfaceConfig_WifiConfig `protobuf:"bytes,4,opt,name=wifi_settings,json=wifiSettings" json:"wifi_settings,omitempty"`
-	Dns          []*common.IPAddress                      `protobuf:"bytes,5,rep,name=dns" json:"dns,omitempty"`
+	Devname      string                                   `protobuf:"bytes,1,opt,name=devname" json:"devname"`
+	Ip           *common.IPAddress                        `protobuf:"bytes,2,opt,name=ip" json:"ip"`
+	GatewayIp    *common.IPAddress                        `protobuf:"bytes,3,opt,name=gateway_ip,json=gatewayIp" json:"gateway_ip"`
+	WifiSettings *Device_DeviceInterfaceConfig_WifiConfig `protobuf:"bytes,4,opt,name=wifi_settings,json=wifiSettings" json:"wifi_settings"`
+	Dns          []*common.IPAddress                      `protobuf:"bytes,5,rep,name=dns" json:"dns"`
 }
 
 func (m *Device_DeviceInterfaceConfig) Reset()                    { *m = Device_DeviceInterfaceConfig{} }
@@ -168,8 +168,8 @@ func (m *Device_DeviceInterfaceConfig) GetDns() []*common.IPAddress {
 }
 
 type Device_DeviceInterfaceConfig_WifiConfig struct {
-	Network      []*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork `protobuf:"bytes,1,rep,name=network" json:"network,omitempty"`
-	ExtraOptions string                                                 `protobuf:"bytes,2,opt,name=extra_options,json=extraOptions" json:"extra_options,omitempty"`
+	Network      []*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork `protobuf:"bytes,1,rep,name=network" json:"network"`
+	ExtraOptions string                                                 `protobuf:"bytes,2,opt,name=extra_options,json=extraOptions" json:"extra_options"`
 }
 
 func (m *Device_DeviceInterfaceConfig_WifiConfig) Reset() {
@@ -196,16 +196,16 @@ func (m *Device_DeviceInterfaceConfig_WifiConfig) GetExtraOptions() string {
 }
 
 type Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork struct {
-	Ssid         string                                                  `protobuf:"bytes,1,opt,name=ssid" json:"ssid,omitempty"`
-	NetType      Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType `protobuf:"varint,9,opt,name=net_type,json=netType,enum=device.Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType" json:"net_type,omitempty"`
-	Psk          string                                                  `protobuf:"bytes,6,opt,name=psk" json:"psk,omitempty"`
-	PskEncoded   bool                                                    `protobuf:"varint,10,opt,name=psk_encoded,json=pskEncoded" json:"psk_encoded,omitempty"`
-	Proto        string                                                  `protobuf:"bytes,2,opt,name=proto" json:"proto,omitempty"`
-	KeyMgmt      string                                                  `protobuf:"bytes,3,opt,name=key_mgmt,json=keyMgmt" json:"key_mgmt,omitempty"`
-	Pairwise     string                                                  `protobuf:"bytes,4,opt,name=pairwise" json:"pairwise,omitempty"`
-	Group        string                                                  `protobuf:"bytes,5,opt,name=group" json:"group,omitempty"`
-	Frequency    string                                                  `protobuf:"bytes,8,opt,name=frequency" json:"frequency,omitempty"`
-	ExtraOptions string                                                  `protobuf:"bytes,7,opt,name=extra_options,json=extraOptions" json:"extra_options,omitempty"`
+	Ssid         string                                                  `protobuf:"bytes,1,opt,name=ssid" json:"ssid"`
+	NetType      Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType `protobuf:"varint,9,opt,name=net_type,json=netType,enum=device.Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType" json:"net_type"`
+	Psk          string                                                  `protobuf:"bytes,6,opt,name=psk" json:"psk"`
+	PskEncoded   bool                                                    `protobuf:"varint,10,opt,name=psk_encoded,json=pskEncoded" json:"psk_encoded"`
+	Proto        string                                                  `protobuf:"bytes,2,opt,name=proto" json:"proto"`
+	KeyMgmt      string                                                  `protobuf:"bytes,3,opt,name=key_mgmt,json=keyMgmt" json:"key_mgmt"`
+	Pairwise     string                                                  `protobuf:"bytes,4,opt,name=pairwise" json:"pairwise"`
+	Group        string                                                  `protobuf:"bytes,5,opt,name=group" json:"group"`
+	Frequency    string                                                  `protobuf:"bytes,8,opt,name=frequency" json:"frequency"`
+	ExtraOptions string                                                  `protobuf:"bytes,7,opt,name=extra_options,json=extraOptions" json:"extra_options"`
 }
 
 func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) Reset() {
@@ -291,8 +291,8 @@ func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetExtraOptions() 
 
 type Device_DeviceIdentity struct {
 	// Generated certs, latest is first
-	Chain     []*common.CertChain `protobuf:"bytes,2,rep,name=chain" json:"chain,omitempty"`
-	PublicKey string              `protobuf:"bytes,3,opt,name=public_key,json=publicKey" json:"public_key,omitempty"`
+	Chain     []*common.CertChain `protobuf:"bytes,2,rep,name=chain" json:"chain"`
+	PublicKey string              `protobuf:"bytes,3,opt,name=public_key,json=publicKey" json:"public_key"`
 }
 
 func (m *Device_DeviceIdentity) Reset()                    { *m = Device_DeviceIdentity{} }
@@ -315,9 +315,9 @@ func (m *Device_DeviceIdentity) GetPublicKey() string {
 }
 
 type DeviceNetworkTemplate struct {
-	Id          string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
-	Name        string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
-	Description string `protobuf:"bytes,3,opt,name=description" json:"description,omitempty"`
+	Id          string `protobuf:"bytes,1,opt,name=id" json:"id"`
+	Name        string `protobuf:"bytes,2,opt,name=name" json:"name"`
+	Description string `protobuf:"bytes,3,opt,name=description" json:"description"`
 }
 
 func (m *DeviceNetworkTemplate) Reset()                    { *m = DeviceNetworkTemplate{} }

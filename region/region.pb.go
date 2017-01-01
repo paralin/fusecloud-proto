@@ -33,15 +33,15 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // Get all regions
 type Region struct {
 	// slug / ID
-	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id"`
 	// Human readable name
-	Name string `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
+	Name string `protobuf:"bytes,2,opt,name=name" json:"name"`
 	// IP range for devices
-	IpRange *common.IPRange `protobuf:"bytes,3,opt,name=ip_range,json=ipRange" json:"ip_range,omitempty"`
+	IpRange *common.IPRange `protobuf:"bytes,3,opt,name=ip_range,json=ipRange" json:"ip_range"`
 	// Location
-	Location *common.GeoLocation `protobuf:"bytes,4,opt,name=location" json:"location,omitempty"`
+	Location *common.GeoLocation `protobuf:"bytes,4,opt,name=location" json:"location"`
 	// Map zoom level default
-	Zoomlevel int32 `protobuf:"varint,5,opt,name=zoomlevel" json:"zoomlevel,omitempty"`
+	Zoomlevel int32 `protobuf:"varint,5,opt,name=zoomlevel" json:"zoomlevel"`
 }
 
 func (m *Region) Reset()                    { *m = Region{} }

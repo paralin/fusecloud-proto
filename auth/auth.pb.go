@@ -53,8 +53,8 @@ func (UserPrivateData_PrivateKeyStrategy) EnumDescriptor() ([]byte, []int) {
 // *
 // UserPublicIdentity: public identity for a user.
 type UserPublicIdentity struct {
-	Username  string `protobuf:"bytes,1,opt,name=username" json:"username,omitempty"`
-	PublicKey string `protobuf:"bytes,2,opt,name=public_key,json=publicKey" json:"public_key,omitempty"`
+	Username  string `protobuf:"bytes,1,opt,name=username" json:"username"`
+	PublicKey string `protobuf:"bytes,2,opt,name=public_key,json=publicKey" json:"public_key"`
 }
 
 func (m *UserPublicIdentity) Reset()                    { *m = UserPublicIdentity{} }
@@ -81,9 +81,9 @@ func (m *UserPublicIdentity) GetPublicKey() string {
 type UserPrivateData struct {
 	// AES256 encrypted private key, aes key is scrypt result.
 	// IV is the same scrypt operation, output length 16
-	PrivateKey   []byte                             `protobuf:"bytes,1,opt,name=private_key,json=privateKey,proto3" json:"private_key,omitempty"`
-	Strategy     UserPrivateData_PrivateKeyStrategy `protobuf:"varint,2,opt,name=strategy,enum=auth.UserPrivateData_PrivateKeyStrategy" json:"strategy,omitempty"`
-	ScryptParams *UserPrivateData_ScryptParams      `protobuf:"bytes,3,opt,name=scrypt_params,json=scryptParams" json:"scrypt_params,omitempty"`
+	PrivateKey   []byte                             `protobuf:"bytes,1,opt,name=private_key,json=privateKey,proto3" json:"private_key"`
+	Strategy     UserPrivateData_PrivateKeyStrategy `protobuf:"varint,2,opt,name=strategy,enum=auth.UserPrivateData_PrivateKeyStrategy" json:"strategy"`
+	ScryptParams *UserPrivateData_ScryptParams      `protobuf:"bytes,3,opt,name=scrypt_params,json=scryptParams" json:"scrypt_params"`
 }
 
 func (m *UserPrivateData) Reset()                    { *m = UserPrivateData{} }
@@ -114,11 +114,11 @@ func (m *UserPrivateData) GetScryptParams() *UserPrivateData_ScryptParams {
 
 type UserPrivateData_ScryptParams struct {
 	// Difficulty, power of 2. Default is 16384
-	N uint32 `protobuf:"varint,1,opt,name=n" json:"n,omitempty"`
+	N uint32 `protobuf:"varint,1,opt,name=n" json:"n"`
 	// r * p < 2^30
-	R uint32 `protobuf:"varint,2,opt,name=r" json:"r,omitempty"`
+	R uint32 `protobuf:"varint,2,opt,name=r" json:"r"`
 	// r * p < 2^30
-	P uint32 `protobuf:"varint,3,opt,name=p" json:"p,omitempty"`
+	P uint32 `protobuf:"varint,3,opt,name=p" json:"p"`
 }
 
 func (m *UserPrivateData_ScryptParams) Reset()                    { *m = UserPrivateData_ScryptParams{} }

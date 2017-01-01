@@ -43,7 +43,7 @@ func (*GetUnixTimeRequest) ProtoMessage()               {}
 func (*GetUnixTimeRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 type GetUnixTimeResponse struct {
-	Time uint32 `protobuf:"varint,1,opt,name=time" json:"time,omitempty"`
+	Time uint32 `protobuf:"varint,1,opt,name=time" json:"time"`
 }
 
 func (m *GetUnixTimeResponse) Reset()                    { *m = GetUnixTimeResponse{} }
