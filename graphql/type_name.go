@@ -1,21 +1,79 @@
 package graphql
 
+import (
+	"reflect"
+	"strings"
+)
+
 type GraphQLProto interface {
 	GraphQLTypeName() string
 }
 
-type GraphQLResult struct {
-	GraphQLProto
-
-	TypeName string `json:"__typename,omitempty"`
-}
-
-func BuildGraphQLResult(proto GraphQLProto) GraphQLProto {
-	if _, ok := proto.(*GraphQLResult); ok {
-		return proto
+// Recursively marshal to a map result, including __typename
+func MarshalToMap(obj interface{}) interface{} {
+	if obj == nil {
+		return nil
 	}
-	return &GraphQLResult{
-		GraphQLProto: proto,
-		TypeName:     proto.GraphQLTypeName(),
+
+	// Try as map[string]interface{}
+	if smap, ok := obj.(map[string]interface{}); ok {
+		return smap
 	}
+
+	sourceVal := reflect.ValueOf(obj)
+	sourceValType := sourceVal.Type()
+	sourceValKind := sourceVal.Kind()
+
+	// Follow pointer
+	if sourceVal.IsValid() && sourceValKind == reflect.Ptr {
+		sourceVal = sourceVal.Elem()
+		if !sourceVal.IsValid() {
+			return nil
+		}
+		sourceValType = sourceVal.Type()
+		sourceValKind = sourceVal.Kind()
+	}
+	if !sourceVal.IsValid() {
+		return nil
+	}
+
+	// If struct, convert to map.
+	if sourceValKind == reflect.Struct {
+		rmap := make(map[string]interface{})
+		if ptn, ok := obj.(GraphQLProto); ok {
+			rmap["__typename"] = ptn.GraphQLTypeName()
+		}
+		for i := 0; i < sourceVal.NumField(); i++ {
+			valueField := sourceVal.Field(i)
+			typeField := sourceValType.Field(i)
+
+			tag := typeField.Tag
+			jsonTag := tag.Get("json")
+			jsonOptions := strings.Split(jsonTag, ",")
+			rmapName := typeField.Name
+			if len(jsonOptions) > 0 {
+				rmapName = jsonOptions[0]
+			}
+
+			if valueField.Kind() == reflect.Ptr && valueField.IsNil() {
+				rmap[rmapName] = nil
+				continue
+			}
+
+			if valueField.IsValid() {
+				elem := valueField
+				if elem.Kind() == reflect.Ptr {
+					elem = valueField.Elem()
+				}
+				rmap[rmapName] = MarshalToMap(valueField.Interface())
+				continue
+			}
+
+			rmap[rmapName] = valueField.Interface()
+		}
+
+		return rmap
+	}
+
+	return obj
 }
