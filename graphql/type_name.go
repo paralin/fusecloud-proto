@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 )
@@ -106,8 +105,6 @@ func MarshalToMap(obj interface{}) interface{} {
 	if sourceValKind == reflect.Uint32 {
 		return uint32(sourceVal.Uint())
 	}
-
-	fmt.Printf("Unhandled type (%v): %v\n", sourceValKind, obj)
 
 	return obj
 }
