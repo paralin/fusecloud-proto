@@ -10,8 +10,12 @@ func (*DeviceNetworkTemplate) GraphQLTypeName() string {
 	return "DeviceNetworkTemplate"
 }
 
-func (*DeviceStatus) GraphQLTypeName() string {
+func (DeviceStatus) GraphQLTypeName() string {
 	return "DeviceStatus"
+}
+
+func (*DeviceWithStatus) GraphQLTypeName() string {
+	return "DeviceWithStatus"
 }
 
 func (*Device_DeviceIdentity) GraphQLTypeName() string {
@@ -28,6 +32,10 @@ func (*Device_DeviceInterfaceConfig_WifiConfig) GraphQLTypeName() string {
 
 func (*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GraphQLTypeName() string {
 	return "WifiNetwork"
+}
+
+func (Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType) GraphQLTypeName() string {
+	return "WifiNetworkType"
 }
 
 func (*Device_DeviceNetworkSettings) GraphQLTypeName() string {

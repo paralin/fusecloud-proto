@@ -14,6 +14,7 @@ import (
 )
 
 var TypeRegex = regexp.MustCompile("(type)(.+)(struct{)(.+)(})")
+var EnumRegex = regexp.MustCompile("(type)(.+)(int32)$")
 
 func main() {
 	importer := imp.Default()
@@ -30,6 +31,9 @@ func main() {
 
 	// Sort the keys of that map too
 	packageTypeMapKeys := make([]string, 0)
+
+	// List of enums
+	enumTypeMap := make(map[string]bool)
 
 	for _, pak := range proto.ProtoPackages {
 		ppkg := fmt.Sprintf("github.com/fuserobotics/proto/%s", pak)
@@ -48,13 +52,23 @@ func main() {
 		for _, nam := range scope.Names() {
 			obj := scope.Lookup(nam)
 			objs := obj.String()
-			if !obj.Exported() ||
-				!TypeRegex.MatchString(objs) {
+			if !obj.Exported() {
 				continue
 			}
+
+			isEnum := false
+			if EnumRegex.MatchString(objs) {
+				isEnum = true
+			} else if !TypeRegex.MatchString(objs) {
+				continue
+			}
+
 			baseNamePts := strings.Split(nam, "_")
 			baseName := baseNamePts[len(baseNamePts)-1]
 			fmt.Printf(" -> %s: %s\n", nam, baseName)
+			if isEnum {
+				enumTypeMap[baseName] = true
+			}
 			if _, ok := typeMap[baseName]; ok {
 				fmt.Printf("  ! warn: %s redefined\n", baseName)
 			} else {
@@ -113,9 +127,12 @@ var GraphQLTypes = map[string]string{%s
 		sort.Strings(pakTypeMapKeys)
 		for _, typeName := range pakTypeMapKeys {
 			gqlTypeName := pakTypeMap[typeName]
+			if _, ok := enumTypeMap[gqlTypeName]; !ok {
+				typeName = "*" + typeName
+			}
 
 			outp.WriteString(fmt.Sprintf(
-				"\nfunc (*%s) GraphQLTypeName() string {\n\treturn \"%s\"\n}\n",
+				"\nfunc (%s) GraphQLTypeName() string {\n\treturn \"%s\"\n}\n",
 				typeName,
 				gqlTypeName,
 			))

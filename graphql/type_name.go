@@ -1,12 +1,18 @@
 package graphql
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 )
 
 type GraphQLProto interface {
 	GraphQLTypeName() string
+}
+
+type GraphQLProtoEnum interface {
+	GraphQLTypeName() string
+	String() string
 }
 
 // Recursively marshal to a map result, including __typename
@@ -74,6 +80,34 @@ func MarshalToMap(obj interface{}) interface{} {
 
 		return rmap
 	}
+
+	if sourceValKind == reflect.String {
+		return obj.(string)
+	}
+
+	if sourceValKind == reflect.Array || sourceValKind == reflect.Slice {
+		rarr := make([]interface{}, sourceVal.Len())
+		for i := 0; i < sourceVal.Len(); i++ {
+			e := sourceVal.Index(i)
+			rarr[i] = MarshalToMap(e.Interface())
+		}
+		return rarr
+	}
+
+	if sourceValKind == reflect.Int32 {
+		// Detect enum value, to see if it's a graphql enum
+		if objes, ok := obj.(GraphQLProtoEnum); ok {
+			// Use it as a string
+			return objes.String()
+		}
+		return int32(sourceVal.Int())
+	}
+
+	if sourceValKind == reflect.Uint32 {
+		return uint32(sourceVal.Uint())
+	}
+
+	fmt.Printf("Unhandled type (%v): %v\n", sourceValKind, obj)
 
 	return obj
 }

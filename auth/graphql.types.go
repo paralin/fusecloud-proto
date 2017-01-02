@@ -6,6 +6,10 @@ func (*UserPrivateData) GraphQLTypeName() string {
 	return "UserPrivateData"
 }
 
+func (UserPrivateData_PrivateKeyStrategy) GraphQLTypeName() string {
+	return "PrivateKeyStrategy"
+}
+
 func (*UserPrivateData_ScryptParams) GraphQLTypeName() string {
 	return "ScryptParams"
 }
