@@ -16,7 +16,8 @@ type UserPrivateDataResolver struct {
 
 func (r *UserPrivateDataResolver) PrivateKey() *[]*uint8 {
 	res := make([]*uint8, len(r.Base.PrivateKey))
-	for idx, val := range r.Base.PrivateKey {
+	for idx, vali := range r.Base.PrivateKey {
+		val := vali
 		res[idx] = &val
 	}
 	return &res
@@ -68,7 +69,8 @@ type CertChainResolver struct {
 
 func (r *CertChainResolver) Cert() *[]*string {
 	res := make([]*string, len(r.Base.Cert))
-	for idx, val := range r.Base.Cert {
+	for idx, vali := range r.Base.Cert {
+		val := vali
 		res[idx] = &val
 	}
 	return &res
@@ -104,7 +106,8 @@ type IPAddressResolver struct {
 
 func (r *IPAddressResolver) Address() *[]*uint32 {
 	res := make([]*uint32, len(r.Base.Address))
-	for idx, val := range r.Base.Address {
+	for idx, vali := range r.Base.Address {
+		val := vali
 		res[idx] = &val
 	}
 	return &res

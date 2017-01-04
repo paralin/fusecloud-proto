@@ -172,7 +172,7 @@ func main() {
 				if isSlice {
 					outpBuf.WriteString(
 						fmt.Sprintf(
-							"\tfor idx, val := range r.Base.%s {\n\t\tres[idx] = &val\n\t}\n\treturn &res\n}\n",
+							"\tfor idx, vali := range r.Base.%s {\n\t\tval := vali\n\t\tres[idx] = &val\n\t}\n\treturn &res\n}\n",
 							field.Name,
 						),
 					)
