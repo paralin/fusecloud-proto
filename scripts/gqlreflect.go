@@ -13,6 +13,7 @@ import (
 	"github.com/fuserobotics/proto"
 )
 
+var ReflectGenPath string = "./resolvers/reflectgen.go"
 var TypeRegex = regexp.MustCompile("(type)(.+)(struct{)(.+)(})")
 var EnumRegex = regexp.MustCompile("(type)(.+)(int32)$")
 
@@ -20,8 +21,10 @@ func main() {
 	importer := imp.Default()
 
 	// We are building a map of graphql types -> go type paths.
-	typeMap := make(map[string]string)
-	typeMapKeys := make([]string, 0)
+	typeMapImports := []string{}
+	typeMapImportMap := map[string]bool{}
+	typeMapStructs := []string{}
+	typeMapStructMap := map[string]string{}
 
 	// Also, append a function to each type that returns the graphql name.
 	packageTypeMap := make(map[string]map[string]string)
@@ -69,13 +72,23 @@ func main() {
 			if isEnum {
 				enumTypeMap[baseName] = true
 			}
-			if _, ok := typeMap[baseName]; ok {
-				fmt.Printf("  ! warn: %s redefined\n", baseName)
-			} else {
-				typeMapKeys = append(typeMapKeys, baseName)
+
+			objsParts := strings.Split(strings.Split(objs, " ")[1], "/")
+			// auth.UserPrivateData
+			objsQualified := objsParts[len(objsParts)-1]
+			objsQualifiedPts := strings.Split(objsQualified, ".")
+
+			if !isEnum {
+				typeMapStructs = append(typeMapStructs, objsQualified)
+				typeMapStructMap[objsQualified] = objsQualified // baseName
+
+				objsImportPath := strings.Join(objsParts[:len(objsParts)-1], "/") + "/" + objsQualifiedPts[0]
+				if _, ok := typeMapImportMap[objsImportPath]; !ok {
+					typeMapImportMap[objsImportPath] = true
+					typeMapImports = append(typeMapImports, objsImportPath)
+				}
 			}
 
-			typeMap[baseName] = strings.Split(objs, " ")[1]
 			ptm[nam] = baseName
 			packageTypeMapKeys = append(packageTypeMapKeys, pak)
 			packageTypeMapPkgKeys[pak] = append(packageTypeMapPkgKeys[pak], nam)
@@ -85,23 +98,39 @@ func main() {
 	// Build Go format map with this information.
 
 	// Output needs to be deterministic.
-	sort.Strings(typeMapKeys)
+	sort.Strings(typeMapStructs)
+	sort.Strings(typeMapImports)
 	typeMapGo := bytes.Buffer{}
-	for _, tmk := range typeMapKeys {
+	typeMapImportsGo := bytes.Buffer{}
+	for _, tmi := range typeMapImports {
+		typeMapImportsGo.WriteString("\n\t\"")
+		typeMapImportsGo.WriteString(tmi)
+		typeMapImportsGo.WriteString("\"")
+	}
+	for _, tmk := range typeMapStructs {
 		typeMapGo.WriteString("\n\t\"")
+		typeMapGo.WriteString(typeMapStructMap[tmk])
+		typeMapGo.WriteString("\": &")
 		typeMapGo.WriteString(tmk)
-		typeMapGo.WriteString("\": \"")
-		typeMapGo.WriteString(typeMap[tmk])
-		typeMapGo.WriteString("\",")
+		typeMapGo.WriteString("{},")
 	}
 
-	ioutil.WriteFile("root_gql.go", []byte(
+	ioutil.WriteFile(ReflectGenPath, []byte(
 		fmt.Sprintf(
-			`package proto
+			`// +build codegen
+
+package main
+
+import (%s
+)
+
+type GraphQLProto interface {
+	GraphQLTypeName() string
+}
 
 // Map of GraphQL simplified names to proto names.
-var GraphQLTypes = map[string]string{%s
-}`, typeMapGo.String(),
+var AllGraphQLTypes = map[string]GraphQLProto{%s
+}`, typeMapImportsGo.String(), typeMapGo.String(),
 		),
 	),
 		0644,
