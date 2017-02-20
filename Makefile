@@ -9,11 +9,6 @@ gengo:
 		$$(pwd)/**/*.proto
 	go install ./...
 	./scripts/gen_root.bash
-	./scripts/gen_gqlmap.bash
-	go install ./...
-	go build -tags 'codegen' -o do-codegen ./resolvers
-	cd resolvers && ../do-codegen && gofmt -w -s ./resolvers.go
-	rm do-codegen
 	find . -name '*.pb.go' -exec sed -i -e 's/,\{0,1\}omitempty//g' {} \;
 	go install ./...
 

@@ -19,4 +19,3 @@ ${PACKAGES_STR}
 EOF
 
 gofmt -w -s ./root.go
-gofmt -w -s ./resolvers/reflectgen.go
