@@ -70,8 +70,3 @@ enum DeviceStatus {
   UNKNOWN = 0;
   ALIVE = 1;
 }
-
-message DeviceWithStatus {
-  Device device = 1;
-  DeviceStatus status = 2;
-}
