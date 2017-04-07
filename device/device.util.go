@@ -17,6 +17,11 @@ import (
 	"github.com/fuserobotics/proto/common"
 )
 
+type KVGDeviceIdentifier struct {
+	Hostname string
+	Region   string
+}
+
 type KVGDeviceSubKeys struct {
 	DeviceInfo string
 }
@@ -36,6 +41,30 @@ func ParseFqdn(fqdn string) (hostname string, region string, err error) {
 		return "", "", errors.New("Unexpected domain parts length.")
 	}
 	return fqdnParts[0], fqdnParts[1], nil
+}
+
+func ParseKVGKey(key string) *KVGDeviceIdentifier {
+	parts := strings.Split(key, "/")
+	// Expect leading / - /rv1.av1.r.fusebot.io
+	if len(parts) < 2 {
+		return nil
+	}
+	hostname := parts[1]
+	if !strings.HasSuffix(hostname, common.RootDomain) {
+		return nil
+	}
+
+	// rootDomainParts.len = 3
+	rootDomainParts := strings.Split(common.RootDomain, ".")
+	// hostnameParts.len = 5
+	hostnameParts := strings.Split(hostname, ".")
+	if (len(hostnameParts) - 2) != len(rootDomainParts) {
+		return nil
+	}
+	return &KVGDeviceIdentifier{
+		Hostname: hostnameParts[0],
+		Region:   hostnameParts[1],
+	}
 }
 
 func (d *Device) BuildKVGPaths() *KVGDeviceSubKeys {
