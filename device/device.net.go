@@ -2,10 +2,9 @@ package device
 
 import (
 	"bytes"
+	"crypto/sha1"
 	"encoding/json"
 	"fmt"
-	"hash/crc64"
-	"math/rand"
 	"strings"
 
 	"github.com/satori/go.uuid"
@@ -26,9 +25,9 @@ var DeviceWifiModeIds = map[DeviceConnection_WifiConfig_WifiMode]string{
 // UUID builds a UUID based on the JSON representation of the connection.
 func (c *DeviceConnection) ToUUID() string {
 	dat, _ := json.Marshal(c)
-	r := rand.New(rand.NewSource(int64(crc64.Checksum(dat, crc64.MakeTable(crc64.ISO)))))
+	sum := sha1.Sum(dat)
 	u := uuid.UUID{}
-	r.Read(u[:])
+	copy(u[:], sum[:])
 	u.SetVersion(4)
 	u.SetVariant()
 	return u.String()
