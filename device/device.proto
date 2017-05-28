@@ -27,8 +27,7 @@ message Device {
 
 // DeviceConnectionConfig represents a NetworkManager connection.
 message DeviceConnection {
-  // ID is the identifier for the config
-  string id = 1;
+  // reserved 1
   // auto_connect controls if the device should automatically use this connection or not.
   bool auto_connect = 2;
   // auto_connect_priority: higher numbers -> higher priority

@@ -46,9 +46,10 @@ func (c *DeviceConnection) BuildKeyfile() string {
 	var output bytes.Buffer
 	w := func(s string, args ...interface{}) { output.WriteString(fmt.Sprintf(s, args...)) }
 
+	uuid := c.ToUUID()
 	w("[connection]\n")
-	w("id=%s\n", c.Id)
-	w("uuid=%s\n", c.ToUUID())
+	w("id=%s\n", uuid)
+	w("uuid=%s\n", uuid)
 	w("type=%s\n", DeviceConnectionTypeIds[c.Type])
 	w("autoconnect=%v\n", c.AutoConnect)
 	if c.AutoConnect {
