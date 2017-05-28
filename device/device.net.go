@@ -103,6 +103,9 @@ func (c *DeviceConnection) BuildKeyfile() string {
 			if addr.Range == nil {
 				continue
 			}
+			if addr.Range.Plen == 0 {
+				addr.Range.Plen = 24
+			}
 			cs, er := addr.Range.CIDRString()
 			if er != nil {
 				continue
