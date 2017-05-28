@@ -13,43 +13,8 @@ message Device {
 
   message DeviceNetworkSettings {
     common.IPAddress ip = 1;
-    repeated DeviceInterfaceConfig interface = 2;
-    // reserved field 3
-  }
-
-  message DeviceInterfaceConfig {
-    string devname = 1;
-    common.IPAddress ip = 2;
-    common.IPAddress gateway_ip = 3;
-    WifiConfig wifi_settings = 4;
-    repeated common.IPAddress dns = 5;
-
-    message WifiConfig {
-      repeated WifiNetwork network = 1;
-      string extra_options = 2;
-
-      message WifiNetwork {
-        string ssid = 1;
-        WifiNetworkType net_type = 9;
-
-        string psk = 6;
-        bool psk_encoded = 10;
-
-        string proto = 2;
-        string key_mgmt = 3;
-        string pairwise = 4;
-        string group = 5;
-        string frequency = 8;
-
-        string extra_options = 7;
-      }
-
-      enum WifiNetworkType {
-        // Standard wifi access point
-        AP = 0;
-        ADHOC = 1;
-      }
-    }
+    // reserved field 2, 3
+    repeated DeviceConnection connection = 4;
   }
 
   message DeviceIdentity {
@@ -60,10 +25,84 @@ message Device {
   }
 }
 
-message DeviceNetworkTemplate {
+// DeviceConnectionConfig represents a NetworkManager connection.
+message DeviceConnection {
+  // ID is the identifier for the config
   string id = 1;
-  string name = 2;
-  string description = 3;
+  // auto_connect controls if the device should automatically use this connection or not.
+  bool auto_connect = 2;
+  // auto_connect_priority: higher numbers -> higher priority
+  int32 auto_connect_priority = 3;
+  // auto_connect_retries - how many connection attempts?
+  int32 auto_connect_retries = 4;
+  // interface restricts the connection to a specific interface.
+  string interface = 5;
+
+  // type controls what kind of connection this is
+  DeviceConnectionType type = 6;
+
+  // ipv4 settings
+  IPV4Config ipv4 = 7;
+  // wifi settings
+  WifiConfig wifi = 8;
+  // ethernet settings
+  EthernetConfig ethernet = 9;
+
+  message EthernetConfig {
+  }
+
+  message WifiConfig {
+    string ssid = 1;
+    WifiMode mode = 2;
+    WifiSecurity security = 3;
+
+    enum WifiMode {
+      WIFI_INFRA = 0;
+      WIFI_ADHOC = 1;
+      WIFI_AP = 2;
+    }
+  }
+
+  message WifiSecurity {
+    WifiSecurityMode mode = 1;
+    // username, if using enterprise.
+    string username = 2;
+    // password, if using personal
+    string password = 3;
+
+    // TODO: mschapv2, etc
+
+    enum WifiSecurityMode {
+      // None to explicitly disable security
+      WIFI_SEC_NONE = 0;
+      // WPA and WPA2 Personal
+      WIFI_SEC_PERSONAL = 1;
+      // WPA and WPA2 Enterprise
+      WIFI_SEC_ENTERPRISE = 2;
+    }
+  }
+
+  message IPV4Config {
+    IPV4Method method = 1;
+    repeated common.IPRange address = 2;
+    repeated common.IPAddress dns = 3;
+    repeated string dns_search = 4;
+    // if set, we will ignore DNS servers given by the DHCP server
+    bool disable_auto_dns = 5;
+
+    enum IPV4Method {
+      IPV4_DISABLED = 0;
+      IPV4_AUTOMATIC = 1;
+      IPV4_MANUAL = 2;
+    }
+  }
+}
+
+enum DeviceConnectionType {
+  // Ethernet connection
+  CONN_ETH = 0;
+  // Wifi connection
+  CONN_WIFI = 1;
 }
 
 enum DeviceStatus {

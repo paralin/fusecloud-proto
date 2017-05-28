@@ -38,3 +38,34 @@ func ParseFqdn(fqdn string) (region string, err error) {
 	}
 	return fqdnParts[0], nil
 }
+
+func GenerateFqdn(id string) string {
+	return common.RegionRootDomain(id)
+}
+
+type KVGRegionIdentifier struct {
+	Id string
+}
+
+func ParseKVGKey(key string) *KVGRegionIdentifier {
+	parts := strings.Split(key, "/")
+	// Expect leading / - /av1.r.fusebot.io
+	if len(parts) < 2 {
+		return nil
+	}
+	hostname := parts[1]
+	if !strings.HasSuffix(hostname, common.RootDomain) {
+		return nil
+	}
+
+	// rootDomainParts.len = 3
+	rootDomainParts := strings.Split(common.RootDomain, ".")
+	// hostnameParts.len = 4
+	hostnameParts := strings.Split(hostname, ".")
+	if (len(hostnameParts) - 1) != len(rootDomainParts) {
+		return nil
+	}
+	return &KVGRegionIdentifier{
+		Id: hostnameParts[0],
+	}
+}

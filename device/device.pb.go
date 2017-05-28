@@ -10,7 +10,7 @@ It is generated from these files:
 
 It has these top-level messages:
 	Device
-	DeviceNetworkTemplate
+	DeviceConnection
 */
 package device
 
@@ -29,6 +29,29 @@ var _ = math.Inf
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+
+type DeviceConnectionType int32
+
+const (
+	// Ethernet connection
+	DeviceConnectionType_CONN_ETH DeviceConnectionType = 0
+	// Wifi connection
+	DeviceConnectionType_CONN_WIFI DeviceConnectionType = 1
+)
+
+var DeviceConnectionType_name = map[int32]string{
+	0: "CONN_ETH",
+	1: "CONN_WIFI",
+}
+var DeviceConnectionType_value = map[string]int32{
+	"CONN_ETH":  0,
+	"CONN_WIFI": 1,
+}
+
+func (x DeviceConnectionType) String() string {
+	return proto.EnumName(DeviceConnectionType_name, int32(x))
+}
+func (DeviceConnectionType) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 type DeviceStatus int32
 
@@ -49,30 +72,87 @@ var DeviceStatus_value = map[string]int32{
 func (x DeviceStatus) String() string {
 	return proto.EnumName(DeviceStatus_name, int32(x))
 }
-func (DeviceStatus) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (DeviceStatus) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-type Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType int32
+type DeviceConnection_WifiConfig_WifiMode int32
 
 const (
-	// Standard wifi access point
-	Device_DeviceInterfaceConfig_WifiConfig_AP    Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType = 0
-	Device_DeviceInterfaceConfig_WifiConfig_ADHOC Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType = 1
+	DeviceConnection_WifiConfig_WIFI_INFRA DeviceConnection_WifiConfig_WifiMode = 0
+	DeviceConnection_WifiConfig_WIFI_ADHOC DeviceConnection_WifiConfig_WifiMode = 1
+	DeviceConnection_WifiConfig_WIFI_AP    DeviceConnection_WifiConfig_WifiMode = 2
 )
 
-var Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType_name = map[int32]string{
-	0: "AP",
-	1: "ADHOC",
+var DeviceConnection_WifiConfig_WifiMode_name = map[int32]string{
+	0: "WIFI_INFRA",
+	1: "WIFI_ADHOC",
+	2: "WIFI_AP",
 }
-var Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType_value = map[string]int32{
-	"AP":    0,
-	"ADHOC": 1,
+var DeviceConnection_WifiConfig_WifiMode_value = map[string]int32{
+	"WIFI_INFRA": 0,
+	"WIFI_ADHOC": 1,
+	"WIFI_AP":    2,
 }
 
-func (x Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType) String() string {
-	return proto.EnumName(Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType_name, int32(x))
+func (x DeviceConnection_WifiConfig_WifiMode) String() string {
+	return proto.EnumName(DeviceConnection_WifiConfig_WifiMode_name, int32(x))
 }
-func (Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{0, 1, 0, 0}
+func (DeviceConnection_WifiConfig_WifiMode) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{1, 1, 0}
+}
+
+type DeviceConnection_WifiSecurity_WifiSecurityMode int32
+
+const (
+	// None to explicitly disable security
+	DeviceConnection_WifiSecurity_WIFI_SEC_NONE DeviceConnection_WifiSecurity_WifiSecurityMode = 0
+	// WPA and WPA2 Personal
+	DeviceConnection_WifiSecurity_WIFI_SEC_PERSONAL DeviceConnection_WifiSecurity_WifiSecurityMode = 1
+	// WPA and WPA2 Enterprise
+	DeviceConnection_WifiSecurity_WIFI_SEC_ENTERPRISE DeviceConnection_WifiSecurity_WifiSecurityMode = 2
+)
+
+var DeviceConnection_WifiSecurity_WifiSecurityMode_name = map[int32]string{
+	0: "WIFI_SEC_NONE",
+	1: "WIFI_SEC_PERSONAL",
+	2: "WIFI_SEC_ENTERPRISE",
+}
+var DeviceConnection_WifiSecurity_WifiSecurityMode_value = map[string]int32{
+	"WIFI_SEC_NONE":       0,
+	"WIFI_SEC_PERSONAL":   1,
+	"WIFI_SEC_ENTERPRISE": 2,
+}
+
+func (x DeviceConnection_WifiSecurity_WifiSecurityMode) String() string {
+	return proto.EnumName(DeviceConnection_WifiSecurity_WifiSecurityMode_name, int32(x))
+}
+func (DeviceConnection_WifiSecurity_WifiSecurityMode) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{1, 2, 0}
+}
+
+type DeviceConnection_IPV4Config_IPV4Method int32
+
+const (
+	DeviceConnection_IPV4Config_IPV4_DISABLED  DeviceConnection_IPV4Config_IPV4Method = 0
+	DeviceConnection_IPV4Config_IPV4_AUTOMATIC DeviceConnection_IPV4Config_IPV4Method = 1
+	DeviceConnection_IPV4Config_IPV4_MANUAL    DeviceConnection_IPV4Config_IPV4Method = 2
+)
+
+var DeviceConnection_IPV4Config_IPV4Method_name = map[int32]string{
+	0: "IPV4_DISABLED",
+	1: "IPV4_AUTOMATIC",
+	2: "IPV4_MANUAL",
+}
+var DeviceConnection_IPV4Config_IPV4Method_value = map[string]int32{
+	"IPV4_DISABLED":  0,
+	"IPV4_AUTOMATIC": 1,
+	"IPV4_MANUAL":    2,
+}
+
+func (x DeviceConnection_IPV4Config_IPV4Method) String() string {
+	return proto.EnumName(DeviceConnection_IPV4Config_IPV4Method_name, int32(x))
+}
+func (DeviceConnection_IPV4Config_IPV4Method) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{1, 3, 0}
 }
 
 // Device: a full-linux computer running serf, docker stack
@@ -117,8 +197,9 @@ func (m *Device) GetIdentity() *Device_DeviceIdentity {
 }
 
 type Device_DeviceNetworkSettings struct {
-	Ip        *common.IPAddress               `protobuf:"bytes,1,opt,name=ip" json:"ip"`
-	Interface []*Device_DeviceInterfaceConfig `protobuf:"bytes,2,rep,name=interface" json:"interface"`
+	Ip *common.IPAddress `protobuf:"bytes,1,opt,name=ip" json:"ip"`
+	// reserved field 2, 3
+	Connection []*DeviceConnection `protobuf:"bytes,4,rep,name=connection" json:"connection"`
 }
 
 func (m *Device_DeviceNetworkSettings) Reset()                    { *m = Device_DeviceNetworkSettings{} }
@@ -133,181 +214,11 @@ func (m *Device_DeviceNetworkSettings) GetIp() *common.IPAddress {
 	return nil
 }
 
-func (m *Device_DeviceNetworkSettings) GetInterface() []*Device_DeviceInterfaceConfig {
+func (m *Device_DeviceNetworkSettings) GetConnection() []*DeviceConnection {
 	if m != nil {
-		return m.Interface
+		return m.Connection
 	}
 	return nil
-}
-
-type Device_DeviceInterfaceConfig struct {
-	Devname      string                                   `protobuf:"bytes,1,opt,name=devname" json:"devname"`
-	Ip           *common.IPAddress                        `protobuf:"bytes,2,opt,name=ip" json:"ip"`
-	GatewayIp    *common.IPAddress                        `protobuf:"bytes,3,opt,name=gateway_ip,json=gatewayIp" json:"gateway_ip"`
-	WifiSettings *Device_DeviceInterfaceConfig_WifiConfig `protobuf:"bytes,4,opt,name=wifi_settings,json=wifiSettings" json:"wifi_settings"`
-	Dns          []*common.IPAddress                      `protobuf:"bytes,5,rep,name=dns" json:"dns"`
-}
-
-func (m *Device_DeviceInterfaceConfig) Reset()                    { *m = Device_DeviceInterfaceConfig{} }
-func (m *Device_DeviceInterfaceConfig) String() string            { return proto.CompactTextString(m) }
-func (*Device_DeviceInterfaceConfig) ProtoMessage()               {}
-func (*Device_DeviceInterfaceConfig) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 1} }
-
-func (m *Device_DeviceInterfaceConfig) GetDevname() string {
-	if m != nil {
-		return m.Devname
-	}
-	return ""
-}
-
-func (m *Device_DeviceInterfaceConfig) GetIp() *common.IPAddress {
-	if m != nil {
-		return m.Ip
-	}
-	return nil
-}
-
-func (m *Device_DeviceInterfaceConfig) GetGatewayIp() *common.IPAddress {
-	if m != nil {
-		return m.GatewayIp
-	}
-	return nil
-}
-
-func (m *Device_DeviceInterfaceConfig) GetWifiSettings() *Device_DeviceInterfaceConfig_WifiConfig {
-	if m != nil {
-		return m.WifiSettings
-	}
-	return nil
-}
-
-func (m *Device_DeviceInterfaceConfig) GetDns() []*common.IPAddress {
-	if m != nil {
-		return m.Dns
-	}
-	return nil
-}
-
-type Device_DeviceInterfaceConfig_WifiConfig struct {
-	Network      []*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork `protobuf:"bytes,1,rep,name=network" json:"network"`
-	ExtraOptions string                                                 `protobuf:"bytes,2,opt,name=extra_options,json=extraOptions" json:"extra_options"`
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig) Reset() {
-	*m = Device_DeviceInterfaceConfig_WifiConfig{}
-}
-func (m *Device_DeviceInterfaceConfig_WifiConfig) String() string { return proto.CompactTextString(m) }
-func (*Device_DeviceInterfaceConfig_WifiConfig) ProtoMessage()    {}
-func (*Device_DeviceInterfaceConfig_WifiConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{0, 1, 0}
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig) GetNetwork() []*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork {
-	if m != nil {
-		return m.Network
-	}
-	return nil
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig) GetExtraOptions() string {
-	if m != nil {
-		return m.ExtraOptions
-	}
-	return ""
-}
-
-type Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork struct {
-	Ssid         string                                                  `protobuf:"bytes,1,opt,name=ssid" json:"ssid"`
-	NetType      Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType `protobuf:"varint,9,opt,name=net_type,json=netType,enum=device.Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType" json:"net_type"`
-	Psk          string                                                  `protobuf:"bytes,6,opt,name=psk" json:"psk"`
-	PskEncoded   bool                                                    `protobuf:"varint,10,opt,name=psk_encoded,json=pskEncoded" json:"psk_encoded"`
-	Proto        string                                                  `protobuf:"bytes,2,opt,name=proto" json:"proto"`
-	KeyMgmt      string                                                  `protobuf:"bytes,3,opt,name=key_mgmt,json=keyMgmt" json:"key_mgmt"`
-	Pairwise     string                                                  `protobuf:"bytes,4,opt,name=pairwise" json:"pairwise"`
-	Group        string                                                  `protobuf:"bytes,5,opt,name=group" json:"group"`
-	Frequency    string                                                  `protobuf:"bytes,8,opt,name=frequency" json:"frequency"`
-	ExtraOptions string                                                  `protobuf:"bytes,7,opt,name=extra_options,json=extraOptions" json:"extra_options"`
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) Reset() {
-	*m = Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork{}
-}
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) String() string {
-	return proto.CompactTextString(m)
-}
-func (*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) ProtoMessage() {}
-func (*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) Descriptor() ([]byte, []int) {
-	return fileDescriptor0, []int{0, 1, 0, 0}
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetSsid() string {
-	if m != nil {
-		return m.Ssid
-	}
-	return ""
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetNetType() Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType {
-	if m != nil {
-		return m.NetType
-	}
-	return Device_DeviceInterfaceConfig_WifiConfig_AP
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetPsk() string {
-	if m != nil {
-		return m.Psk
-	}
-	return ""
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetPskEncoded() bool {
-	if m != nil {
-		return m.PskEncoded
-	}
-	return false
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetProto() string {
-	if m != nil {
-		return m.Proto
-	}
-	return ""
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetKeyMgmt() string {
-	if m != nil {
-		return m.KeyMgmt
-	}
-	return ""
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetPairwise() string {
-	if m != nil {
-		return m.Pairwise
-	}
-	return ""
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetGroup() string {
-	if m != nil {
-		return m.Group
-	}
-	return ""
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetFrequency() string {
-	if m != nil {
-		return m.Frequency
-	}
-	return ""
-}
-
-func (m *Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork) GetExtraOptions() string {
-	if m != nil {
-		return m.ExtraOptions
-	}
-	return ""
 }
 
 type Device_DeviceIdentity struct {
@@ -319,7 +230,7 @@ type Device_DeviceIdentity struct {
 func (m *Device_DeviceIdentity) Reset()                    { *m = Device_DeviceIdentity{} }
 func (m *Device_DeviceIdentity) String() string            { return proto.CompactTextString(m) }
 func (*Device_DeviceIdentity) ProtoMessage()               {}
-func (*Device_DeviceIdentity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 2} }
+func (*Device_DeviceIdentity) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0, 1} }
 
 func (m *Device_DeviceIdentity) GetChain() []*common.CertChain {
 	if m != nil {
@@ -335,95 +246,296 @@ func (m *Device_DeviceIdentity) GetPublicKey() string {
 	return ""
 }
 
-type DeviceNetworkTemplate struct {
-	Id          string `protobuf:"bytes,1,opt,name=id" json:"id"`
-	Name        string `protobuf:"bytes,2,opt,name=name" json:"name"`
-	Description string `protobuf:"bytes,3,opt,name=description" json:"description"`
+// DeviceConnectionConfig represents a NetworkManager connection.
+type DeviceConnection struct {
+	// ID is the identifier for the config
+	Id string `protobuf:"bytes,1,opt,name=id" json:"id"`
+	// auto_connect controls if the device should automatically use this connection or not.
+	AutoConnect bool `protobuf:"varint,2,opt,name=auto_connect,json=autoConnect" json:"auto_connect"`
+	// auto_connect_priority: higher numbers -> higher priority
+	AutoConnectPriority int32 `protobuf:"varint,3,opt,name=auto_connect_priority,json=autoConnectPriority" json:"auto_connect_priority"`
+	// auto_connect_retries - how many connection attempts?
+	AutoConnectRetries int32 `protobuf:"varint,4,opt,name=auto_connect_retries,json=autoConnectRetries" json:"auto_connect_retries"`
+	// interface restricts the connection to a specific interface.
+	Interface string `protobuf:"bytes,5,opt,name=interface" json:"interface"`
+	// type controls what kind of connection this is
+	Type DeviceConnectionType `protobuf:"varint,6,opt,name=type,enum=device.DeviceConnectionType" json:"type"`
+	// ipv4 settings
+	Ipv4 *DeviceConnection_IPV4Config `protobuf:"bytes,7,opt,name=ipv4" json:"ipv4"`
+	// wifi settings
+	Wifi *DeviceConnection_WifiConfig `protobuf:"bytes,8,opt,name=wifi" json:"wifi"`
+	// ethernet settings
+	Ethernet *DeviceConnection_EthernetConfig `protobuf:"bytes,9,opt,name=ethernet" json:"ethernet"`
 }
 
-func (m *DeviceNetworkTemplate) Reset()                    { *m = DeviceNetworkTemplate{} }
-func (m *DeviceNetworkTemplate) String() string            { return proto.CompactTextString(m) }
-func (*DeviceNetworkTemplate) ProtoMessage()               {}
-func (*DeviceNetworkTemplate) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (m *DeviceConnection) Reset()                    { *m = DeviceConnection{} }
+func (m *DeviceConnection) String() string            { return proto.CompactTextString(m) }
+func (*DeviceConnection) ProtoMessage()               {}
+func (*DeviceConnection) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *DeviceNetworkTemplate) GetId() string {
+func (m *DeviceConnection) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-func (m *DeviceNetworkTemplate) GetName() string {
+func (m *DeviceConnection) GetAutoConnect() bool {
 	if m != nil {
-		return m.Name
+		return m.AutoConnect
+	}
+	return false
+}
+
+func (m *DeviceConnection) GetAutoConnectPriority() int32 {
+	if m != nil {
+		return m.AutoConnectPriority
+	}
+	return 0
+}
+
+func (m *DeviceConnection) GetAutoConnectRetries() int32 {
+	if m != nil {
+		return m.AutoConnectRetries
+	}
+	return 0
+}
+
+func (m *DeviceConnection) GetInterface() string {
+	if m != nil {
+		return m.Interface
 	}
 	return ""
 }
 
-func (m *DeviceNetworkTemplate) GetDescription() string {
+func (m *DeviceConnection) GetType() DeviceConnectionType {
 	if m != nil {
-		return m.Description
+		return m.Type
+	}
+	return DeviceConnectionType_CONN_ETH
+}
+
+func (m *DeviceConnection) GetIpv4() *DeviceConnection_IPV4Config {
+	if m != nil {
+		return m.Ipv4
+	}
+	return nil
+}
+
+func (m *DeviceConnection) GetWifi() *DeviceConnection_WifiConfig {
+	if m != nil {
+		return m.Wifi
+	}
+	return nil
+}
+
+func (m *DeviceConnection) GetEthernet() *DeviceConnection_EthernetConfig {
+	if m != nil {
+		return m.Ethernet
+	}
+	return nil
+}
+
+type DeviceConnection_EthernetConfig struct {
+}
+
+func (m *DeviceConnection_EthernetConfig) Reset()         { *m = DeviceConnection_EthernetConfig{} }
+func (m *DeviceConnection_EthernetConfig) String() string { return proto.CompactTextString(m) }
+func (*DeviceConnection_EthernetConfig) ProtoMessage()    {}
+func (*DeviceConnection_EthernetConfig) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{1, 0}
+}
+
+type DeviceConnection_WifiConfig struct {
+	Ssid     string                               `protobuf:"bytes,1,opt,name=ssid" json:"ssid"`
+	Mode     DeviceConnection_WifiConfig_WifiMode `protobuf:"varint,2,opt,name=mode,enum=device.DeviceConnection_WifiConfig_WifiMode" json:"mode"`
+	Security *DeviceConnection_WifiSecurity       `protobuf:"bytes,3,opt,name=security" json:"security"`
+}
+
+func (m *DeviceConnection_WifiConfig) Reset()                    { *m = DeviceConnection_WifiConfig{} }
+func (m *DeviceConnection_WifiConfig) String() string            { return proto.CompactTextString(m) }
+func (*DeviceConnection_WifiConfig) ProtoMessage()               {}
+func (*DeviceConnection_WifiConfig) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1, 1} }
+
+func (m *DeviceConnection_WifiConfig) GetSsid() string {
+	if m != nil {
+		return m.Ssid
 	}
 	return ""
+}
+
+func (m *DeviceConnection_WifiConfig) GetMode() DeviceConnection_WifiConfig_WifiMode {
+	if m != nil {
+		return m.Mode
+	}
+	return DeviceConnection_WifiConfig_WIFI_INFRA
+}
+
+func (m *DeviceConnection_WifiConfig) GetSecurity() *DeviceConnection_WifiSecurity {
+	if m != nil {
+		return m.Security
+	}
+	return nil
+}
+
+type DeviceConnection_WifiSecurity struct {
+	Mode DeviceConnection_WifiSecurity_WifiSecurityMode `protobuf:"varint,1,opt,name=mode,enum=device.DeviceConnection_WifiSecurity_WifiSecurityMode" json:"mode"`
+	// username, if using enterprise.
+	Username string `protobuf:"bytes,2,opt,name=username" json:"username"`
+	// password, if using personal
+	Password string `protobuf:"bytes,3,opt,name=password" json:"password"`
+}
+
+func (m *DeviceConnection_WifiSecurity) Reset()         { *m = DeviceConnection_WifiSecurity{} }
+func (m *DeviceConnection_WifiSecurity) String() string { return proto.CompactTextString(m) }
+func (*DeviceConnection_WifiSecurity) ProtoMessage()    {}
+func (*DeviceConnection_WifiSecurity) Descriptor() ([]byte, []int) {
+	return fileDescriptor0, []int{1, 2}
+}
+
+func (m *DeviceConnection_WifiSecurity) GetMode() DeviceConnection_WifiSecurity_WifiSecurityMode {
+	if m != nil {
+		return m.Mode
+	}
+	return DeviceConnection_WifiSecurity_WIFI_SEC_NONE
+}
+
+func (m *DeviceConnection_WifiSecurity) GetUsername() string {
+	if m != nil {
+		return m.Username
+	}
+	return ""
+}
+
+func (m *DeviceConnection_WifiSecurity) GetPassword() string {
+	if m != nil {
+		return m.Password
+	}
+	return ""
+}
+
+type DeviceConnection_IPV4Config struct {
+	Method    DeviceConnection_IPV4Config_IPV4Method `protobuf:"varint,1,opt,name=method,enum=device.DeviceConnection_IPV4Config_IPV4Method" json:"method"`
+	Address   []*common.IPRange                      `protobuf:"bytes,2,rep,name=address" json:"address"`
+	Dns       []*common.IPAddress                    `protobuf:"bytes,3,rep,name=dns" json:"dns"`
+	DnsSearch []string                               `protobuf:"bytes,4,rep,name=dns_search,json=dnsSearch" json:"dns_search"`
+	// if set, we will ignore DNS servers given by the DHCP server
+	DisableAutoDns bool `protobuf:"varint,5,opt,name=disable_auto_dns,json=disableAutoDns" json:"disable_auto_dns"`
+}
+
+func (m *DeviceConnection_IPV4Config) Reset()                    { *m = DeviceConnection_IPV4Config{} }
+func (m *DeviceConnection_IPV4Config) String() string            { return proto.CompactTextString(m) }
+func (*DeviceConnection_IPV4Config) ProtoMessage()               {}
+func (*DeviceConnection_IPV4Config) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1, 3} }
+
+func (m *DeviceConnection_IPV4Config) GetMethod() DeviceConnection_IPV4Config_IPV4Method {
+	if m != nil {
+		return m.Method
+	}
+	return DeviceConnection_IPV4Config_IPV4_DISABLED
+}
+
+func (m *DeviceConnection_IPV4Config) GetAddress() []*common.IPRange {
+	if m != nil {
+		return m.Address
+	}
+	return nil
+}
+
+func (m *DeviceConnection_IPV4Config) GetDns() []*common.IPAddress {
+	if m != nil {
+		return m.Dns
+	}
+	return nil
+}
+
+func (m *DeviceConnection_IPV4Config) GetDnsSearch() []string {
+	if m != nil {
+		return m.DnsSearch
+	}
+	return nil
+}
+
+func (m *DeviceConnection_IPV4Config) GetDisableAutoDns() bool {
+	if m != nil {
+		return m.DisableAutoDns
+	}
+	return false
 }
 
 func init() {
 	proto.RegisterType((*Device)(nil), "device.Device")
 	proto.RegisterType((*Device_DeviceNetworkSettings)(nil), "device.Device.DeviceNetworkSettings")
-	proto.RegisterType((*Device_DeviceInterfaceConfig)(nil), "device.Device.DeviceInterfaceConfig")
-	proto.RegisterType((*Device_DeviceInterfaceConfig_WifiConfig)(nil), "device.Device.DeviceInterfaceConfig.WifiConfig")
-	proto.RegisterType((*Device_DeviceInterfaceConfig_WifiConfig_WifiNetwork)(nil), "device.Device.DeviceInterfaceConfig.WifiConfig.WifiNetwork")
 	proto.RegisterType((*Device_DeviceIdentity)(nil), "device.Device.DeviceIdentity")
-	proto.RegisterType((*DeviceNetworkTemplate)(nil), "device.DeviceNetworkTemplate")
+	proto.RegisterType((*DeviceConnection)(nil), "device.DeviceConnection")
+	proto.RegisterType((*DeviceConnection_EthernetConfig)(nil), "device.DeviceConnection.EthernetConfig")
+	proto.RegisterType((*DeviceConnection_WifiConfig)(nil), "device.DeviceConnection.WifiConfig")
+	proto.RegisterType((*DeviceConnection_WifiSecurity)(nil), "device.DeviceConnection.WifiSecurity")
+	proto.RegisterType((*DeviceConnection_IPV4Config)(nil), "device.DeviceConnection.IPV4Config")
+	proto.RegisterEnum("device.DeviceConnectionType", DeviceConnectionType_name, DeviceConnectionType_value)
 	proto.RegisterEnum("device.DeviceStatus", DeviceStatus_name, DeviceStatus_value)
-	proto.RegisterEnum("device.Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType", Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType_name, Device_DeviceInterfaceConfig_WifiConfig_WifiNetworkType_value)
+	proto.RegisterEnum("device.DeviceConnection_WifiConfig_WifiMode", DeviceConnection_WifiConfig_WifiMode_name, DeviceConnection_WifiConfig_WifiMode_value)
+	proto.RegisterEnum("device.DeviceConnection_WifiSecurity_WifiSecurityMode", DeviceConnection_WifiSecurity_WifiSecurityMode_name, DeviceConnection_WifiSecurity_WifiSecurityMode_value)
+	proto.RegisterEnum("device.DeviceConnection_IPV4Config_IPV4Method", DeviceConnection_IPV4Config_IPV4Method_name, DeviceConnection_IPV4Config_IPV4Method_value)
 }
 
 func init() { proto.RegisterFile("github.com/fuserobotics/proto/device/device.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 680 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0xa4, 0x53, 0x4b, 0x6f, 0xdb, 0x46,
-	0x10, 0x2e, 0x29, 0xeb, 0xc1, 0x91, 0x1f, 0xea, 0xa2, 0x2d, 0x58, 0xa1, 0x46, 0x55, 0xdb, 0x68,
-	0x85, 0x1e, 0xa4, 0xc4, 0x39, 0x05, 0x39, 0x04, 0x8e, 0x6c, 0x20, 0x82, 0x13, 0xc9, 0xa0, 0xed,
-	0x38, 0x08, 0x10, 0x08, 0x14, 0x39, 0xa2, 0x17, 0x32, 0x77, 0x37, 0xdc, 0x95, 0x15, 0x5e, 0x72,
-	0xcd, 0x21, 0x7f, 0x26, 0xbf, 0x26, 0xbf, 0x27, 0xe0, 0x72, 0xf5, 0xb0, 0xad, 0xbc, 0x90, 0xd3,
-	0xce, 0xf3, 0xe3, 0x7c, 0xf3, 0x71, 0xe0, 0x7e, 0x44, 0xd5, 0xe5, 0x64, 0xd8, 0x0a, 0x78, 0xdc,
-	0x1e, 0x4d, 0x24, 0x26, 0x7c, 0xc8, 0x15, 0x0d, 0x64, 0x5b, 0x24, 0x5c, 0xf1, 0x76, 0x88, 0xd7,
-	0x34, 0x40, 0xf3, 0xb4, 0x74, 0x8c, 0x94, 0x72, 0xaf, 0xfe, 0x8d, 0xd6, 0x80, 0xc7, 0x31, 0x67,
-	0xe6, 0xc9, 0x5b, 0x77, 0x3e, 0x3a, 0x50, 0x3a, 0xd4, 0xdd, 0xa4, 0x0e, 0x95, 0x4b, 0x2e, 0x15,
-	0xf3, 0x63, 0x74, 0xad, 0x86, 0xd5, 0x74, 0xbc, 0xb9, 0x4f, 0xfe, 0x80, 0x52, 0x82, 0x11, 0xe5,
-	0xcc, 0xb5, 0x75, 0xc6, 0x78, 0xa4, 0x0f, 0x35, 0x86, 0x6a, 0xca, 0x93, 0xf1, 0x40, 0xa2, 0x52,
-	0x94, 0x45, 0xd2, 0x2d, 0x34, 0xac, 0x66, 0x75, 0x7f, 0xaf, 0x65, 0x46, 0x3c, 0x5c, 0x7e, 0x7a,
-	0x79, 0xf1, 0xa9, 0xa9, 0xf5, 0xb6, 0xd8, 0xcd, 0x00, 0x79, 0x08, 0x15, 0x1a, 0x22, 0x53, 0x54,
-	0xa5, 0xee, 0x9a, 0x06, 0xda, 0x5e, 0x09, 0xd4, 0x35, 0x45, 0xde, 0xbc, 0xbc, 0xfe, 0x0e, 0x7e,
-	0x5f, 0xf9, 0x11, 0xf2, 0x0f, 0xd8, 0x54, 0x68, 0x4a, 0xd5, 0xfd, 0x5f, 0x5b, 0x86, 0x7e, 0xf7,
-	0xe4, 0x20, 0x0c, 0x13, 0x94, 0xd2, 0xb3, 0xa9, 0x20, 0x4f, 0xc0, 0xa1, 0x4c, 0x61, 0x32, 0xf2,
-	0x03, 0x74, 0xed, 0x46, 0xe1, 0x8b, 0x04, 0xba, 0xb3, 0xaa, 0x0e, 0x67, 0x23, 0x1a, 0x79, 0x8b,
-	0xb6, 0xfa, 0x87, 0xd2, 0x6c, 0x80, 0x5b, 0x45, 0xc4, 0x85, 0x72, 0x88, 0xd7, 0x4b, 0x8b, 0x9d,
-	0xb9, 0x66, 0x34, 0xfb, 0x6b, 0xa3, 0xdd, 0x03, 0x88, 0x7c, 0x85, 0x53, 0x3f, 0x1d, 0x50, 0x61,
-	0x96, 0xbb, 0xa2, 0xd4, 0x31, 0x45, 0x5d, 0x41, 0xce, 0x60, 0x63, 0x4a, 0x47, 0x74, 0xa1, 0x48,
-	0xbe, 0xc8, 0xf6, 0xf7, 0x10, 0x6a, 0x5d, 0xd0, 0x11, 0x35, 0xdc, 0xd6, 0x33, 0x94, 0xf9, 0x16,
-	0x77, 0xa1, 0x10, 0x32, 0xe9, 0x16, 0xf5, 0x72, 0x56, 0x0c, 0x90, 0x65, 0xeb, 0xef, 0xd7, 0x00,
-	0x16, 0x08, 0xe4, 0x1c, 0xca, 0x46, 0x60, 0xd7, 0xd2, 0x7d, 0x8f, 0x7e, 0x70, 0x06, 0x6d, 0x1a,
-	0x3d, 0xbd, 0x19, 0x16, 0xd9, 0x85, 0x0d, 0x7c, 0xab, 0x12, 0x7f, 0xc0, 0x85, 0xa2, 0x9c, 0x49,
-	0xf3, 0x53, 0xae, 0xeb, 0x60, 0x3f, 0x8f, 0xd5, 0x3f, 0xd9, 0x50, 0x5d, 0xea, 0x26, 0x04, 0xd6,
-	0xa4, 0xa4, 0xa1, 0x51, 0x40, 0xdb, 0xe4, 0x15, 0x54, 0x18, 0xaa, 0x81, 0x4a, 0x05, 0xba, 0x4e,
-	0xc3, 0x6a, 0x6e, 0xee, 0x3f, 0xfe, 0x89, 0x01, 0xcf, 0x52, 0x81, 0x7a, 0xc8, 0xcc, 0x20, 0x35,
-	0x28, 0x08, 0x39, 0x76, 0x4b, 0xfa, 0x73, 0x99, 0x49, 0xfe, 0x86, 0xaa, 0x90, 0xe3, 0x01, 0xb2,
-	0x80, 0x87, 0x18, 0xba, 0xd0, 0xb0, 0x9a, 0x15, 0x0f, 0x84, 0x1c, 0x1f, 0xe5, 0x11, 0xf2, 0x1b,
-	0x14, 0xf5, 0x55, 0x1a, 0x3e, 0xb9, 0x43, 0xfe, 0x84, 0xca, 0x18, 0xd3, 0x41, 0x1c, 0xc5, 0x4a,
-	0xcb, 0xef, 0x78, 0xe5, 0x31, 0xa6, 0xcf, 0xa3, 0x58, 0x65, 0x27, 0x2b, 0x7c, 0x9a, 0x4c, 0xa9,
-	0x44, 0x2d, 0xb2, 0xe3, 0xcd, 0xfd, 0x0c, 0x2c, 0x4a, 0xf8, 0x44, 0xb8, 0xc5, 0x1c, 0x4c, 0x3b,
-	0xe4, 0x2f, 0x70, 0x46, 0x09, 0xbe, 0x99, 0x20, 0x0b, 0x52, 0xb7, 0xa2, 0x33, 0x8b, 0xc0, 0xdd,
-	0xc5, 0x96, 0xef, 0x2e, 0x76, 0x67, 0x0f, 0xb6, 0x6e, 0x91, 0x26, 0x25, 0xb0, 0x0f, 0x4e, 0x6a,
-	0xbf, 0x10, 0x07, 0x8a, 0x07, 0x87, 0x4f, 0xfb, 0x9d, 0x9a, 0x55, 0x7f, 0x09, 0x9b, 0x37, 0x2f,
-	0x95, 0xfc, 0x07, 0xc5, 0xe0, 0xd2, 0xa7, 0xcc, 0xdc, 0xd7, 0xfc, 0x17, 0xea, 0x60, 0xa2, 0x3a,
-	0x59, 0xc2, 0xcb, 0xf3, 0x64, 0x1b, 0x40, 0x4c, 0x86, 0x57, 0x34, 0x18, 0x8c, 0x31, 0x35, 0x94,
-	0x9d, 0x3c, 0x72, 0x8c, 0xe9, 0xce, 0xeb, 0x5b, 0x77, 0x7e, 0x86, 0xb1, 0xb8, 0xf2, 0x15, 0x92,
-	0x4d, 0xb0, 0xe7, 0xfa, 0xda, 0x34, 0xcc, 0x14, 0xd7, 0x37, 0x97, 0x6f, 0x53, 0xdb, 0xa4, 0x01,
-	0xd5, 0x10, 0x65, 0x90, 0x50, 0x4d, 0xc6, 0x80, 0x2f, 0x87, 0xfe, 0xff, 0x17, 0xd6, 0x73, 0xf8,
-	0x53, 0xe5, 0xab, 0x89, 0x24, 0x55, 0x28, 0x9f, 0xf7, 0x8e, 0x7b, 0xfd, 0x8b, 0x9e, 0x21, 0xf8,
-	0xac, 0xfb, 0xe2, 0xa8, 0x66, 0x0d, 0x4b, 0x5a, 0x9d, 0x07, 0x9f, 0x03, 0x00, 0x00, 0xff, 0xff,
-	0x8c, 0x37, 0x07, 0xac, 0xb0, 0x05, 0x00, 0x00,
+	// 873 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x8c, 0x55, 0xdb, 0x6e, 0xdb, 0x36,
+	0x18, 0xb6, 0x7c, 0x8a, 0xf5, 0x3b, 0x75, 0x14, 0xb6, 0xd9, 0x04, 0xa3, 0x05, 0x52, 0x77, 0x5b,
+	0xbd, 0x62, 0x70, 0x3a, 0xb7, 0x58, 0xb7, 0xbb, 0x69, 0xb6, 0x82, 0x6a, 0x4d, 0x64, 0x83, 0x76,
+	0x9a, 0xdd, 0x09, 0xb2, 0x44, 0xdb, 0x44, 0x6b, 0x51, 0x10, 0xe9, 0x06, 0x7e, 0x93, 0xbd, 0xc7,
+	0x1e, 0x62, 0x6f, 0xb1, 0xfb, 0xbd, 0xc5, 0x40, 0x8a, 0x51, 0xec, 0x22, 0x59, 0x73, 0x25, 0xfe,
+	0x87, 0xef, 0x3f, 0x92, 0x9f, 0xe0, 0xc7, 0x05, 0x15, 0xcb, 0xf5, 0xac, 0x17, 0xb1, 0xd5, 0xc9,
+	0x7c, 0xcd, 0x49, 0xc6, 0x66, 0x4c, 0xd0, 0x88, 0x9f, 0xa4, 0x19, 0x13, 0xec, 0x24, 0x26, 0x9f,
+	0x68, 0x44, 0xf4, 0xa7, 0xa7, 0x74, 0xa8, 0x9e, 0x4b, 0xed, 0x2f, 0x40, 0x23, 0xb6, 0x5a, 0xb1,
+	0x44, 0x7f, 0x72, 0x68, 0xe7, 0xcf, 0x0a, 0xd4, 0x87, 0x0a, 0x8d, 0xda, 0xd0, 0x58, 0x32, 0x2e,
+	0x92, 0x70, 0x45, 0x6c, 0xe3, 0xd8, 0xe8, 0x9a, 0xb8, 0x90, 0xd1, 0x57, 0x50, 0xcf, 0xc8, 0x82,
+	0xb2, 0xc4, 0x2e, 0x2b, 0x8b, 0x96, 0xd0, 0x08, 0xac, 0x84, 0x88, 0x2b, 0x96, 0x7d, 0x08, 0x38,
+	0x11, 0x82, 0x26, 0x0b, 0x6e, 0x57, 0x8e, 0x8d, 0x6e, 0xb3, 0xff, 0x4d, 0x4f, 0x97, 0x38, 0xdc,
+	0xfe, 0xf8, 0xb9, 0xf3, 0x44, 0xfb, 0xe2, 0x83, 0x64, 0x57, 0x81, 0x7e, 0x81, 0x06, 0x8d, 0x49,
+	0x22, 0xa8, 0xd8, 0xd8, 0x55, 0x15, 0xe8, 0xc9, 0xad, 0x81, 0x3c, 0xed, 0x84, 0x0b, 0xf7, 0xb6,
+	0x80, 0xa3, 0x5b, 0x93, 0xa0, 0xa7, 0x50, 0xa6, 0xa9, 0x6a, 0xa9, 0xd9, 0x3f, 0xec, 0xe9, 0xf6,
+	0xbd, 0xb1, 0x13, 0xc7, 0x19, 0xe1, 0x1c, 0x97, 0x69, 0x8a, 0x7e, 0x06, 0x88, 0x58, 0x92, 0x90,
+	0x48, 0xc8, 0x1e, 0xab, 0xc7, 0x95, 0x6e, 0xb3, 0x6f, 0xef, 0x26, 0x1e, 0x14, 0x76, 0xbc, 0xe5,
+	0xdb, 0xfe, 0x03, 0x5a, 0xbb, 0x15, 0xa1, 0xe7, 0x50, 0x8b, 0x96, 0x21, 0x95, 0xa3, 0xaa, 0x6c,
+	0x67, 0x1c, 0x90, 0x4c, 0x0c, 0xa4, 0x01, 0xe7, 0x76, 0xf4, 0x04, 0x20, 0x5d, 0xcf, 0x3e, 0xd2,
+	0x28, 0xf8, 0x40, 0x36, 0x6a, 0x6c, 0x26, 0x36, 0x73, 0xcd, 0x3b, 0xb2, 0xe9, 0xfc, 0x6d, 0x82,
+	0xf5, 0x79, 0x6a, 0xd4, 0x82, 0x32, 0x8d, 0xf5, 0x7a, 0xca, 0x34, 0x46, 0x4f, 0x61, 0x3f, 0x5c,
+	0x0b, 0x16, 0xe8, 0x8a, 0xd4, 0x7a, 0x1a, 0xb8, 0x29, 0x75, 0x1a, 0x85, 0xfa, 0x70, 0xb4, 0xed,
+	0x12, 0xa4, 0x19, 0x65, 0x99, 0x9c, 0xaf, 0xcc, 0x58, 0xc3, 0x0f, 0xb7, 0x7c, 0xc7, 0xda, 0x84,
+	0x5e, 0xc2, 0xa3, 0x1d, 0x4c, 0x46, 0x44, 0x46, 0x09, 0x57, 0x2b, 0xa9, 0x61, 0xb4, 0x05, 0xc1,
+	0xb9, 0x05, 0x3d, 0x06, 0x93, 0x26, 0x82, 0x64, 0xf3, 0x30, 0x22, 0x76, 0x2d, 0xef, 0xa5, 0x50,
+	0xa0, 0x97, 0x50, 0x15, 0x9b, 0x94, 0xd8, 0xf5, 0x63, 0xa3, 0xdb, 0xea, 0x3f, 0xbe, 0x6b, 0xb2,
+	0xd3, 0x4d, 0x4a, 0xb0, 0xf2, 0x44, 0x6f, 0xa0, 0x4a, 0xd3, 0x4f, 0xaf, 0xed, 0x3d, 0xb5, 0xb6,
+	0x67, 0x77, 0x21, 0x7a, 0xde, 0xf8, 0xfd, 0xeb, 0x01, 0x4b, 0xe6, 0x74, 0x81, 0x15, 0x40, 0x02,
+	0xaf, 0xe8, 0x9c, 0xda, 0x8d, 0x2f, 0x00, 0x2f, 0xe9, 0x9c, 0x5e, 0x03, 0x25, 0x00, 0x0d, 0xa0,
+	0x41, 0xc4, 0x92, 0x64, 0x09, 0x11, 0xb6, 0xa9, 0xc0, 0xcf, 0xef, 0x04, 0xbb, 0xda, 0x51, 0x07,
+	0x28, 0x80, 0x6d, 0x0b, 0x5a, 0xbb, 0xb6, 0xf6, 0x3f, 0x06, 0xc0, 0x4d, 0x2e, 0x84, 0xa0, 0xca,
+	0x79, 0xb1, 0x42, 0x75, 0x46, 0xbf, 0x42, 0x75, 0xc5, 0x62, 0xa2, 0x96, 0xd7, 0xea, 0xff, 0x70,
+	0x8f, 0x92, 0xd5, 0xf1, 0x9c, 0xc5, 0x04, 0x2b, 0x24, 0x72, 0xa0, 0xc1, 0x49, 0xb4, 0x2e, 0xd6,
+	0xda, 0xec, 0x7f, 0xfb, 0xbf, 0x51, 0x26, 0xda, 0x19, 0x17, 0xb0, 0xce, 0x1b, 0x68, 0x5c, 0x07,
+	0x45, 0x2d, 0x80, 0x4b, 0xef, 0xd4, 0x0b, 0x3c, 0xff, 0x14, 0x3b, 0x56, 0xa9, 0x90, 0x9d, 0xe1,
+	0xdb, 0xd1, 0xc0, 0x32, 0x50, 0x13, 0xf6, 0x72, 0x79, 0x6c, 0x95, 0xdb, 0xff, 0x1a, 0xb0, 0xbf,
+	0x1d, 0x13, 0xfd, 0xae, 0xdb, 0x31, 0x54, 0x3b, 0x3f, 0xdd, 0xab, 0x90, 0x1d, 0x61, 0xab, 0xb1,
+	0x36, 0x34, 0x24, 0x91, 0x29, 0x52, 0xca, 0xa9, 0xa7, 0x90, 0xa5, 0x2d, 0x0d, 0x39, 0xbf, 0x62,
+	0x59, 0xac, 0x5f, 0x4f, 0x21, 0x77, 0x2e, 0xc0, 0xfa, 0x3c, 0x22, 0x3a, 0x84, 0x07, 0xaa, 0xea,
+	0x89, 0x3b, 0x08, 0xfc, 0x91, 0xef, 0x5a, 0x25, 0x74, 0x04, 0x87, 0x85, 0x6a, 0xec, 0xe2, 0xc9,
+	0xc8, 0x77, 0xce, 0x2c, 0x03, 0x7d, 0x0d, 0x0f, 0x0b, 0xb5, 0xeb, 0x4f, 0x5d, 0x3c, 0xc6, 0xde,
+	0xc4, 0xb5, 0xca, 0xed, 0xbf, 0xca, 0x00, 0x37, 0x37, 0x0e, 0x9d, 0x42, 0x7d, 0x45, 0xc4, 0x92,
+	0xc5, 0xba, 0xd7, 0xde, 0x3d, 0xae, 0xa9, 0x3a, 0x9e, 0x2b, 0x14, 0xd6, 0x68, 0xf4, 0x3d, 0xec,
+	0x85, 0x39, 0x1b, 0x69, 0xd2, 0x38, 0xb8, 0xa1, 0x29, 0x1c, 0x26, 0x0b, 0x82, 0xaf, 0xed, 0xe8,
+	0x19, 0x54, 0xe2, 0x44, 0x92, 0x6c, 0xe5, 0x76, 0x36, 0x93, 0x56, 0xc9, 0x2c, 0x71, 0xc2, 0x03,
+	0x4e, 0xc2, 0x2c, 0x5a, 0x2a, 0x3a, 0x33, 0xb1, 0x19, 0x27, 0x7c, 0xa2, 0x14, 0xa8, 0x0b, 0x56,
+	0x4c, 0x79, 0x38, 0xfb, 0x48, 0x02, 0xf5, 0xca, 0x65, 0xc0, 0x9a, 0x22, 0x8e, 0x96, 0xd6, 0x3b,
+	0x6b, 0xc1, 0x86, 0x09, 0xef, 0x0c, 0xf3, 0x76, 0xf3, 0x72, 0xe5, 0x00, 0xa5, 0x14, 0x0c, 0xbd,
+	0x89, 0xf3, 0xdb, 0x99, 0x3b, 0xb4, 0x4a, 0x08, 0x41, 0x4b, 0xa9, 0x9c, 0x8b, 0xe9, 0xe8, 0xdc,
+	0x99, 0x7a, 0xf2, 0x76, 0x1c, 0x40, 0x53, 0xe9, 0xce, 0x1d, 0xff, 0xc2, 0x39, 0xb3, 0xca, 0x2f,
+	0x5e, 0xc1, 0xa3, 0xdb, 0x5e, 0x3a, 0xda, 0x87, 0xc6, 0x60, 0xe4, 0xfb, 0x81, 0x3b, 0x7d, 0x6b,
+	0x95, 0xd0, 0x03, 0x30, 0x95, 0x24, 0x27, 0x6f, 0x19, 0x2f, 0xbe, 0x83, 0xfd, 0x1c, 0x34, 0x11,
+	0xa1, 0x58, 0x73, 0x79, 0xe7, 0x2e, 0xfc, 0x77, 0xfe, 0xe8, 0xd2, 0xb7, 0x4a, 0xc8, 0x84, 0x9a,
+	0x73, 0xe6, 0xbd, 0x77, 0x2d, 0x63, 0x56, 0x57, 0x3f, 0xb2, 0x57, 0xff, 0x05, 0x00, 0x00, 0xff,
+	0xff, 0xc8, 0xf6, 0xe7, 0x7f, 0x38, 0x07, 0x00, 0x00,
 }
