@@ -27,7 +27,8 @@ message Device {
 
 // DeviceConnectionConfig represents a NetworkManager connection.
 message DeviceConnection {
-  // reserved 1
+  // type controls what kind of connection this is
+  DeviceConnectionType type = 1;
   // auto_connect controls if the device should automatically use this connection or not.
   bool auto_connect = 2;
   // auto_connect_priority: higher numbers -> higher priority
@@ -37,15 +38,12 @@ message DeviceConnection {
   // interface restricts the connection to a specific interface.
   string interface = 5;
 
-  // type controls what kind of connection this is
-  DeviceConnectionType type = 6;
-
   // ipv4 settings
-  IPV4Config ipv4 = 7;
+  IPV4Config ipv4 = 6;
   // wifi settings
-  WifiConfig wifi = 8;
+  WifiConfig wifi = 7;
   // ethernet settings
-  EthernetConfig ethernet = 9;
+  EthernetConfig ethernet = 8;
 
   message EthernetConfig {
   }
