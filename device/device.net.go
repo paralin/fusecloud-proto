@@ -23,13 +23,6 @@ var DeviceWifiModeIds = map[DeviceConnection_WifiConfig_WifiMode]string{
 	DeviceConnection_WifiConfig_WIFI_INFRA: "infrastructure",
 }
 
-// IPV4MethodIds pairs DeviceConnection_IPV4Config_IPV4Method with NetworkManager ID string
-var IPV4MethodIds = map[DeviceConnection_IPV4Config_IPV4Method]string{
-	DeviceConnection_IPV4Config_IPV4_MANUAL:    "manual",
-	DeviceConnection_IPV4Config_IPV4_DISABLED:  "disabled",
-	DeviceConnection_IPV4Config_IPV4_AUTOMATIC: "auto",
-}
-
 // UUID builds a UUID based on the JSON representation of the connection.
 func (c *DeviceConnection) ToUUID() string {
 	dat, _ := json.Marshal(c)
@@ -91,26 +84,56 @@ func (c *DeviceConnection) BuildKeyfile() string {
 		w("mac-address-blacklist=")
 	}
 
-	if c.Ipv4 != nil {
-		w("\n[ipv4]\n")
-		w("method=%s\n", IPV4MethodIds[c.Ipv4.Method])
-		w("dns=")
-		for _, search := range c.Ipv4.Dns {
-			str, er := search.IPString()
+	w("\n[ipv6]\n")
+	w("addr-gen-mode=stable-privacy\n")
+	w("method=auto\n")
+
+	if c.Ipv4 == nil {
+		c.Ipv4 = &DeviceConnection_IPV4Config{}
+	}
+
+	w("\n[ipv4]\n")
+	w("method=")
+	if len(c.Ipv4.Address) > 0 {
+		w("auto\n")
+	} else {
+		w("manual\n")
+		addri := 1
+		for _, addr := range c.Ipv4.Address {
+			if addr.Range == nil {
+				continue
+			}
+			cs, er := addr.Range.CIDRString()
 			if er != nil {
 				continue
 			}
-			w("%s;", str)
+			w("address%d=%s", addri, cs)
+			if addr.Gateway != nil {
+				gs, err := addr.Gateway.IPString()
+				if err == nil {
+					w(",%s", gs)
+				}
+			}
+			w("\n")
+			addri++
 		}
-		w("\ndns-search=")
-		for _, search := range c.Ipv4.DnsSearch {
-			w(strings.TrimSpace(search))
-			w(";")
+	}
+	w("dns=")
+	for _, search := range c.Ipv4.Dns {
+		str, er := search.IPString()
+		if er != nil {
+			continue
 		}
-		w("\n")
-		if c.Ipv4.DisableAutoDns && c.Ipv4.Method == DeviceConnection_IPV4Config_IPV4_AUTOMATIC {
-			w("ignore-auto-dns=true\n")
-		}
+		w("%s;", str)
+	}
+	w("\ndns-search=")
+	for _, search := range c.Ipv4.DnsSearch {
+		w(strings.TrimSpace(search))
+		w(";")
+	}
+	w("\n")
+	if c.Ipv4.DisableAutoDns {
+		w("ignore-auto-dns=true\n")
 	}
 
 	return output.String()

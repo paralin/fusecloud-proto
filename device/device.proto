@@ -82,18 +82,18 @@ message DeviceConnection {
   }
 
   message IPV4Config {
-    IPV4Method method = 1;
-    repeated common.IPRange address = 2;
-    repeated common.IPAddress dns = 3;
-    repeated string dns_search = 4;
+    // If set, will use manual mode instead of dhcp.
+    repeated IPV4ConfigAddress address = 1;
+    repeated common.IPAddress dns = 2;
+    repeated string dns_search = 3;
     // if set, we will ignore DNS servers given by the DHCP server
-    bool disable_auto_dns = 5;
+    bool disable_auto_dns = 4;
+  }
 
-    enum IPV4Method {
-      IPV4_DISABLED = 0;
-      IPV4_AUTOMATIC = 1;
-      IPV4_MANUAL = 2;
-    }
+  // Configured address for an IPV4 device.
+  message IPV4ConfigAddress {
+    common.IPRange range = 1;
+    common.IPAddress gateway = 2;
   }
 }
 
