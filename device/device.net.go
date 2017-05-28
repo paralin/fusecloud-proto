@@ -94,7 +94,7 @@ func (c *DeviceConnection) BuildKeyfile() string {
 
 	w("\n[ipv4]\n")
 	w("method=")
-	if len(c.Ipv4.Address) > 0 {
+	if len(c.Ipv4.Address) == 0 {
 		w("auto\n")
 	} else {
 		w("manual\n")
