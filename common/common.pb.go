@@ -34,9 +34,9 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // IP address CIDR
 type IPRange struct {
 	// IP data
-	Ip *IPAddress `protobuf:"bytes,1,opt,name=ip" json:"ip"`
+	Ip *IPAddress `protobuf:"bytes,1,opt,name=ip" json:"ip,omitempty"`
 	// Prefix length: 0->32
-	Plen uint32 `protobuf:"varint,2,opt,name=plen" json:"plen"`
+	Plen uint32 `protobuf:"varint,2,opt,name=plen" json:"plen,omitempty"`
 }
 
 func (m *IPRange) Reset()                    { *m = IPRange{} }
@@ -59,7 +59,7 @@ func (m *IPRange) GetPlen() uint32 {
 }
 
 type IPAddress struct {
-	Address []uint32 `protobuf:"varint,1,rep,packed,name=address" json:"address"`
+	Address []uint32 `protobuf:"varint,1,rep,packed,name=address" json:"address,omitempty"`
 }
 
 func (m *IPAddress) Reset()                    { *m = IPAddress{} }
@@ -77,10 +77,10 @@ func (m *IPAddress) GetAddress() []uint32 {
 // Certificate chain
 type CertChain struct {
 	// Cert chain, idx 0 should be last cert.
-	Cert       []string `protobuf:"bytes,1,rep,name=cert" json:"cert"`
-	ValidUntil int64    `protobuf:"varint,2,opt,name=valid_until,json=validUntil" json:"valid_until"`
-	Csr        string   `protobuf:"bytes,3,opt,name=csr" json:"csr"`
-	CsrWaiting bool     `protobuf:"varint,4,opt,name=csr_waiting,json=csrWaiting" json:"csr_waiting"`
+	Cert       []string `protobuf:"bytes,1,rep,name=cert" json:"cert,omitempty"`
+	ValidUntil int64    `protobuf:"varint,2,opt,name=valid_until,json=validUntil" json:"valid_until,omitempty"`
+	Csr        string   `protobuf:"bytes,3,opt,name=csr" json:"csr,omitempty"`
+	CsrWaiting bool     `protobuf:"varint,4,opt,name=csr_waiting,json=csrWaiting" json:"csr_waiting,omitempty"`
 }
 
 func (m *CertChain) Reset()                    { *m = CertChain{} }
@@ -118,8 +118,8 @@ func (m *CertChain) GetCsrWaiting() bool {
 
 // Equivilent to Point in RethinkDB
 type GeoLocation struct {
-	Latitude  float64 `protobuf:"fixed64,1,opt,name=latitude" json:"latitude"`
-	Longitude float64 `protobuf:"fixed64,2,opt,name=longitude" json:"longitude"`
+	Latitude  float64 `protobuf:"fixed64,1,opt,name=latitude" json:"latitude,omitempty"`
+	Longitude float64 `protobuf:"fixed64,2,opt,name=longitude" json:"longitude,omitempty"`
 }
 
 func (m *GeoLocation) Reset()                    { *m = GeoLocation{} }

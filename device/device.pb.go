@@ -131,10 +131,10 @@ func (DeviceConnection_WifiSecurity_WifiSecurityMode) EnumDescriptor() ([]byte, 
 
 // Device: a full-linux computer running serf, docker stack
 type Device struct {
-	Hostname        string                        `protobuf:"bytes,1,opt,name=hostname" json:"hostname"`
-	Region          string                        `protobuf:"bytes,2,opt,name=region" json:"region"`
-	NetworkSettings *Device_DeviceNetworkSettings `protobuf:"bytes,3,opt,name=network_settings,json=networkSettings" json:"network_settings"`
-	Identity        *Device_DeviceIdentity        `protobuf:"bytes,4,opt,name=identity" json:"identity"`
+	Hostname        string                        `protobuf:"bytes,1,opt,name=hostname" json:"hostname,omitempty"`
+	Region          string                        `protobuf:"bytes,2,opt,name=region" json:"region,omitempty"`
+	NetworkSettings *Device_DeviceNetworkSettings `protobuf:"bytes,3,opt,name=network_settings,json=networkSettings" json:"network_settings,omitempty"`
+	Identity        *Device_DeviceIdentity        `protobuf:"bytes,4,opt,name=identity" json:"identity,omitempty"`
 }
 
 func (m *Device) Reset()                    { *m = Device{} }
@@ -171,9 +171,9 @@ func (m *Device) GetIdentity() *Device_DeviceIdentity {
 }
 
 type Device_DeviceNetworkSettings struct {
-	Ip *common.IPAddress `protobuf:"bytes,1,opt,name=ip" json:"ip"`
+	Ip *common.IPAddress `protobuf:"bytes,1,opt,name=ip" json:"ip,omitempty"`
 	// reserved field 2, 3
-	Connection []*DeviceConnection `protobuf:"bytes,4,rep,name=connection" json:"connection"`
+	Connection []*DeviceConnection `protobuf:"bytes,4,rep,name=connection" json:"connection,omitempty"`
 }
 
 func (m *Device_DeviceNetworkSettings) Reset()                    { *m = Device_DeviceNetworkSettings{} }
@@ -197,8 +197,8 @@ func (m *Device_DeviceNetworkSettings) GetConnection() []*DeviceConnection {
 
 type Device_DeviceIdentity struct {
 	// Generated certs, latest is first
-	Chain     []*common.CertChain `protobuf:"bytes,2,rep,name=chain" json:"chain"`
-	PublicKey string              `protobuf:"bytes,3,opt,name=public_key,json=publicKey" json:"public_key"`
+	Chain     []*common.CertChain `protobuf:"bytes,2,rep,name=chain" json:"chain,omitempty"`
+	PublicKey string              `protobuf:"bytes,3,opt,name=public_key,json=publicKey" json:"public_key,omitempty"`
 }
 
 func (m *Device_DeviceIdentity) Reset()                    { *m = Device_DeviceIdentity{} }
@@ -223,21 +223,21 @@ func (m *Device_DeviceIdentity) GetPublicKey() string {
 // DeviceConnectionConfig represents a NetworkManager connection.
 type DeviceConnection struct {
 	// type controls what kind of connection this is
-	Type DeviceConnectionType `protobuf:"varint,1,opt,name=type,enum=device.DeviceConnectionType" json:"type"`
+	Type DeviceConnectionType `protobuf:"varint,1,opt,name=type,enum=device.DeviceConnectionType" json:"type,omitempty"`
 	// auto_connect controls if the device should automatically use this connection or not.
-	AutoConnect bool `protobuf:"varint,2,opt,name=auto_connect,json=autoConnect" json:"auto_connect"`
+	AutoConnect bool `protobuf:"varint,2,opt,name=auto_connect,json=autoConnect" json:"auto_connect,omitempty"`
 	// auto_connect_priority: higher numbers -> higher priority
-	AutoConnectPriority int32 `protobuf:"varint,3,opt,name=auto_connect_priority,json=autoConnectPriority" json:"auto_connect_priority"`
+	AutoConnectPriority int32 `protobuf:"varint,3,opt,name=auto_connect_priority,json=autoConnectPriority" json:"auto_connect_priority,omitempty"`
 	// auto_connect_retries - how many connection attempts?
-	AutoConnectRetries int32 `protobuf:"varint,4,opt,name=auto_connect_retries,json=autoConnectRetries" json:"auto_connect_retries"`
+	AutoConnectRetries int32 `protobuf:"varint,4,opt,name=auto_connect_retries,json=autoConnectRetries" json:"auto_connect_retries,omitempty"`
 	// interface restricts the connection to a specific interface.
-	Interface string `protobuf:"bytes,5,opt,name=interface" json:"interface"`
+	Interface string `protobuf:"bytes,5,opt,name=interface" json:"interface,omitempty"`
 	// ipv4 settings
-	Ipv4 *DeviceConnection_IPV4Config `protobuf:"bytes,6,opt,name=ipv4" json:"ipv4"`
+	Ipv4 *DeviceConnection_IPV4Config `protobuf:"bytes,6,opt,name=ipv4" json:"ipv4,omitempty"`
 	// wifi settings
-	Wifi *DeviceConnection_WifiConfig `protobuf:"bytes,7,opt,name=wifi" json:"wifi"`
+	Wifi *DeviceConnection_WifiConfig `protobuf:"bytes,7,opt,name=wifi" json:"wifi,omitempty"`
 	// ethernet settings
-	Ethernet *DeviceConnection_EthernetConfig `protobuf:"bytes,8,opt,name=ethernet" json:"ethernet"`
+	Ethernet *DeviceConnection_EthernetConfig `protobuf:"bytes,8,opt,name=ethernet" json:"ethernet,omitempty"`
 }
 
 func (m *DeviceConnection) Reset()                    { *m = DeviceConnection{} }
@@ -312,9 +312,9 @@ func (*DeviceConnection_EthernetConfig) Descriptor() ([]byte, []int) {
 }
 
 type DeviceConnection_WifiConfig struct {
-	Ssid     string                               `protobuf:"bytes,1,opt,name=ssid" json:"ssid"`
-	Mode     DeviceConnection_WifiConfig_WifiMode `protobuf:"varint,2,opt,name=mode,enum=device.DeviceConnection_WifiConfig_WifiMode" json:"mode"`
-	Security *DeviceConnection_WifiSecurity       `protobuf:"bytes,3,opt,name=security" json:"security"`
+	Ssid     string                               `protobuf:"bytes,1,opt,name=ssid" json:"ssid,omitempty"`
+	Mode     DeviceConnection_WifiConfig_WifiMode `protobuf:"varint,2,opt,name=mode,enum=device.DeviceConnection_WifiConfig_WifiMode" json:"mode,omitempty"`
+	Security *DeviceConnection_WifiSecurity       `protobuf:"bytes,3,opt,name=security" json:"security,omitempty"`
 }
 
 func (m *DeviceConnection_WifiConfig) Reset()                    { *m = DeviceConnection_WifiConfig{} }
@@ -344,11 +344,11 @@ func (m *DeviceConnection_WifiConfig) GetSecurity() *DeviceConnection_WifiSecuri
 }
 
 type DeviceConnection_WifiSecurity struct {
-	Mode DeviceConnection_WifiSecurity_WifiSecurityMode `protobuf:"varint,1,opt,name=mode,enum=device.DeviceConnection_WifiSecurity_WifiSecurityMode" json:"mode"`
+	Mode DeviceConnection_WifiSecurity_WifiSecurityMode `protobuf:"varint,1,opt,name=mode,enum=device.DeviceConnection_WifiSecurity_WifiSecurityMode" json:"mode,omitempty"`
 	// username, if using enterprise.
-	Username string `protobuf:"bytes,2,opt,name=username" json:"username"`
+	Username string `protobuf:"bytes,2,opt,name=username" json:"username,omitempty"`
 	// password, if using personal
-	Password string `protobuf:"bytes,3,opt,name=password" json:"password"`
+	Password string `protobuf:"bytes,3,opt,name=password" json:"password,omitempty"`
 }
 
 func (m *DeviceConnection_WifiSecurity) Reset()         { *m = DeviceConnection_WifiSecurity{} }
@@ -381,11 +381,11 @@ func (m *DeviceConnection_WifiSecurity) GetPassword() string {
 
 type DeviceConnection_IPV4Config struct {
 	// If set, will use manual mode instead of dhcp.
-	Address   []*DeviceConnection_IPV4ConfigAddress `protobuf:"bytes,1,rep,name=address" json:"address"`
-	Dns       []*common.IPAddress                   `protobuf:"bytes,2,rep,name=dns" json:"dns"`
-	DnsSearch []string                              `protobuf:"bytes,3,rep,name=dns_search,json=dnsSearch" json:"dns_search"`
+	Address   []*DeviceConnection_IPV4ConfigAddress `protobuf:"bytes,1,rep,name=address" json:"address,omitempty"`
+	Dns       []*common.IPAddress                   `protobuf:"bytes,2,rep,name=dns" json:"dns,omitempty"`
+	DnsSearch []string                              `protobuf:"bytes,3,rep,name=dns_search,json=dnsSearch" json:"dns_search,omitempty"`
 	// if set, we will ignore DNS servers given by the DHCP server
-	DisableAutoDns bool `protobuf:"varint,4,opt,name=disable_auto_dns,json=disableAutoDns" json:"disable_auto_dns"`
+	DisableAutoDns bool `protobuf:"varint,4,opt,name=disable_auto_dns,json=disableAutoDns" json:"disable_auto_dns,omitempty"`
 }
 
 func (m *DeviceConnection_IPV4Config) Reset()                    { *m = DeviceConnection_IPV4Config{} }
@@ -423,8 +423,8 @@ func (m *DeviceConnection_IPV4Config) GetDisableAutoDns() bool {
 
 // Configured address for an IPV4 device.
 type DeviceConnection_IPV4ConfigAddress struct {
-	Range   *common.IPRange   `protobuf:"bytes,1,opt,name=range" json:"range"`
-	Gateway *common.IPAddress `protobuf:"bytes,2,opt,name=gateway" json:"gateway"`
+	Range   *common.IPRange   `protobuf:"bytes,1,opt,name=range" json:"range,omitempty"`
+	Gateway *common.IPAddress `protobuf:"bytes,2,opt,name=gateway" json:"gateway,omitempty"`
 }
 
 func (m *DeviceConnection_IPV4ConfigAddress) Reset()         { *m = DeviceConnection_IPV4ConfigAddress{} }

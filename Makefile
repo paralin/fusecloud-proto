@@ -9,7 +9,7 @@ gengo:
 		$$(pwd)/**/*.proto
 	go install ./...
 	./scripts/gen_root.bash
-	find . -name '*.pb.go' -exec sed -i -e 's/,\{0,1\}omitempty//g' {} \;
+	# find . -name '*.pb.go' -exec sed -i -e 's/,\{0,1\}omitempty//g' {} \;
 	go install ./...
 
 deps:
